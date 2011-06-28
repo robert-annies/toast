@@ -131,14 +131,22 @@ In `test/rails_app` you can find a rails application with tests. To run
 the tests you need to
 
 0. Install the *jeweler* gem:
+
         gem install jeweler
+
 1. install the toast gem from this git clone:
+
         rake install
+
 2. initialize the test application
+
         cd test/rails_app
         bundle install
+
 3. Now you call 'rake' from within the test application
+
         rake
+
    Or you may call `rake test` from the root directory of the working
    copy. This will reinstall the toast gem before running tests
    automatically.
