@@ -32,6 +32,7 @@ Example
 =======
 
 Let the table `bananas` have the following schema:
+
      create_table "bananas", :force => true do |t|
        t.string   "name"
        t.integer  "number"
@@ -40,6 +41,7 @@ Let the table `bananas` have the following schema:
      end
 
 and let a corresponding model class have a *resourceful_model* annotation:
+
      class Banana < ActiveRecord::Base
        belongs_to :apple
        has_many :coconuts
@@ -120,9 +122,9 @@ Installation
 ============
 
     git clone git@github.com:robokopp/toast.git
+    gem install jeweler
     cd toast
     rake install
-
 
 Test Suite
 ==========
@@ -143,7 +145,7 @@ the tests you need to
         cd test/rails_app
         bundle install
 
-3. Now you call 'rake' from within the test application
+3. Now you can run the test suite from within the test application
 
         rake
 
