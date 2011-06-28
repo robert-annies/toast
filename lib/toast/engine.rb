@@ -15,8 +15,14 @@ module Toast
       # Add 'restful_model' declaration to ActiveRecord::Base
       ActiveRecord::Base.extend Toast::ActiveRecordExtensions
 
-      # Load all models in app/models
-      Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require m }
+      # Load all models in app/models early to setup routing
+      begin
+        Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require m }
+
+      rescue ActiveRecord::StatementInvalid
+        # raised when DB is not setup yet. (rake db:schema:load)
+      end
+
     end
   end
 end
