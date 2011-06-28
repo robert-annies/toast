@@ -16,7 +16,7 @@ representation format is JSON."
     gem.add_dependency 'blockenspiel', '~> 0.4.2'
   end
 rescue LoadError
-  puts "Please install jeweler to run the test suite"
+  puts "Please install jeweler first"
   exit -1
 end
 
