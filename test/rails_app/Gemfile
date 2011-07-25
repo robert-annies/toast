@@ -11,7 +11,7 @@ gem 'rake', '0.8.7'
 gem 'faker'
 gem 'thin'
 
-gem 'toast'
+gem 'toast', '0.2.0'
 
 group 'test' do
   gem 'shoulda'

@@ -1,6 +1,8 @@
 module Toast
   class Attribute < Resource
 
+    attr_reader :model
+
     def initialize model, id, attribute_name
       unless model.toast_config.exposed_attributes.include? attribute_name
         raise ResourceNotFound 

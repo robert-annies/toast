@@ -1,6 +1,8 @@
 module Toast
   class RootCollection < Resource
     
+    attr_reader :model
+    
     def initialize model, subresource_name
       
       subresource_name ||= "all"

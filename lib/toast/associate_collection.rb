@@ -1,6 +1,8 @@
 module Toast
   class AssociateCollection < Resource
     
+    attr_reader :model
+
     def initialize model, id, subresource_name
       unless model.toast_config.exposed_associations.include? subresource_name
         raise ResourceNotFound

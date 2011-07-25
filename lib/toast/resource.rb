@@ -72,6 +72,9 @@ module Toast
     end
 
     def apply method, payload
+
+      raise MethodNotAllowed if self.model.toast_config.disallow_methods.include?(method.downcase)
+      
       case method
       when "PUT","POST"
         self.send(method.downcase, ActiveSupport::JSON.decode(payload))

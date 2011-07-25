@@ -12,6 +12,7 @@ module Toast
         @media_type = "application/json"
         @exposed_attributes = []
         @exposed_associations = []
+        @disallow_methods = []
         @in_collection = ConfigDSL::InCollection.new model, self
       end
 
@@ -24,12 +25,20 @@ module Toast
             @exposed_associations << attr_or_assoc
           end
         end
-
       end
 
       def fields *arg
         return(@fields) if arg.empty?
         self.fields = *arg
+      end
+
+      def disallow_methods= *arg
+        @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
+      end
+
+      def disallow_methods *arg
+        return(@disallow_methods) if arg.empty?
+        self.disallow_methods = *arg        
       end
 
       attr_reader :exposed_attributes, :exposed_associations

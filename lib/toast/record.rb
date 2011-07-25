@@ -1,5 +1,7 @@
 module Toast
   class Record < Resource
+
+    attr_reader :model
     
     def initialize model, id
       @model = model      
@@ -27,7 +29,7 @@ module Toast
       end
       
       @record.update_attributes payload
-      {
+     { 
         :json => @record.exposed_attributes,
         :status => :ok,
         :location => @record.uri
@@ -44,6 +46,7 @@ module Toast
     def delete
       @record.destroy
       {
+        :nothing => true,
         :status => :ok
       }
     end
