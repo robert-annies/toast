@@ -266,7 +266,7 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
-      assert_raise Psych::SyntaxError do
+      assert_raise StandardError do
         post "bananas/#{b1.id}/coconuts", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
       end
 
@@ -346,13 +346,11 @@ class ToastTest < ActionDispatch::IntegrationTest
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
 
       # corrupt json string
-      assert_raise Psych::SyntaxError do
+      #    can't assert any response here (what does Rails respond?)
+      #    (assert_response :bad_request)
+      assert_raise StandardError do
         put "bananas/#{b2.id}", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
       end
-      # ...
-      # Psych::SyntaxError is a bit too specific, but assert_raise doesn't check superclasses.
-      # can't assert any response here (what does Rails respond?)
-      #   assert_response :bad_request
 
       # put Array
       put_json "bananas/#{b2.id}", ["foobar",42]
