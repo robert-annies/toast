@@ -45,7 +45,7 @@ module Toast
       record = @model.create payload
       
       {
-        :json => record,
+        :json => record.exposed_attributes,
         :location => record.uri,
         :status => :created
       }

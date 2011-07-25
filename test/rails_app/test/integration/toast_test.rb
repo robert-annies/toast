@@ -211,11 +211,14 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :created
       uri1 = @response.header["Location"]
       record1.merge! "uri" => uri1
+      assert_equal record1, json_response
 
       post_json "fruits/coconuts", record2
       assert_response :created
       uri2 = @response.header["Location"]
       record2.merge! "uri" => uri2
+      assert_equal record2, json_response
+
 
       get "fruits/coconuts"
       assert_same_elements [record1, record2], json_response
@@ -246,8 +249,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       post_json "bananas/#{b1.id}/coconuts", {"number" => 123, "name" => "eriberto_morar@kochmraz.name"}
       assert_response :created
 
-      assert_equal 123, json_response["number"]
-      assert_equal "eriberto_morar@kochmraz.name", json_response["name"]
+      assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name", "uri" => "http://www.example.com/coconuts/3"}, json_response)
 
       c3 = Coconut.find_by_number 123
       assert_equal "http://www.example.com/coconuts/#{c3.id}", json_response["uri"]
