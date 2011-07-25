@@ -16,6 +16,10 @@ module Toast
     end
 
     def get
+      if @model.toast_config.in_collection.disallow_methods.include? "get"
+        raise MethodNotAllowed 
+      end
+
       records = @model.send(@collection)
       {
         :json => records.map{|r| r.exposed_attributes(:in_collection => true)},
@@ -28,6 +32,10 @@ module Toast
     end
 
     def post payload
+      if @model.toast_config.in_collection.disallow_methods.include? "post"
+        raise MethodNotAllowed
+      end
+        
       if @collection != "all"
         raise MethodNotAllowed
       end

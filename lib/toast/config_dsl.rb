@@ -70,6 +70,7 @@ module Toast
       def initialize model, base_config
         @model = model
         @fields = base_config.fields
+        @disallow_methods = []
         @exposed_attributes = base_config.exposed_attributes
         @exposed_associations = base_config.exposed_associations
         @media_type = "application/json"
@@ -93,6 +94,15 @@ module Toast
       def fields *arg
         return(@fields) if arg.empty?
         self.fields = *arg
+      end
+
+      def disallow_methods= *arg
+        @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
+      end
+
+      def disallow_methods *arg
+        return(@disallow_methods) if arg.empty?
+        self.disallow_methods = *arg        
       end
 
       attr_reader :exposed_attributes, :exposed_associations
