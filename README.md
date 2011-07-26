@@ -126,6 +126,13 @@ Installation
     cd toast
     rake install
 
+or with bundler (Gemfile) 
+
+    gem "toast", :git => "https://github.com/robokopp/toast.git"
+
+Note: There is a Gem on RubyGems.org too, but I will not keep it up-to-date for now. 
+Please use the git (edge) version.
+
 Test Suite
 ==========
 
