@@ -19,7 +19,7 @@ module Toast
       begin
         Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require m }
 
-      rescue ActiveRecord::StatementInvalid
+      rescue 
         # raised when DB is not setup yet. (rake db:schema:load)
       end
 
