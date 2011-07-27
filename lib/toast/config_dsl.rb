@@ -13,6 +13,7 @@ module Toast
         @exposed_attributes = []
         @exposed_associations = []
         @disallow_methods = []
+        @pass_params_to = []
         @in_collection = ConfigDSL::InCollection.new model, self
       end
 
@@ -40,6 +41,16 @@ module Toast
         return(@disallow_methods) if arg.empty?
         self.disallow_methods = *arg        
       end
+
+      def pass_params_to= *arg
+        @pass_params_to.push *ConfigDSL.sanitize(arg,"pass_params_to")
+      end
+
+      def pass_params_to *arg
+        return(@pass_params_to) if arg.empty?
+        self.pass_params_to = *arg        
+      end
+
 
       attr_reader :exposed_attributes, :exposed_associations
 

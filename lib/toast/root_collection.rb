@@ -3,7 +3,7 @@ module Toast
     
     attr_reader :model
     
-    def initialize model, subresource_name
+    def initialize model, subresource_name, params
       
       subresource_name ||= "all"
       
@@ -13,14 +13,20 @@ module Toast
 
       @model = model
       @collection = subresource_name
+      @params = params
     end
 
     def get
       if @model.toast_config.in_collection.disallow_methods.include? "get"
         raise MethodNotAllowed 
       end
+       
+      records = if @model.toast_config.pass_params_to.include?(@collection) 
+                  @model.send(@collection, @params)
+                else
+                  @model.send(@collection)
+                end
 
-      records = @model.send(@collection)
       {
         :json => records.map{|r| r.exposed_attributes(:in_collection => true)},
         :status => :ok

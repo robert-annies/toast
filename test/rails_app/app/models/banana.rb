@@ -6,8 +6,14 @@ class Banana < ActiveRecord::Base
 
   resourceful_model do
     fields :name, :number, :coconuts, :apple, :dragonfruit
-    collections :find_some, :all
+    collections :find_some, :all, :query
+    pass_params_to :query
   end
 
   scope :find_some, where("number < 100")
+
+
+  def self.query params
+    where(["number > ?", params[:gt]])
+  end
 end

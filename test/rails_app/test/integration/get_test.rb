@@ -3,14 +3,15 @@ require 'test_helper'
 
 # Test Cases Overview
 =begin
-|        |                                        | status | comment |
-|--------+----------------------------------------+--------+---------|
-| GET    | single resource success                | ok     |         |
-|        | single resource not found              | ok     |         |
-|        | default root collection success        | ok     |         |
-|        | other root collection (a scope)        | ok     |         |
-|        | subresource: association collection    | ok     |         |
-|        | subresource: attribute                 | ok     |         |
+|     |                                     | status | comment |
+|-----+-------------------------------------+--------+---------|
+| GET | single resource success             | ok     |         |
+|     | single resource not found           | ok     |         |
+|     | default root collection success     | ok     |         |
+|     | other root collection (a scope)     | ok     |         |
+|     | collection with params              | ok     |         |
+|     | subresource: association collection | ok     |         |
+|     | subresource: attribute              | ok     |         |
 =end
 
 class ToastTest < ActionDispatch::IntegrationTest
@@ -113,6 +114,30 @@ class ToastTest < ActionDispatch::IntegrationTest
                                 "uri" => "http://www.example.com/bananas/#{b4.id}" }
                             ], json_response)
 
+    end
+    
+    should "respond on collections with params" do
+      b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
+      b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
+      b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
+      b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
+
+      get "bananas/query?gt=100"
+      assert_response :ok
+      
+      assert_same_elements( [ { "number" => 133,
+                                "name" => "camilla@leffler.ca" ,
+                                "apple" =>       "http://www.example.com/bananas/#{b2.id}/apple",
+                                "coconuts" =>    "http://www.example.com/bananas/#{b2.id}/coconuts" ,
+                                "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
+                                "uri" =>         "http://www.example.com/bananas/#{b2.id}" },
+                              { "number" => 465,
+                                "name" => "ruth@balistreri.com",
+                                "apple" =>       "http://www.example.com/bananas/#{b3.id}/apple",
+                                "coconuts" =>    "http://www.example.com/bananas/#{b3.id}/coconuts" ,                                         
+                                "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit" ,
+                                "uri" =>         "http://www.example.com/bananas/#{b3.id}" }
+                            ], json_response)    
     end
 
     should "respond on subresources" do

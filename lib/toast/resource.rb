@@ -34,10 +34,10 @@ module Toast
 
         model.uri_base = uri_base
         model.uri_base += "/#{model.toast_config.namespace}" if model.toast_config.namespace
-
+        
         # decide which sub type
         rsc = if id.nil?
-                Toast::RootCollection.new(model, subresource_name)
+                Toast::RootCollection.new(model, subresource_name, params.clone)
               elsif subresource_name.nil?
                 Toast::Record.new(model, id)
               elsif model.toast_config.exposed_associations.include? subresource_name
