@@ -54,7 +54,7 @@ class ToastTest < ActionDispatch::IntegrationTest
 
 
       put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name"}
-      assert_response :unprocessable_entity
+      assert_response :forbidden
 
       get "bananas/#{b2.id}"
       assert_equal({"number"=>133,

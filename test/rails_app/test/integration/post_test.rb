@@ -58,7 +58,7 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       # try to post an un-exposed field
       post_json "fruits/coconuts", record
-      assert_response :unprocessable_entity
+      assert_response :forbidden
     end
 
     should "create new associated records" do

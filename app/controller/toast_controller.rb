@@ -10,7 +10,7 @@ class ToastController < ApplicationController
       return head(:not_found)
 
     rescue Toast::PayloadInvalid => e
-      return head(:unprocessable_entity)
+      return render :text => e.message, :status => :forbidden 
 
     rescue Toast::PayloadFormatError => e
       return head(:bad_request)
