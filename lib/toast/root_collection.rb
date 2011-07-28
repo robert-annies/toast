@@ -58,13 +58,19 @@ module Toast
         raise PayloadInvalid
       end
       
-      record = @model.create payload
-      
-      {
-        :json => record.exposed_attributes,
-        :location => record.uri,
-        :status => :created
-      }
+
+      begin
+        record = @model.create! payload              
+
+        {
+          :json => record.exposed_attributes,
+          :location => record.uri,
+          :status => :created
+        }
+
+      rescue ActiveRecord::RecordInvalid => e
+        raise PayloadInvalid.new(e.message)
+      end
     end
 
     def delete
