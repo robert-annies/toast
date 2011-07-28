@@ -22,19 +22,13 @@ module Toast
       id = params[:id]
       subresource_name = params[:subresource]
 
-      uri_base = "#{request.protocol}#{request.host}"
-      unless (request.protocol == "http://" and request.port == 80) or
-             (request.protocol == "https://" and request.port == 443)
-        uri_base += ":#{request.port}"
-      end
-
       begin
 
         model = get_class_by_resource_name resource_name
+                
+        # base is complete URL until the resource name
+        model.uri_base = request.url.match(/(.*)\/#{resource_name}(?:\/|\z)/)[1]
 
-        model.uri_base = uri_base
-        model.uri_base += "/#{model.toast_config.namespace}" if model.toast_config.namespace
-        
         # decide which sub type
         rsc = if id.nil?
                 Toast::RootCollection.new(model, subresource_name, params.clone)
