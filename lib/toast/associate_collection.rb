@@ -31,19 +31,18 @@ module Toast
 
     def post payload
 
-
       if self.media_type != @associate_model.toast_config.media_type
         raise UnsupportedMediaType
       end
 
-      if payload.keys.to_set != @associate_model.toast_config.exposed_attributes.to_set
+      if payload.keys.to_set != (@associate_model.toast_config.exposed_attributes.to_set - @associate_model.toast_config.auto_fields.to_set)
         raise PayloadInvalid
       end
 
       unless payload.is_a? Hash
         raise PayloadFormatError
       end 
-      #debugger  
+
       record = @record.send(@collection).create payload
       
       {

@@ -21,6 +21,7 @@ module Toast
     end
 
     def put payload
+      
       @record.update_attribute(@attribute_name, payload)
       { 
         :json => @record[@attribute_name],

@@ -54,7 +54,7 @@ module Toast
         raise PayloadFormatError
       end
 
-      if payload.keys.to_set != @model.toast_config.exposed_attributes.to_set
+      if payload.keys.to_set != (@model.toast_config.exposed_attributes.to_set - @model.toast_config.auto_fields.to_set)
         raise PayloadInvalid
       end
       

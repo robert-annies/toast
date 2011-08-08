@@ -4,10 +4,12 @@ module Toast
     class Base
       include Blockenspiel::DSL
       dsl_attr_accessor :media_type, :has_many, :namespace
+      attr_reader :exposed_attributes, :exposed_associations
 
       def initialize model
         @model = model
         @fields = []
+        @auto_fields = []
         @collections = []
         @media_type = "application/json"
         @exposed_attributes = []
@@ -33,6 +35,15 @@ module Toast
         self.fields = *arg
       end
 
+      def auto_fields= *arg
+        @auto_fields.push *ConfigDSL.sanitize(arg,"auto fields")
+      end
+
+      def auto_fields *arg
+        return(@auto_fields) if arg.empty?
+        self.auto_fields = *arg        
+      end
+     
       def disallow_methods= *arg
         @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
       end
@@ -51,8 +62,8 @@ module Toast
         self.pass_params_to = *arg        
       end
 
+      
 
-      attr_reader :exposed_attributes, :exposed_associations
 
       def collections= collections=[]
         @collections = ConfigDSL.sanitize(collections, "collections")
