@@ -41,7 +41,7 @@ module Toast
                                       self.class.toast_config.exposed_attributes
 
           out = exposed_attr.inject({}) do |acc, attr|
-            acc[attr] = self[attr]
+            acc[attr] = self.send attr
             acc
           end
 

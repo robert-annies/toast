@@ -4,7 +4,7 @@ module Toast
     class Base
       include Blockenspiel::DSL
       dsl_attr_accessor :media_type, :has_many, :namespace
-      attr_reader :exposed_attributes, :exposed_associations
+      # attr_reader :exposed_attributes, :exposed_associations
 
       def initialize model
         @model = model
@@ -12,8 +12,6 @@ module Toast
         @auto_fields = []
         @collections = []
         @media_type = "application/json"
-        @exposed_attributes = []
-        @exposed_associations = []
         @disallow_methods = []
         @pass_params_to = []
         @in_collection = ConfigDSL::InCollection.new model, self
@@ -21,18 +19,21 @@ module Toast
 
       def fields= *fields
         @fields.push *ConfigDSL.sanitize(fields,"fields")
-        @fields.each do |attr_or_assoc|
-          if @model.new.attributes.keys.include? attr_or_assoc
-            @exposed_attributes << attr_or_assoc
-          else
-            @exposed_associations << attr_or_assoc
-          end
-        end
       end
 
       def fields *arg
         return(@fields) if arg.empty?
         self.fields = *arg
+      end
+
+      def exposed_attributes
+        assocs = @model.reflect_on_all_associations
+        @fields.select{|f| !assocs.include?(f)}
+      end
+
+      def exposed_associations
+        assocs = @model.reflect_on_all_associations
+        @fields.select{|f| assocs.include?(f)}
       end
 
       def auto_fields= *arg
@@ -61,10 +62,7 @@ module Toast
         return(@pass_params_to) if arg.empty?
         self.pass_params_to = *arg        
       end
-
-      
-
-
+     
       def collections= collections=[]
         @collections = ConfigDSL.sanitize(collections, "collections")
       end
@@ -93,29 +91,39 @@ module Toast
         @model = model
         @fields = base_config.fields
         @disallow_methods = []
-        @exposed_attributes = base_config.exposed_attributes
-        @exposed_associations = base_config.exposed_associations
+        # @exposed_attributes = base_config.exposed_attributes
+        # @exposed_associations = base_config.exposed_associations
         @media_type = "application/json"
       end
 
       def fields= *fields
         @fields = ConfigDSL.sanitize(fields,"fields")
 
-        @exposed_attributes = []
-        @exposed_associations = []
+        # @exposed_attributes = []
+        # @exposed_associations = []
 
-        @fields.each do |attr_or_assoc|
-          if @model.new.attributes.keys.include? attr_or_assoc
-            @exposed_attributes << attr_or_assoc
-          else
-            @exposed_associations << attr_or_assoc
-          end
-        end
+        # @fields.each do |attr_or_assoc|
+        #   if @model.new.attributes.keys.include? attr_or_assoc
+        #     @exposed_attributes << attr_or_assoc
+        #   else
+        #     @exposed_associations << attr_or_assoc
+        #   end
+        # end
       end
 
       def fields *arg
         return(@fields) if arg.empty?
         self.fields = *arg
+      end
+
+      def exposed_attributes
+        assocs = @model.reflect_on_all_associations
+        @fields.select{|f| !assocs.include?(f)}
+      end
+
+      def exposed_associations
+        assocs = @model.reflect_on_all_associations
+        @fields.select{|f| assocs.include?(f)}
       end
 
       def disallow_methods= *arg
@@ -127,7 +135,7 @@ module Toast
         self.disallow_methods = *arg        
       end
 
-      attr_reader :exposed_attributes, :exposed_associations
+      # attr_reader :exposed_attributes, :exposed_associations
     end
 
 
