@@ -27,12 +27,12 @@ module Toast
       end
 
       def exposed_attributes
-        assocs = @model.reflect_on_all_associations
+        assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
         @fields.select{|f| !assocs.include?(f)}
       end
 
       def exposed_associations
-        assocs = @model.reflect_on_all_associations
+        assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
         @fields.select{|f| assocs.include?(f)}
       end
 
@@ -117,12 +117,12 @@ module Toast
       end
 
       def exposed_attributes
-        assocs = @model.reflect_on_all_associations
+        assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
         @fields.select{|f| !assocs.include?(f)}
       end
 
       def exposed_associations
-        assocs = @model.reflect_on_all_associations
+        assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
         @fields.select{|f| assocs.include?(f)}
       end
 
