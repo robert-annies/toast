@@ -4,6 +4,7 @@ class Apple < ActiveRecord::Base
     resource.media_type = "application/json+apple"
     resource.fields = :name, :number, :bananas
     resource.collections = :all
+    resource.singles = :first
 
     resource.in_collection do
       fields :number

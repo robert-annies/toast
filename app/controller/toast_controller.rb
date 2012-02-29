@@ -3,9 +3,11 @@ class ToastController < ApplicationController
   def catch_all
 
     begin
-      resource = Toast::Resource.build( params, request )
-      render resource.apply(request.method, request.body.read)
 
+      @resource = Toast::Resource.build( params, request )     
+
+      render @resource.apply(request.method, request.body.read) 
+      
     rescue Toast::ResourceNotFound => e
       return head(:not_found)
 

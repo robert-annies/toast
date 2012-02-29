@@ -1,9 +1,11 @@
 require 'toast/active_record_extensions.rb'
 require 'toast/resource.rb'
 require 'toast/root_collection'
-require 'toast/associate_collection'
+require 'toast/association'
 require 'toast/attribute'
 require 'toast/record'
+require 'toast/single'
+
 require 'action_dispatch/http/request'
 
 module Toast

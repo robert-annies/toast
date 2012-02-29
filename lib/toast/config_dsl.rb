@@ -11,6 +11,7 @@ module Toast
         @fields = []
         @auto_fields = []
         @collections = []
+        @singles = []
         @media_type = "application/json"
         @disallow_methods = []
         @pass_params_to = []
@@ -70,6 +71,15 @@ module Toast
       def collections *arg
         return(@collections) if arg.empty?
         self.collections = *arg
+      end
+
+      def singles= singles=[]
+        @singles = ConfigDSL.sanitize(singles, "singles")
+      end
+
+      def singles *arg
+        return(@singles) if arg.empty?
+        self.singles = *arg
       end
 
       def in_collection &block
