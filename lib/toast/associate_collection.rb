@@ -1,9 +1,9 @@
 module Toast
-  class AssociateCollection < Resource
+  class Association < Resource
     
     attr_reader :model
 
-    def initialize model, id, subresource_name
+    def initialize model, id, subresource_name, format
       unless model.toast_config.exposed_associations.include? subresource_name
         raise ResourceNotFound
       end
@@ -11,6 +11,7 @@ module Toast
       @model = model
       @record = model.find(id) rescue raise(ResourceNotFound)
       @collection = subresource_name
+      @format = format
 
       @associate_model = Resource.get_class_by_resource_name subresource_name
       @associate_model.uri_base = @model.uri_base
@@ -18,11 +19,20 @@ module Toast
     end
 
     def get
-      records = @record.send(@collection)
-      {
-        :json => records.map{|r| r.exposed_attributes(:in_collection => true)},
-        :status => :ok
-      }
+      result = @record.send(@collection)
+
+      if result.is_a? Array 
+        {
+          :json => result.map{|r| r.exposed_attributes(:in_collection => true)},
+          :status => :ok
+        }
+      else
+        {
+          :json => result.exposed_attributes(:in_collection => true),
+          :status => :ok
+        }
+      end
+
     end
 
     def put

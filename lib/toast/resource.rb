@@ -21,23 +21,26 @@ module Toast
       resource_name = params[:resource]
       id = params[:id]
       subresource_name = params[:subresource]
+      format = params[:format]
 
       begin
-
+        
         model = get_class_by_resource_name resource_name
                 
         # base is complete URL until the resource name
-        model.uri_base = request.url.match(/(.*)\/#{resource_name}(?:\/|\z)/)[1]
+        model.uri_base = request.url.match(/(.*)\/#{resource_name}(?:\..+|\/|\z)/)[1]
 
         # decide which sub type
-        rsc = if id.nil?
+        rsc = if id.nil? and model.toast_config.singles.include?(subresource_name)
+                Toast::Single.new(model, subresource_name, params.clone)                 
+              elsif id.nil?
                 Toast::RootCollection.new(model, subresource_name, params.clone)
               elsif subresource_name.nil?
-                Toast::Record.new(model, id)
+                Toast::Record.new(model, id, format)
               elsif model.toast_config.exposed_associations.include? subresource_name
-                Toast::AssociateCollection.new(model, id, subresource_name)
+                Toast::Association.new(model, id, subresource_name, format)                
               elsif model.toast_config.exposed_attributes.include? subresource_name
-                Toast::Attribute.new(model, id, subresource_name)
+                Toast::Attribute.new(model, id, subresource_name, format)
               else
                 raise ResourceNotFound
               end
@@ -76,7 +79,7 @@ module Toast
         self.send(method.downcase)
       else
         raise MethodNotAllowed
-      end
+      end            
     end
   end
 end

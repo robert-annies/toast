@@ -3,7 +3,7 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, id, attribute_name
+    def initialize model, id, attribute_name, format
       unless model.toast_config.exposed_attributes.include? attribute_name
         raise ResourceNotFound 
       end
@@ -11,6 +11,7 @@ module Toast
       @model = model
       @record = model.find(id) rescue raise(ResourceNotFound)
       @attribute_name = attribute_name
+      @format = format
     end
     
     def get

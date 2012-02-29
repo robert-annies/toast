@@ -1,11 +1,12 @@
 module Toast
   class Record < Resource
 
-    attr_reader :model
+    attr_reader :model    
     
-    def initialize model, id
+    def initialize model, id, format
       @model = model      
       @record = model.find(id) rescue raise(ResourceNotFound.new)
+      @format = format
     end
 
     def post payload
@@ -29,18 +30,28 @@ module Toast
       end
       
       @record.update_attributes payload
-     { 
+      { 
         :json => @record.exposed_attributes,
         :status => :ok,
         :location => @record.uri
       }
     end
 
-    def get 
-      {
-        :json => @record.exposed_attributes,
-        :status => :ok
-      }
+    def get
+      case @format
+      when "html", "xml"
+        {
+          :template => "resources/#{model.to_s.underscore}",
+          :locals => { model.to_s.underscore.to_sym => @record } # full record, view should filter
+        }
+      when "json"
+        {
+          :json => @record.exposed_attributes,
+          :status => :ok
+        }
+      else 
+        raise ResourceNotFound
+      end
     end
 
     def delete

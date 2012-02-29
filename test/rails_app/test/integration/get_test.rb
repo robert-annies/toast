@@ -3,15 +3,17 @@ require 'test_helper'
 
 # Test Cases Overview
 =begin
-|     |                                     | status | comment |
-|-----+-------------------------------------+--------+---------|
-| GET | single resource success             | ok     |         |
-|     | single resource not found           | ok     |         |
-|     | default root collection success     | ok     |         |
-|     | other root collection (a scope)     | ok     |         |
-|     | collection with params              | ok     |         |
-|     | subresource: association collection | ok     |         |
-|     | subresource: attribute              | ok     |         |
+|     |                                        | status | comment |
+|-----+----------------------------------------+--------+---------|
+| GET | single record by ID success            | ok     |         |
+|     | single record ID not found             | ok     |         |
+|     | single record instance by class method | ok     |         |
+|     | default root collection success        | ok     |         |
+|     | other root collection (a scope)        | ok     |         |
+|     | collection with params                 | ok     |         |
+|     | subresource: association collection    | ok     |         |
+|     | subresource: attribute                 | ok     |         |
+
 =end
 
 class ToastTest < ActionDispatch::IntegrationTest
@@ -50,7 +52,22 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
                    }, json_response)
+    end
+    
+    should "respond on class methods returning single instance" do
+      a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
+      a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+      
+      get "apples/first"
+      assert_response :ok
+      assert_equal({
+                     "uri" => "http://www.example.com/apples/#{a1.id}",
+                     "number" => 45,
+                     "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
+                     "name" => "loyce.donnelly@daugherty.info"
+                   }, json_response)
 
+      
     end
 
     should "respond with '404 Not found' on non existing resources" do
@@ -121,7 +138,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
-
+      
       get "bananas/query?gt=100"
       assert_response :ok
       
@@ -215,7 +232,53 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :method_not_allowed
     end
 
+    
+    should "respond with HTML on .html for single resources" do       
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+
+      get "apples/#{a1.id}.html"      
+      
+      assert_response :ok
+      assert_equal "text/html", @response.content_type
+
+      assert_select "table>tr" do
+        assert_select "td", 2
+        assert_select "td", "camilla@leffler.ca"
+        assert_select "td", "133"        
+      end                        
+    end
+
+    should "respond with HTML on .html for resource collections" do       
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
+      
+      get "apples.html"      
+      
+      assert_response :ok
+      assert_equal "text/html", @response.content_type
+      
+      assert_select "ul" do
+        assert_select "li", 2
+        assert_select "li", "camilla@leffler.ca 133"
+        assert_select "li", "ruth@balistreri.com 465"
+      end                        
+    end    
+    
+    should "respond with XML on .xml for single resources" do       
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
+      
+
+      get "apples/#{a1.id}.xml"      
+
+      assert_response :ok
+      assert_equal "application/xml", @response.content_type
+
+      assert_select "apple>name", "camilla@leffler.ca"
+      assert_select "apple>number", "133"
+
+    end    
+
 
   end # context GET
-
 end

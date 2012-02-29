@@ -14,6 +14,7 @@ module Toast
       @model = model
       @collection = subresource_name
       @params = params
+      @format = params[:format]
     end
 
     def get
@@ -27,10 +28,20 @@ module Toast
                   @model.send(@collection)
                 end
 
-      {
-        :json => records.map{|r| r.exposed_attributes(:in_collection => true)},
-        :status => :ok
-      }
+      case @format
+      when "html"
+        {
+          :template => "resources/#{model.to_s.pluralize.underscore}",
+          :locals => { model.to_s.pluralize.underscore.to_sym => records } 
+        }
+      when "json"        
+        {
+          :json => records.map{|r| r.exposed_attributes(:in_collection => true)},
+          :status => :ok
+        }
+      else
+        raise ResourceNotFound
+      end
     end
 
     def put
