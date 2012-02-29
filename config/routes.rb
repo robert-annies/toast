@@ -15,9 +15,6 @@ Rails.application.routes.draw do
           :defaults => { :format => 'json' })
   end
 
-  match ":resource(/:id(/:subresource))" => 'toast#not_found', :constraints => { :id => /\d+/ }
-  match ":resource/:subresource" => 'toast#not_found'
-
 end
 
 
