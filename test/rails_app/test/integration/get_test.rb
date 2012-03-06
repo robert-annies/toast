@@ -81,17 +81,19 @@ class ToastTest < ActionDispatch::IntegrationTest
       get "apples/9999"
       assert_response :not_found
 
-      # unknown model
-      get "hamburgers/133"
-      assert_response :not_found
+      # unknown model 
+      assert_raise ActionController::RoutingError do
+        get "hamburgers/133"
+      end
 
       # known model but not restful
       get "dragonfruits/92"
       assert_response :not_found
 
       # try to hack with exisiting class
-      get "ActiveRecord%3A%3ABases/133"
-      assert_response :not_found
+      assert_raise ActionController::RoutingError do
+        get "ActiveRecord%3A%3ABases/133"
+      end
 
     end
 
