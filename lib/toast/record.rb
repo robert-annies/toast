@@ -25,10 +25,24 @@ module Toast
         raise PayloadFormatError
       end
 
-      if payload.keys.to_set != (@model.toast_config.exposed_attributes.to_set - @model.toast_config.auto_fields.to_set)
+     # debugger
+      
+      # silently ignore all exposed readable, but not writable fields
+      (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
+        payload.delete(rof)
+      end
+
+      # be offended by any other unknown attribute
+      if payload.keys.to_set != @model.toast_config.writables.to_set
         raise PayloadInvalid
       end
       
+      # set the virtual attributes 
+      (payload.keys.to_set - @record.attribute_names.to_set).each do |vattr|
+        @record.send("#{vattr}=", payload.delete(vattr))             
+      end 
+      
+      # mass-update for the rest 
       @record.update_attributes payload
       { 
         :json => @record.exposed_attributes,

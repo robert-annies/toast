@@ -6,7 +6,7 @@ class Coconut < ActiveRecord::Base
   has_many :dragonfruits, :through => :coconut_dragonfruits
 
   resourceful_model do |r|
-    r.fields = :name, :number
+    r.writables = :name, :number
     r.collections = :all
     r.namespace = "fruits"
   end

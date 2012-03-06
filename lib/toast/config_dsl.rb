@@ -4,12 +4,11 @@ module Toast
     class Base
       include Blockenspiel::DSL
       dsl_attr_accessor :media_type, :has_many, :namespace
-      # attr_reader :exposed_attributes, :exposed_associations
 
       def initialize model
         @model = model
-        @fields = []
-        @auto_fields = []
+        @readables = []
+        @writables = []
         @collections = []
         @singles = []
         @media_type = "application/json"
@@ -29,22 +28,42 @@ module Toast
 
       def exposed_attributes
         assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
-        @fields.select{|f| !assocs.include?(f)}
+        (@writables + @readables).uniq.select{|f| !assocs.include?(f)}
       end
 
       def exposed_associations
         assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
-        @fields.select{|f| assocs.include?(f)}
+        (@writables + @readables).uniq.select{|f| assocs.include?(f)}
       end
 
-      def auto_fields= *arg
-        @auto_fields.push *ConfigDSL.sanitize(arg,"auto fields")
+      def readables= *arg
+        if arg.first == :all
+          @readables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "readables")
+        else
+          @readables.push *ConfigDSL.sanitize(arg,"readables")          
+        end
       end
 
-      def auto_fields *arg
-        return(@auto_fields) if arg.empty?
-        self.auto_fields = *arg        
+      # args: Array or :all, :except => Array
+      def readables *arg
+        return(@readables) if arg.empty?
+        self.readables = *arg        
       end
+
+      def writables= *arg
+        if arg.first == :all
+          @writables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "writables")
+        else
+          @writables.push *ConfigDSL.sanitize(arg,"writables")          
+        end
+      end
+
+      # args: Array or :all, :except => Array
+      def writables *arg
+        return(@writables) if arg.empty?
+        self.writables = *arg        
+      end
+
      
       def disallow_methods= *arg
         @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
@@ -99,41 +118,40 @@ module Toast
 
       def initialize model, base_config
         @model = model
-        @fields = base_config.fields
+        @readables = base_config.readables # must assign a reference 
+        @writables = base_config.writables # must assign a reference 
         @disallow_methods = []
-        # @exposed_attributes = base_config.exposed_attributes
-        # @exposed_associations = base_config.exposed_associations
         @media_type = "application/json"
       end
 
-      def fields= *fields
-        @fields = ConfigDSL.sanitize(fields,"fields")
-
-        # @exposed_attributes = []
-        # @exposed_associations = []
-
-        # @fields.each do |attr_or_assoc|
-        #   if @model.new.attributes.keys.include? attr_or_assoc
-        #     @exposed_attributes << attr_or_assoc
-        #   else
-        #     @exposed_associations << attr_or_assoc
-        #   end
-        # end
+      def readables= *readables
+        @writables = [] # forget inherited writables
+        @readables = ConfigDSL.sanitize(readables,"readables")
       end
 
-      def fields *arg
-        return(@fields) if arg.empty?
-        self.fields = *arg
+      def readables *arg
+        return(@readables) if arg.empty?
+        self.readables = *arg
+      end
+
+      def writables *arg
+        self.writables = 42
+      end
+
+      def writables= *arg
+        puts
+        puts "Toast Config Warning (#{model.class}): Defining \"writables\" in collection definition has no effect."
+        puts
       end
 
       def exposed_attributes
         assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
-        @fields.select{|f| !assocs.include?(f)}
+        (@readables + @writables).uniq.select{|f| !assocs.include?(f)}
       end
 
       def exposed_associations
         assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
-        @fields.select{|f| assocs.include?(f)}
+        (@readables + @writables).uniq.select{|f| assocs.include?(f)}
       end
 
       def disallow_methods= *arg
@@ -145,7 +163,6 @@ module Toast
         self.disallow_methods = *arg        
       end
 
-      # attr_reader :exposed_attributes, :exposed_associations
     end
 
 

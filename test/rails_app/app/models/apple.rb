@@ -2,12 +2,13 @@ class Apple < ActiveRecord::Base
 
   resourceful_model do |resource|
     resource.media_type = "application/json+apple"
-    resource.fields = :name, :number, :bananas
+    resource.writables = :name, :number
+    resource.readables = :bananas
     resource.collections = :all
     resource.singles = :first
 
     resource.in_collection do
-      fields :number
+      readables :number
     end
   end
 

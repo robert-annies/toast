@@ -30,13 +30,14 @@ class ToastTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
       a1 = Apple.create :number => 245, :name => "heather@lockmankreiger.biz"
-
-      put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211}
+      
+      put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12, "apple" => "nono"}
       assert_response :ok
 
       get "bananas/#{b4.id}"
       assert_equal({"number"=>2211,
                      "name"=> "linda@pacocha.name",
+                     "curvature" => 8.18,
                      "apple" => "http://www.example.com/bananas/#{b4.id}/apple",
                      "coconuts" => "http://www.example.com/bananas/#{b4.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b4.id}/dragonfruit" ,
@@ -60,6 +61,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_equal({"number"=>133,
                      "name"=>"camilla@leffler.ca",
                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
+                     "curvature" => 8.18,
                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
                      "uri" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
@@ -118,6 +120,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       get "bananas/#{b1.id}"
       assert_equal({ "number" => 56,
                      "name" => "mia_hartmann@carterbarton.net",
+                     "curvature" => 8.18,
                      "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
                      "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
@@ -130,6 +133,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       get "bananas/#{b2.id}"
       assert_equal({"number" => 76,
                      "name" => "garrick_buckridge@quigley.org",
+                     "curvature" => 8.18,
                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,

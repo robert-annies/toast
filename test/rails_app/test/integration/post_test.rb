@@ -41,7 +41,6 @@ class ToastTest < ActionDispatch::IntegrationTest
       record2.merge! "uri" => uri2
       assert_equal record2, json_response
 
-
       get "fruits/coconuts"
       assert_same_elements [record1, record2], json_response
 

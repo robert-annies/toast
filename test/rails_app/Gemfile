@@ -9,7 +9,7 @@ gem 'sqlite3'
 
 gem 'faker'
 
-gem 'toast', "~> 0.3.3"
+gem 'toast', "~> 0.4.0"
 
 group 'test' do
   gem 'shoulda'

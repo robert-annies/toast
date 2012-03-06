@@ -48,6 +48,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "uri" => "http://www.example.com/bananas/#{b1.id}",
                      "number" => 895,
                      "name" => "tommie.rohan@kub.name",
+                     "curvature" => 8.18,
                      "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
                      "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
@@ -121,12 +122,14 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       assert_same_elements( [ { "number" => 45,
                                 "name" => "loyce.donnelly@daugherty.info" ,
+                                "curvature" => 8.18,
                                 "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
                                 "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
                                 "uri" => "http://www.example.com/bananas/#{b1.id}" },
                               { "number" => 13,
                                 "name" => "chadd.lind@abshire.com",
+                                "curvature" => 8.18,
                                 "apple" => "http://www.example.com/bananas/#{b4.id}/apple",
                                 "coconuts" => "http://www.example.com/bananas/#{b4.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b4.id}/dragonfruit" ,
@@ -140,19 +143,21 @@ class ToastTest < ActionDispatch::IntegrationTest
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
-      
+
       get "bananas/query?gt=100"
       assert_response :ok
       
       assert_same_elements( [ { "number" => 133,
                                 "name" => "camilla@leffler.ca" ,
                                 "apple" =>       "http://www.example.com/bananas/#{b2.id}/apple",
+                                "curvature" => 8.18,
                                 "coconuts" =>    "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
                                 "uri" =>         "http://www.example.com/bananas/#{b2.id}" },
                               { "number" => 465,
                                 "name" => "ruth@balistreri.com",
                                 "apple" =>       "http://www.example.com/bananas/#{b3.id}/apple",
+                                "curvature" => 8.18,
                                 "coconuts" =>    "http://www.example.com/bananas/#{b3.id}/coconuts" ,                                         
                                 "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit" ,
                                 "uri" =>         "http://www.example.com/bananas/#{b3.id}" }
@@ -196,12 +201,14 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_equal [{"number" => 45,
                       "name" => "loyce.donnelly@daugherty.info",
                       "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
+                      "curvature" => 8.18,
                       "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit",
                       "uri" => "http://www.example.com/bananas/#{b1.id}" },
 
                     {"number" => 465,
                       "name" => "ruth@balistreri.com",
+                      "curvature" => 8.18,
                       "apple" =>  "http://www.example.com/bananas/#{b3.id}/apple",
                       "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
@@ -212,11 +219,13 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :ok
       assert_equal [{"number" => 145,
                       "name" => "theresa@deckowsipes.net",
+                      "curvature" => 8.18,
                       "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
                       "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit",
                       "uri" => "http://www.example.com/bananas/#{b2.id}" },
                     {"number" => 13,
+                      "curvature" => 8.18,
                       "name" => "chadd.lind@abshire.com",
                       "apple" => "http://www.example.com/bananas/#{b4.id}/apple",
                       "coconuts" => "http://www.example.com/bananas/#{b4.id}/coconuts",

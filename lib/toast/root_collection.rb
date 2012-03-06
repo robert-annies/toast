@@ -65,11 +65,17 @@ module Toast
         raise PayloadFormatError
       end
 
-      if payload.keys.to_set != (@model.toast_config.exposed_attributes.to_set - @model.toast_config.auto_fields.to_set)
+      # silently ignore all exposed readable, but not writable fields
+      (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
+        payload.delete(rof)
+      end
+
+
+      # be offended by any other unknown attribute
+      if payload.keys.to_set != @model.toast_config.writables.to_set
         raise PayloadInvalid
       end
       
-
       begin
         record = @model.create! payload              
 
@@ -78,8 +84,9 @@ module Toast
           :location => record.uri,
           :status => :created
         }
-
+        
       rescue ActiveRecord::RecordInvalid => e
+        # model validation failed
         raise PayloadInvalid.new(e.message)
       end
     end

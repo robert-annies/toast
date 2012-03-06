@@ -45,7 +45,14 @@ module Toast
         raise UnsupportedMediaType
       end
 
-      if payload.keys.to_set != (@associate_model.toast_config.exposed_attributes.to_set - @associate_model.toast_config.auto_fields.to_set)
+
+      # silently ignore all exposed readable, but not writable fields
+      (@associate_model.toast_config.readables - @associate_model.toast_config.writables).each do |rof|
+        payload.delete(rof)
+      end
+
+      # be offended by any other unknown attribute
+      if payload.keys.to_set != @associate_model.toast_config.writables.to_set
         raise PayloadInvalid
       end
 
@@ -53,13 +60,19 @@ module Toast
         raise PayloadFormatError
       end 
 
-      record = @record.send(@collection).create payload
+      begin
+        record = @record.send(@collection).create! payload
       
-      {
-        :json => record.exposed_attributes,
-        :location => record.uri,
-        :status => :created
-      }
+        {
+          :json => record.exposed_attributes,
+          :location => record.uri,
+          :status => :created
+        }
+      
+      rescue ActiveRecord::RecordInvalid => e
+        # model validation failed
+        raise PayloadInvalid.new(e.message)
+      end
     end
 
     def delete

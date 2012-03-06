@@ -5,9 +5,13 @@ class Banana < ActiveRecord::Base
   has_many :coconuts
 
   resourceful_model do
-    fields :name, :number, :coconuts, :apple, :dragonfruit
+
+    writables :name, :number
+    readables :curvature, :coconuts, :apple, :dragonfruit
+
     collections :find_some, :all, :query
     pass_params_to :query
+
   end
 
   scope :find_some, where("number < 100")
@@ -15,5 +19,9 @@ class Banana < ActiveRecord::Base
 
   def self.query params
     where(["number > ?", params[:gt]])
+  end
+
+  def curvature
+    8.18
   end
 end
