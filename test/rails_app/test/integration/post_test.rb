@@ -51,13 +51,36 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_equal record2, json_response
     end
 
-    should "not set un-exposed fields" do
+    should "not set non-writable fields" do
 
-      record = {"number" => 3312, "name" => "Benny Hane I", "hidden" => "Cairo"}
+      c0 = {"number" => 3312, "name" => "Benny Hane I", "hidden" => "Cairo"}
+      b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
-      # try to post an un-exposed field
-      post_json "fruits/coconuts", record
-      assert_response :forbidden
+      # try to post a non-writable field to root collecton
+      post_json "fruits/coconuts", c0
+      assert_response :created
+
+      c1 = Coconut.first
+      assert_equal "Capetown", c1.hidden # "Capetown" is the default in the db-schema
+      assert_equal 3312, c1.number
+      assert_equal "Benny Hane I", c1.name 
+      
+    end
+
+    should "not set non-writable fields in associate collection" do
+
+      c0 = {"number" => 3312, "name" => "Benny Hane I", "hidden" => "Cairo"}
+      b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
+
+      # try to post a non-writable field to a association 
+      post_json "bananas/#{b1.id}/coconuts", c0
+      assert_response :created
+      
+      c2 = Coconut.last
+      assert_equal "Capetown", c2.hidden # "Capetown" is the default in the db-schema
+      assert_equal 3312, c2.number
+      assert_equal "Benny Hane I", c2.name 
+  
     end
 
     should "create new associated records" do
@@ -65,7 +88,8 @@ class ToastTest < ActionDispatch::IntegrationTest
       c1 = Coconut.create :number => 103, :name => "adaline@armstrong.com"
       c2 = Coconut.create :number => 906, :name => "genesis@jacobs.biz"
 
-      b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info", :coconuts => [c1,c2]
+      b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
+      b1.coconuts = [c1,c2]
 
       post_json "bananas/#{b1.id}/coconuts", {"number" => 123, "name" => "eriberto_morar@kochmraz.name"}
       assert_response :created
@@ -83,6 +107,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                             {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "uri" => "http://www.example.com/coconuts/#{c3.id}"}],
                            json_response
     end
+
 
     should "not accept bad JSON strings" do
 

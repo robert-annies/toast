@@ -58,7 +58,7 @@ class ToastTest < ActionDispatch::IntegrationTest
     should "respond on class methods returning single instance" do
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
-      
+
       get "apples/first"
       assert_response :ok
       assert_equal({
@@ -174,8 +174,12 @@ class ToastTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca", :bananas => [b1, b3]
-      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com", :bananas => [b2, b4]
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+      a1.bananas = [b1, b3]
+
+      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
+      a2.bananas = [b2, b4]
+      
 
       get "apples/#{a1.id}/bananas"
       assert_response :ok

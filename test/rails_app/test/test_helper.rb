@@ -18,12 +18,12 @@ class ActiveSupport::TestCase
     ActiveSupport::JSON.decode(@response.body)
   end
   
-  def post_json uri, payload
-    post uri, payload.to_json, {"CONTENT_TYPE"=>"application/json"}
+  def post_json uri, payload, media=nil
+    post uri, payload.to_json, (media.nil? ? {"CONTENT_TYPE"=>"application/json"} :  {"CONTENT_TYPE"=> media})
   end
 
-  def put_json uri, payload
-    put uri, payload.to_json, {"CONTENT_TYPE"=>"application/json"}
+  def put_json uri, payload, media=nil
+    put uri, payload.to_json, (media.nil? ? {"CONTENT_TYPE"=>"application/json"} :  {"CONTENT_TYPE"=> media} )
   end
 
 end

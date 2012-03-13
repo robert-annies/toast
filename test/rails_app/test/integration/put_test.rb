@@ -30,8 +30,10 @@ class ToastTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
       a1 = Apple.create :number => 245, :name => "heather@lockmankreiger.biz"
-      
-      put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12, "apple" => "nono"}
+      a1.bananas << b3
+
+      put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12,
+                                    "apple" => "nono" , "uri"=>"nono"}
       assert_response :ok
 
       get "bananas/#{b4.id}"
@@ -76,6 +78,29 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "uri" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
 
     end
+    
+    should "not update non-writable attributes" do
+      b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
+      a1 = Apple.create :number => 43, :name => "dandre@ondricka.uk"
+      b2.apple = a1
+      b2.save
+
+      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name", "apple_id" => 666}
+      assert_response :ok
+      
+      b2.reload
+      assert_equal a1.id, b2.apple_id
+
+      get "bananas/#{b2.id}"
+      assert_equal({"number"=>133,
+                     "name"=>"fatima@hills.name",
+                     "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
+                     "curvature" => 8.18,
+                     "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
+                     "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
+                     "uri" => "http://www.example.com/bananas/#{b2.id}"}, json_response)      
+    end
+
 
     should "not create resources when id is not existing" do
       # discussable

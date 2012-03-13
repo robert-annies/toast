@@ -7,7 +7,7 @@ module Toast
 
       def initialize model
         @model = model
-        @readables = []
+        @readables = ["uri"]
         @writables = []
         @collections = []
         @singles = []
@@ -15,15 +15,6 @@ module Toast
         @disallow_methods = []
         @pass_params_to = []
         @in_collection = ConfigDSL::InCollection.new model, self
-      end
-
-      def fields= *fields
-        @fields.push *ConfigDSL.sanitize(fields,"fields")
-      end
-
-      def fields *arg
-        return(@fields) if arg.empty?
-        self.fields = *arg
       end
 
       def exposed_attributes
@@ -36,51 +27,53 @@ module Toast
         (@writables + @readables).uniq.select{|f| assocs.include?(f)}
       end
 
-      def readables= *arg
-        if arg.first == :all
-          @readables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "readables")
-        else
+      def readables= arg
+        #if arg.first == :all
+        #  @readables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "readables")
+        #else
           @readables.push *ConfigDSL.sanitize(arg,"readables")          
-        end
+        #end
       end
 
       # args: Array or :all, :except => Array
       def readables *arg
         return(@readables) if arg.empty?
-        self.readables = *arg        
+        self.readables = arg        
       end
 
-      def writables= *arg
-        if arg.first == :all
-          @writables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "writables")
-        else
-          @writables.push *ConfigDSL.sanitize(arg,"writables")          
-        end
+      def writables= arg
+        #if arg.first == :all
+        #  @writables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "writables")
+        #else
+        # white list writables (protect the rest from mass-assignment)
+        @model.attr_accessible *arg
+        @writables.push *ConfigDSL.sanitize(arg,"writables")          
+        #end
       end
 
       # args: Array or :all, :except => Array
       def writables *arg
         return(@writables) if arg.empty?
-        self.writables = *arg        
+        self.writables = arg        
       end
 
      
-      def disallow_methods= *arg
+      def disallow_methods= arg
         @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
       end
 
       def disallow_methods *arg
         return(@disallow_methods) if arg.empty?
-        self.disallow_methods = *arg        
+        self.disallow_methods = arg        
       end
 
-      def pass_params_to= *arg
+      def pass_params_to= arg
         @pass_params_to.push *ConfigDSL.sanitize(arg,"pass_params_to")
       end
 
       def pass_params_to *arg
         return(@pass_params_to) if arg.empty?
-        self.pass_params_to = *arg        
+        self.pass_params_to = arg        
       end
      
       def collections= collections=[]
@@ -89,7 +82,7 @@ module Toast
 
       def collections *arg
         return(@collections) if arg.empty?
-        self.collections = *arg
+        self.collections = arg
       end
 
       def singles= singles=[]
@@ -98,7 +91,7 @@ module Toast
 
       def singles *arg
         return(@singles) if arg.empty?
-        self.singles = *arg
+        self.singles = arg
       end
 
       def in_collection &block
@@ -124,21 +117,21 @@ module Toast
         @media_type = "application/json"
       end
 
-      def readables= *readables
+      def readables= readables
         @writables = [] # forget inherited writables
-        @readables = ConfigDSL.sanitize(readables,"readables")
+        @readables = ConfigDSL.sanitize(readables,"readables") << "uri"
       end
 
       def readables *arg
         return(@readables) if arg.empty?
-        self.readables = *arg
+        self.readables = arg
       end
 
       def writables *arg
         self.writables = 42
       end
 
-      def writables= *arg
+      def writables= arg
         puts
         puts "Toast Config Warning (#{model.class}): Defining \"writables\" in collection definition has no effect."
         puts
@@ -154,13 +147,13 @@ module Toast
         (@readables + @writables).uniq.select{|f| assocs.include?(f)}
       end
 
-      def disallow_methods= *arg
+      def disallow_methods= arg
         @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
       end
 
       def disallow_methods *arg
         return(@disallow_methods) if arg.empty?
-        self.disallow_methods = *arg        
+        self.disallow_methods = arg        
       end
 
     end
