@@ -69,12 +69,6 @@ module Toast
       (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
         payload.delete(rof)
       end
-
-
-      # be offended by any other unknown attribute
-      if payload.keys.to_set != @model.toast_config.writables.to_set
-        raise PayloadInvalid
-      end
       
       begin
         record = @model.create! payload              

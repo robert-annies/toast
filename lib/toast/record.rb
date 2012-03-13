@@ -25,16 +25,9 @@ module Toast
         raise PayloadFormatError
       end
 
-     # debugger
-      
       # silently ignore all exposed readable, but not writable fields
       (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
         payload.delete(rof)
-      end
-
-      # be offended by any other unknown attribute
-      if payload.keys.to_set != @model.toast_config.writables.to_set
-        raise PayloadInvalid
       end
       
       # set the virtual attributes 

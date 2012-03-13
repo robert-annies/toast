@@ -44,22 +44,31 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "uri" => "http://www.example.com/bananas/#{b4.id}"},
                    json_response)
 
-      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_json, {"CONTENT_TYPE"=> "application/json+apple"}
+      put_json "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}, "application/json+apple"
       assert_response :ok
+
+      a1.reload
+      assert_equal 120, a1.number
+      
+
+      put_json "bananas/#{b3.id}/apple",  {:number => 816, :name => "dandre@ondricka.uk"}, "application/json+apple"
+      assert_response :ok
+
+      a1.reload
+      assert_equal "dandre@ondricka.uk", a1.name
+
 
     end
 
-    should "not do partial updates" do
-
+    should "partially update" do
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
 
-
       put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name"}
-      assert_response :forbidden
+      assert_response :ok
 
       get "bananas/#{b2.id}"
       assert_equal({"number"=>133,
-                     "name"=>"camilla@leffler.ca",
+                     "name"=>"fatima@hills.name",
                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
                      "curvature" => 8.18,
                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
