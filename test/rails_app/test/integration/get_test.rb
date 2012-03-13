@@ -164,25 +164,6 @@ class ToastTest < ActionDispatch::IntegrationTest
                             ], json_response)    
     end
 
-    should "respond on subresources" do
-
-      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
-      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
-
-      get "apples/#{a1.id}/name"
-      assert_response :ok
-      assert_equal "camilla@leffler.ca", @response.body
-
-      get "apples/#{a2.id}/number"
-      assert_response :ok
-      assert_equal "465", @response.body
-
-      get "apples/#{a1.id}/xyz"
-      assert_response :not_found
-
-
-    end
-
     should "respond on has_many associations" do
 
       c1 = Coconut.create :number => 831, :name => "bertram.schuster@stantonjacobs.com"

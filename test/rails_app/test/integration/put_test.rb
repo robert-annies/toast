@@ -109,38 +109,6 @@ class ToastTest < ActionDispatch::IntegrationTest
 
     end
 
-    should "update single attributes as subresources" do
-
-      b1 = Banana.create :number => 133, :name => "mia_hartmann@carterbarton.net"
-      b2 = Banana.create :number => 76, :name => "alan@king.net"
-
-      put_json "bananas/#{b1.id}/number", 56
-      assert_response :ok
-
-      get "bananas/#{b1.id}"
-      assert_equal({ "number" => 56,
-                     "name" => "mia_hartmann@carterbarton.net",
-                     "curvature" => 8.18,
-                     "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
-                     "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts" ,
-                     "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
-                     "uri" => "http://www.example.com/bananas/#{b1.id}"},
-                   json_response)
-
-      put_json "bananas/#{b2.id}/name", "garrick_buckridge@quigley.org"
-      assert_response :ok
-
-      get "bananas/#{b2.id}"
-      assert_equal({"number" => 76,
-                     "name" => "garrick_buckridge@quigley.org",
-                     "curvature" => 8.18,
-                     "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
-                     "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
-                     "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
-                     "uri" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
-
-    end
-
     should "not update when PUT is disallowed" do
 
       d1 = Dragonfruit.create :number => 35, :name => "mia_hartmann@carterbarton.net"
