@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{toast}
-  s.version = "0.3.5"
+  s.version = "0.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Robert Annies"]
-  s.date = %q{2012-02-29}
+  s.date = %q{2012-03-13}
   s.description = %q{Toast is an extension to Ruby on Rails that lets you expose any
 ActiveRecord model as a resource according to the REST paradigm. The
 representation format is JSON.}
@@ -23,7 +23,6 @@ representation format is JSON.}
     "lib/toast.rb",
     "lib/toast/active_record_extensions.rb",
     "lib/toast/association.rb",
-    "lib/toast/attribute.rb",
     "lib/toast/config_dsl.rb",
     "lib/toast/engine.rb",
     "lib/toast/record.rb",
