@@ -10,8 +10,9 @@ module Toast
 
       @model = model
       @record = model.find(id) rescue raise(ResourceNotFound)
-      @collection = subresource_name
+      @assoc = subresource_name
       @format = format
+      @is_collection = [:has_many, :has_and_belongs_to_many].include? @model.reflect_on_association(@assoc.to_sym).macro
 
       @associate_model = Resource.get_class_by_resource_name subresource_name
       @associate_model.uri_base = @model.uri_base
@@ -19,7 +20,7 @@ module Toast
     end
 
     def get
-      result = @record.send(@collection)
+      result = @record.send(@assoc)
 
       if result.is_a? Array 
         {
@@ -35,8 +36,38 @@ module Toast
 
     end
 
-    def put
-      raise MethodNotAllowed
+    def put payload
+      # only for has_one/belongs_to assocs            
+      raise MethodNotAllowed if @is_collection
+      
+      # update see record
+      if self.media_type != @associate_model.toast_config.media_type
+        raise UnsupportedMediaType
+      end
+
+      unless payload.is_a? Hash
+        raise PayloadFormatError
+      end
+
+      # silently ignore all exposed readable, but not writable fields
+      (@associate_model.toast_config.readables - @associate_model.toast_config.writables).each do |rof|
+        payload.delete(rof)
+      end
+      
+      record = @record.send(@assoc)
+      
+      # set the virtual attributes 
+      (payload.keys.to_set - record.attribute_names.to_set).each do |vattr|
+        record.send("#{vattr}=", payload.delete(vattr))             
+      end 
+      
+      # mass-update for the rest 
+      record.update_attributes payload
+      { 
+        :json => record.exposed_attributes,
+        :status => :ok,
+        :location => record.uri
+      }      
     end
 
     def post payload
@@ -51,17 +82,12 @@ module Toast
         payload.delete(rof)
       end
 
-      # be offended by any other unknown attribute
-      if payload.keys.to_set != @associate_model.toast_config.writables.to_set
-        raise PayloadInvalid
-      end
-
       unless payload.is_a? Hash
         raise PayloadFormatError
       end 
 
       begin
-        record = @record.send(@collection).create! payload
+        record = @record.send(@assoc).create! payload
       
         {
           :json => record.exposed_attributes,
