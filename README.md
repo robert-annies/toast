@@ -11,7 +11,7 @@ and what attributes and associations are to be exposed. That's it. No
 controller boiler plate code for every model, no routing setup.
 
 Toast is a Rails engine that runs one generic controller and a sets up
-the routing to it according to the definition in the models, which is
+the routing according to the definition in the models, which is
 denoted using a block oriented DSL.
 
 REST is more than some pretty URIs, the use of the HTTP verbs and
@@ -23,7 +23,7 @@ which ever suits the task best. That's why TOAST stands for:
 >  **TOast Ain't reST**
 
 *Be careful*: This version is experimental and probably not bullet
-proof. As soon as the gem is installed a controller with ready routing
+proof. As soon as the gem is loaded a controller with ready routing
 is enabled serving the annotated model's data records for reading,
 updating and deleting. There are no measures to prevent XSS and CSFR
 attacks.
@@ -49,8 +49,9 @@ and let a corresponding model class have a *resourceful_model* annotation:
 
        resourceful_model do
          # attributes or association names
-         fields :name, :number, :coconuts, :apple
-
+         readables :coconuts, :apple
+	 writables :name, :number	 
+	 
          # class methods of Banana returning an Array of Banana records
          collections :find_some, :all
        end
@@ -121,17 +122,13 @@ More details and configuration options are documented in the manual... (_comming
 Installation
 ============
 
-    git clone git@github.com:robokopp/toast.git
-    gem install jeweler
-    cd toast
-    rake install
+With bundler
 
-or with bundler (Gemfile) 
+    gem "toast"
 
-    gem "toast", :git => "https://github.com/robokopp/toast.git"
+the latest Git:
 
-Note: There is a Gem on RubyGems.org too, but I will not keep it up-to-date for now. 
-Please use the git (edge) version.
+    gem "toast", :git => "https://github.com/robokopp/toast.git"	
 
 Test Suite
 ==========
