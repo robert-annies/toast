@@ -17,14 +17,21 @@ module Toast
     # argument for ActionController#render
 
     def put payload       
+      
       if self.media_type != @model.toast_config.media_type
         raise UnsupportedMediaType
       end
 
+      begin 
+        payload = ActiveSupport::JSON.decode(payload)
+      rescue
+        raise PayloadFormatError
+      end
+      
       unless payload.is_a? Hash
         raise PayloadFormatError
       end
-
+      
       # silently ignore all exposed readable, but not writable fields
       (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
         payload.delete(rof)

@@ -61,6 +61,11 @@ module Toast
         raise UnsupportedMediaType
       end
 
+      begin 
+        payload = ActiveSupport::JSON.decode(payload)
+      rescue
+        raise PayloadFormatError
+      end
       unless payload.is_a? Hash
         raise PayloadFormatError
       end

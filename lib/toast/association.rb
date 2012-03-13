@@ -39,14 +39,22 @@ module Toast
     def put payload
       # only for has_one/belongs_to assocs            
       raise MethodNotAllowed if @is_collection
+
+      
+      begin 
+        payload = ActiveSupport::JSON.decode(payload)
+      rescue
+        raise PayloadFormatError
+      end
+
+
+      unless payload.is_a? Hash
+        raise PayloadFormatError
+      end
       
       # update see record
       if self.media_type != @associate_model.toast_config.media_type
         raise UnsupportedMediaType
-      end
-
-      unless payload.is_a? Hash
-        raise PayloadFormatError
       end
 
       # silently ignore all exposed readable, but not writable fields
@@ -76,16 +84,23 @@ module Toast
         raise UnsupportedMediaType
       end
 
-
-      # silently ignore all exposed readable, but not writable fields
-      (@associate_model.toast_config.readables - @associate_model.toast_config.writables).each do |rof|
-        payload.delete(rof)
+      begin 
+        payload = ActiveSupport::JSON.decode(payload)
+      rescue
+        raise PayloadFormatError
       end
 
       unless payload.is_a? Hash
         raise PayloadFormatError
       end 
 
+
+      # silently ignore all exposed readable, but not writable fields
+      (@associate_model.toast_config.readables - @associate_model.toast_config.writables).each do |rof|
+        payload.delete(rof)
+      end
+
+      
       begin
         record = @record.send(@assoc).create! payload
       

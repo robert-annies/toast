@@ -115,7 +115,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 245, :name => "heather@lockmankreiger.biz"
 
       # x-www-form-url-encoded
-      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}
+      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}, {"CONTENT_TYPE" => "application/x-www-form-urlencoded"}
       assert_response :unsupported_media_type
 
       # xml
@@ -123,8 +123,20 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :unsupported_media_type
 
       # should be application/apple+json
-      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml, {"CONTENT_TYPE"=> "application/json"}
+      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_json, {"CONTENT_TYPE"=> "application/json"}
       assert_response :unsupported_media_type
+
+      # payload is XML but content type is json+apple
+      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml, {"CONTENT_TYPE"=> "application/json+apple"}
+      assert_response :bad_request
+      
+           
+      # payload is XML but content type is json 
+      # 
+      # This causes a decoding exception before ToastController can catch it, in Rails 3.1.x
+      # put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml, {"CONTENT_TYPE" => "application/json"}
+      # assert_response :bad_request
+      
     end
 
     should "not accept bad data" do
@@ -134,7 +146,11 @@ class ToastTest < ActionDispatch::IntegrationTest
       #    can't assert any response here (what does Rails respond?)
       #    (assert_response :bad_request)
       assert_raise StandardError do
-        put "bananas/#{b2.id}", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
+        begin
+          put "bananas/#{b2.id}", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
+        rescue 
+          raise StandardError  # different rails version raise different exceptions, equalize it
+        end
       end
 
       # put Array

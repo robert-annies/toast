@@ -115,7 +115,11 @@ class ToastTest < ActionDispatch::IntegrationTest
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
       assert_raise StandardError do
-        post "bananas/#{b1.id}/coconuts", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
+        begin        
+          post "bananas/#{b1.id}/coconuts", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
+        rescue 
+          raise StandardError  # diffirent rails version raise different exceptions, equalize it
+        end
       end
 
     end

@@ -1,4 +1,4 @@
-require "faker"
+require "ffaker"
 
 module ModelFactory
 

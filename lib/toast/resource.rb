@@ -42,7 +42,7 @@ module Toast
               else
                 raise ResourceNotFound
               end
-
+        
         rsc.media_type = request.media_type
 
         rsc
@@ -72,7 +72,7 @@ module Toast
       
       case method
       when "PUT","POST"
-        self.send(method.downcase, ActiveSupport::JSON.decode(payload))
+        self.send(method.downcase, payload)
       when "DELETE","GET"
         self.send(method.downcase)
       else
