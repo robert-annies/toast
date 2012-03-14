@@ -1,8 +1,13 @@
 #!/usr/bin/env ruby
 
-RAILS_VERSIONS=%w(3.0.9 3.1.0 3.2.0) 
-
-# Note: edge Rails requires Ruby 1.9.3+ 
+case RUBY_VERSION
+when "1.8.7"
+  RAILS_VERSIONS=%w(3.0.0 3.1.0 3.2.0) 
+when "1.9.3"
+  RAILS_VERSIONS=%w(3.0.0 3.1.0 3.2.0)
+else
+  puts "Warning: Toast is currently only tested against Ruby 1.8.7 and 1.9.3, you have #{RUBY_VERSION}"
+end
 
 for rails_version in RAILS_VERSIONS
   
@@ -10,8 +15,7 @@ for rails_version in RAILS_VERSIONS
   puts `bundle install`
 
   puts "="*60
-  puts "Running test suite with "
-  print `bundle show rails`
+  puts "Running test suite with Ruby #{RUBY_VERSION} and Rails #{`bundle show rails`.split('-').last}"
   puts "="*60
 
   unless $?.success?
