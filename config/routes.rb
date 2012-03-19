@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     match("#{model.toast_config.namespace}/#{resource_name}(/:id(/:subresource))" => 'toast#catch_all', 
           :constraints => { :id => /\d+/ }, 
           :resource => resource_name,
+          :as => resource_name,
           :defaults => { :format => 'json' })
     
     match("#{model.toast_config.namespace}/#{resource_name}/:subresource" => 'toast#catch_all', 
