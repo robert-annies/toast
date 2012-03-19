@@ -2,6 +2,19 @@ require "rake/testtask"
 
 begin
   require "jeweler"
+
+  # monkey patch: gem install -Vl 
+  # otherwise it tries to download specs form rubygems.org everytime   
+  class Jeweler::Commands::InstallGem
+      def run	
+        command = "#{gem_command} install -Vl #{gemspec_helper.gem_path}"
+        output.puts "Executing #{command.inspect}:"
+
+        sh command # TODO where does sh actually come from!? - rake, apparently
+      end
+  end
+
+
   Jeweler::Tasks.new do |gem|
     gem.name = "toast"
     gem.summary = "Toast adds a RESTful interface to ActiveRecord models in Ruby on Rails."
