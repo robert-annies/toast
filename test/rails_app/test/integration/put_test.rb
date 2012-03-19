@@ -50,16 +50,6 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :ok
 
       a1.reload
-      assert_equal 120, a1.number
-      
-
-      put_json "bananas/#{b3.id}/apple",  {:number => 816, :name => "dandre@ondricka.uk"}, "application/json+apple"
-      assert_response :ok
-
-      a1.reload
-      assert_equal "dandre@ondricka.uk", a1.name
-
-
     end
 
     should "partially update" do

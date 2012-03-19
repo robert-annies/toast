@@ -37,45 +37,6 @@ module Toast
     end
 
     def put payload
-      # only for has_one/belongs_to assocs            
-      raise MethodNotAllowed if @is_collection
-
-      
-      begin 
-        payload = ActiveSupport::JSON.decode(payload)
-      rescue
-        raise PayloadFormatError
-      end
-
-
-      unless payload.is_a? Hash
-        raise PayloadFormatError
-      end
-      
-      # update see record
-      if self.media_type != @associate_model.toast_config.media_type
-        raise UnsupportedMediaType
-      end
-
-      # silently ignore all exposed readable, but not writable fields
-      (@associate_model.toast_config.readables - @associate_model.toast_config.writables).each do |rof|
-        payload.delete(rof)
-      end
-      
-      record = @record.send(@assoc)
-      
-      # set the virtual attributes 
-      (payload.keys.to_set - record.attribute_names.to_set).each do |vattr|
-        record.send("#{vattr}=", payload.delete(vattr))             
-      end 
-      
-      # mass-update for the rest 
-      record.update_attributes payload
-      { 
-        :json => record.exposed_attributes,
-        :status => :ok,
-        :location => record.uri
-      }      
     end
 
     def post payload
