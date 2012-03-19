@@ -4,7 +4,7 @@ class Banana < ActiveRecord::Base
 
   has_many :coconuts
 
-  resourceful_model do
+  acts_as_resource {
 
     writables :name, :number
     readables :curvature, :coconuts, :apple, :dragonfruit
@@ -12,7 +12,7 @@ class Banana < ActiveRecord::Base
     collections :find_some, :all, :query
     pass_params_to :query
 
-  end
+  }
 
   scope :find_some, where("number < 100")
 

@@ -1,6 +1,6 @@
 class Apple < ActiveRecord::Base
 
-  resourceful_model do |resource|
+  acts_as_resource do |resource|
     resource.media_type = "application/json+apple"
     resource.writables = :name, :number
     resource.readables = :bananas

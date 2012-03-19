@@ -61,6 +61,8 @@ module Toast
       end
     end
 
+    alias acts_as_resource resourceful_model
+
     # defaults for non resourceful-models
     def is_resourceful_model?
       false
