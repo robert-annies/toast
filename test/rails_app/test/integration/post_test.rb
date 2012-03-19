@@ -94,17 +94,18 @@ class ToastTest < ActionDispatch::IntegrationTest
       post_json "bananas/#{b1.id}/coconuts", {"number" => 123, "name" => "eriberto_morar@kochmraz.name"}
       assert_response :created
 
-      assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name", "uri" => "http://www.example.com/coconuts/3"}, json_response)
+      assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name", 
+                     "uri" => "http://www.example.com/fruits/coconuts/3"}, json_response)
 
       c3 = Coconut.find_by_number 123
-      assert_equal "http://www.example.com/coconuts/#{c3.id}", json_response["uri"]
+      assert_equal "http://www.example.com/fruits/coconuts/#{c3.id}", json_response["uri"]
 
       get "bananas/#{b1.id}/coconuts"
       assert_response :ok
 
-      assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "uri" => "http://www.example.com/coconuts/#{c1.id}"},
-                            {"number" => 906, "name" => "genesis@jacobs.biz", "uri" => "http://www.example.com/coconuts/#{c2.id}"},
-                            {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "uri" => "http://www.example.com/coconuts/#{c3.id}"}],
+      assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "uri" => "http://www.example.com/fruits/coconuts/#{c1.id}"},
+                            {"number" => 906, "name" => "genesis@jacobs.biz", "uri" => "http://www.example.com/fruits/coconuts/#{c2.id}"},
+                            {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "uri" => "http://www.example.com/fruits/coconuts/#{c3.id}"}],
                            json_response
     end
 

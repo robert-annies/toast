@@ -25,9 +25,12 @@ module Toast
 
       # add instance methods
       self.class_eval do
-        # Return toast's standard uri for a record
-        def uri
-          "#{self.class.uri_base}/#{self.class.to_s.pluralize.underscore}/#{self.id}"
+        # Return the path segment of the URI of this record
+        def uri_fullpath
+          "/" +
+            (self.class.toast_config.namespace ? self.class.toast_config.namespace+"/" : "") +
+            self.class.to_s.pluralize.underscore + "/" +
+            self.id.to_s
         end
 
         # Returns a Hash with all exposed attributes
@@ -44,17 +47,6 @@ module Toast
             acc[attr] = self.send attr
             acc
           end
-
-          # association URIs
-          exposed_assoc =
-            options[:in_collection] ? self.class.toast_config.in_collection.exposed_associations :
-                                      self.class.toast_config.exposed_associations
-
-          exposed_assoc.each do |assoc|
-            out[assoc] = self.uri + "/" + assoc
-          end
-
-          out["uri"] = self.uri if options[:with_uri]
 
           out
         end

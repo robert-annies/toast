@@ -31,12 +31,12 @@ module Toast
       unless payload.is_a? Hash
         raise PayloadFormatError
       end
-      
-      # silently ignore all exposed readable, but not writable fields
-      (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
+
+      # ignore all exposed readable, but not writable fields
+      (@model.toast_config.readables - @model.toast_config.writables + ["uri"]).each do |rof|
         payload.delete(rof)
       end
-      
+
       # set the virtual attributes 
       (payload.keys.to_set - @record.attribute_names.to_set).each do |vattr|
         @record.send("#{vattr}=", payload.delete(vattr))             
@@ -45,9 +45,9 @@ module Toast
       # mass-update for the rest 
       @record.update_attributes payload
       { 
-        :json => @record.exposed_attributes,
+        :json => @record.exposed_attributes.merge( uri_fields(@record) ),
         :status => :ok,
-        :location => @record.uri
+        :location => self.base_uri + @record.uri_fullpath
       }
     end
 
@@ -58,9 +58,9 @@ module Toast
           :template => "resources/#{model.to_s.underscore}",
           :locals => { model.to_s.underscore.to_sym => @record } # full record, view should filter
         }
-      when "json"
+      when "json"       
         {
-          :json => @record.exposed_attributes,
+          :json => @record.exposed_attributes.merge( uri_fields(@record) ), 
           :status => :ok
         }
       else 
@@ -75,5 +75,6 @@ module Toast
         :status => :ok
       }
     end
+    
   end
 end

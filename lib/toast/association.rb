@@ -24,12 +24,16 @@ module Toast
 
       if result.is_a? Array 
         {
-          :json => result.map{|r| r.exposed_attributes(:in_collection => true)},
+          :json => result.map{|r|
+            r.exposed_attributes(:in_collection => true).
+            merge( uri_fields(r, true) )
+          },
           :status => :ok
         }
       else
         {
-          :json => result.exposed_attributes(:in_collection => true),
+          :json => result.exposed_attributes(:in_collection => true).
+                   merge( uri_fields(result) ),
           :status => :ok
         }
       end
@@ -37,6 +41,7 @@ module Toast
     end
 
     def put payload
+      raise MethodNotAllowed 
     end
 
     def post payload
@@ -66,8 +71,8 @@ module Toast
         record = @record.send(@assoc).create! payload
       
         {
-          :json => record.exposed_attributes,
-          :location => record.uri,
+          :json => record.exposed_attributes.merge( uri_fields(record) ),
+          :location => self.base_uri + record.uri_fullpath,
           :status => :created
         }
       

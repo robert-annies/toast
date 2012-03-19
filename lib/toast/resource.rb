@@ -10,7 +10,7 @@ module Toast
   # Record, RootCollection, Association, Single
   class Resource
 
-    attr_accessor :media_type
+    attr_accessor :media_type, :base_uri
 
     def initialize
       raise 'ToastResource#new: use #build to create an instance'
@@ -24,26 +24,24 @@ module Toast
       format = params[:format]
 
       begin
-        
+
         model = get_class_by_resource_name resource_name
-                
-        # base is complete URL until the resource name
-        model.uri_base = request.url.match(/(.*)\/#{resource_name}(?:\..+|\/|\z)/)[1]
 
         # decide which sub type
         rsc = if id.nil? and model.toast_config.singles.include?(subresource_name)
-                Toast::Single.new(model, subresource_name, params.clone)                 
+                Toast::Single.new(model, subresource_name, params.clone)
               elsif id.nil?
                 Toast::RootCollection.new(model, subresource_name, params.clone)
               elsif subresource_name.nil?
                 Toast::Record.new(model, id, format)
               elsif model.toast_config.exposed_associations.include? subresource_name
-                Toast::Association.new(model, id, subresource_name, format)                
+                Toast::Association.new(model, id, subresource_name, format)
               else
                 raise ResourceNotFound
               end
-        
+
         rsc.media_type = request.media_type
+        rsc.base_uri = request.base_url
 
         rsc
       rescue NameError
@@ -69,7 +67,7 @@ module Toast
     def apply method, payload
 
       raise MethodNotAllowed if self.model.toast_config.disallow_methods.include?(method.downcase)
-      
+
       case method
       when "PUT","POST"
         self.send(method.downcase, payload)
@@ -77,8 +75,26 @@ module Toast
         self.send(method.downcase)
       else
         raise MethodNotAllowed
-      end            
+      end
     end
+
+    private
+    def uri_fields record, in_collection=false
+      out = {}
+
+      exposed_assoc =
+        in_collection ? record.class.toast_config.in_collection.exposed_associations :
+                        record.class.toast_config.exposed_associations
+
+      exposed_assoc.each do |assoc|
+        out[assoc] = "#{self.base_uri}#{record.uri_fullpath}/#{assoc}"
+      end
+
+      out["uri"] = self.base_uri + record.uri_fullpath
+
+      out
+    end
+
   end
 end
 

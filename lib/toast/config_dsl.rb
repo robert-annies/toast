@@ -7,7 +7,7 @@ module Toast
 
       def initialize model
         @model = model
-        @readables = ["uri"]
+        @readables = []
         @writables = []
         @collections = []
         @singles = []
@@ -119,7 +119,7 @@ module Toast
 
       def readables= readables
         @writables = [] # forget inherited writables
-        @readables = ConfigDSL.sanitize(readables,"readables") << "uri"
+        @readables = ConfigDSL.sanitize(readables,"readables")
       end
 
       def readables *arg

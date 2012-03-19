@@ -36,7 +36,10 @@ module Toast
         }
       when "json"        
         {
-          :json => records.map{|r| r.exposed_attributes(:in_collection => true)},
+          :json => records.map{|r|
+            r.exposed_attributes(:in_collection => true).
+            merge( uri_fields(r, true) )
+          },
           :status => :ok
         }
       else
@@ -71,7 +74,7 @@ module Toast
       end
 
       # silently ignore all exposed readable, but not writable fields
-      (@model.toast_config.readables - @model.toast_config.writables).each do |rof|
+      (@model.toast_config.readables - @model.toast_config.writables + ["uri"]).each do |rof|
         payload.delete(rof)
       end
       
@@ -79,8 +82,8 @@ module Toast
         record = @model.create! payload              
 
         {
-          :json => record.exposed_attributes,
-          :location => record.uri,
+          :json => record.exposed_attributes.merge( uri_fields(record) ),
+          :location => self.base_uri + record.uri_fullpath,
           :status => :created
         }
         
