@@ -12,7 +12,8 @@ module Toast
         @collections = []
         @singles = []
         @media_type = "application/json"
-        @disallow_methods = []
+        @deletable = false
+        @postable = false
         @pass_params_to = []
         @in_collection = ConfigDSL::InCollection.new model, self
       end
@@ -28,43 +29,40 @@ module Toast
       end
 
       def readables= arg
-        #if arg.first == :all
-        #  @readables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "readables")
-        #else
-          @readables.push *ConfigDSL.sanitize(arg,"readables")          
-        #end
+          @readables.push *ConfigDSL.sanitize(arg,"readables")
       end
 
       # args: Array or :all, :except => Array
       def readables *arg
         return(@readables) if arg.empty?
-        self.readables = arg        
+        self.readables = arg
       end
 
       def writables= arg
-        #if arg.first == :all
-        #  @writables.push @model.attribute_names - ConfigDSL.sanitize(args.last[:except], "writables")
-        #else
-        # white list writables (protect the rest from mass-assignment)
         @model.attr_accessible *arg
-        @writables.push *ConfigDSL.sanitize(arg,"writables")          
-        #end
+        @writables.push *ConfigDSL.sanitize(arg,"writables")
       end
 
       # args: Array or :all, :except => Array
       def writables *arg
         return(@writables) if arg.empty?
-        self.writables = arg        
+        self.writables = arg
       end
 
-     
-      def disallow_methods= arg
-        @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
+      def deletable
+        @deletable = true
       end
 
-      def disallow_methods *arg
-        return(@disallow_methods) if arg.empty?
-        self.disallow_methods = arg        
+      def deletable?
+        @deletable
+      end
+
+      def postable
+        @postable = true
+      end
+
+      def postable?
+        @postable
       end
 
       def pass_params_to= arg
@@ -73,9 +71,9 @@ module Toast
 
       def pass_params_to *arg
         return(@pass_params_to) if arg.empty?
-        self.pass_params_to = arg        
+        self.pass_params_to = arg
       end
-     
+
       def collections= collections=[]
         @collections = ConfigDSL.sanitize(collections, "collections")
       end
@@ -111,9 +109,8 @@ module Toast
 
       def initialize model, base_config
         @model = model
-        @readables = base_config.readables # must assign a reference 
-        @writables = base_config.writables # must assign a reference 
-        @disallow_methods = []
+        @readables = base_config.readables # must assign a reference
+        @writables = base_config.writables # must assign a reference
         @media_type = "application/json"
       end
 
@@ -146,16 +143,6 @@ module Toast
         assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
         (@readables + @writables).uniq.select{|f| assocs.include?(f)}
       end
-
-      def disallow_methods= arg
-        @disallow_methods.push *ConfigDSL.sanitize(arg,"disallow methods")
-      end
-
-      def disallow_methods *arg
-        return(@disallow_methods) if arg.empty?
-        self.disallow_methods = arg        
-      end
-
     end
 
 

@@ -45,6 +45,7 @@ module Toast
     end
 
     def post payload
+      raise MethodNotAllowed unless @model.toast_config.writables.include? @assoc
 
       if self.media_type != @associate_model.toast_config.media_type
         raise UnsupportedMediaType

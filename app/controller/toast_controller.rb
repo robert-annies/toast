@@ -4,15 +4,15 @@ class ToastController < ApplicationController
 
     begin
 
-      @resource = Toast::Resource.build( params, request )     
+      @resource = Toast::Resource.build( params, request )
 
-      render @resource.apply(request.method, request.body.read) 
-      
+      render @resource.apply(request.method, request.body.read)
+
     rescue Toast::ResourceNotFound => e
       return head(:not_found)
 
     rescue Toast::PayloadInvalid => e
-      return render :text => e.message, :status => :forbidden 
+      return render :text => e.message, :status => :forbidden
 
     rescue Toast::PayloadFormatError => e
       return head(:bad_request)

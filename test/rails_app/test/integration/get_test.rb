@@ -218,16 +218,6 @@ class ToastTest < ActionDispatch::IntegrationTest
                       "uri" => "http://www.example.com/bananas/#{b4.id}"}], json_response
 
     end
-
-
-    should "not respond when GET is disallowed" do
-
-      d1 = Dragonfruit.create :number => 35, :name => "mia_hartmann@carterbarton.net"
-
-      get "dragonfruits/#{d1.id}"
-      assert_response :method_not_allowed
-    end
-
     
     should "respond with HTML on .html for single resources" do       
       a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"

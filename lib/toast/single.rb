@@ -34,10 +34,6 @@ module Toast
     end
 
     def get
-      if @model.toast_config.in_collection.disallow_methods.include? "get"
-        raise MethodNotAllowed
-      end
-
       case @format
       when "html"
         {

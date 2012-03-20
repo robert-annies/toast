@@ -69,6 +69,8 @@ module Toast
     end
 
     def delete
+      raise MethodNotAllowed unless @model.toast_config.deletable?
+
       @record.destroy
       {
         :nothing => true,

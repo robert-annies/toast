@@ -18,9 +18,6 @@ module Toast
     end
 
     def get
-      if @model.toast_config.in_collection.disallow_methods.include? "get"
-        raise MethodNotAllowed 
-      end
        
       records = if @model.toast_config.pass_params_to.include?(@collection) 
                   @model.send(@collection, @params)
@@ -52,10 +49,8 @@ module Toast
     end
 
     def post payload
-      if @model.toast_config.in_collection.disallow_methods.include? "post"
-        raise MethodNotAllowed
-      end
-        
+      raise MethodNotAllowed unless @model.toast_config.postable?
+
       if @collection != "all"
         raise MethodNotAllowed
       end

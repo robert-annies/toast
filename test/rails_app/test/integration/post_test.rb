@@ -63,8 +63,8 @@ class ToastTest < ActionDispatch::IntegrationTest
       c1 = Coconut.first
       assert_equal "Capetown", c1.hidden # "Capetown" is the default in the db-schema
       assert_equal 3312, c1.number
-      assert_equal "Benny Hane I", c1.name 
-      
+      assert_equal "Benny Hane I", c1.name
+
     end
 
     should "not set non-writable fields in associate collection" do
@@ -72,15 +72,15 @@ class ToastTest < ActionDispatch::IntegrationTest
       c0 = {"number" => 3312, "name" => "Benny Hane I", "hidden" => "Cairo"}
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
-      # try to post a non-writable field to a association 
+      # try to post a non-writable field to a association
       post_json "bananas/#{b1.id}/coconuts", c0
       assert_response :created
-      
+
       c2 = Coconut.last
       assert_equal "Capetown", c2.hidden # "Capetown" is the default in the db-schema
       assert_equal 3312, c2.number
-      assert_equal "Benny Hane I", c2.name 
-  
+      assert_equal "Benny Hane I", c2.name
+
     end
 
     should "create new associated records" do
@@ -94,7 +94,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       post_json "bananas/#{b1.id}/coconuts", {"number" => 123, "name" => "eriberto_morar@kochmraz.name"}
       assert_response :created
 
-      assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name", 
+      assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name",
                      "uri" => "http://www.example.com/fruits/coconuts/3"}, json_response)
 
       c3 = Coconut.find_by_number 123
@@ -116,16 +116,16 @@ class ToastTest < ActionDispatch::IntegrationTest
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
       assert_raise StandardError do
-        begin        
+        begin
           post "bananas/#{b1.id}/coconuts", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
-        rescue 
+        rescue
           raise StandardError  # diffirent rails version raise different exceptions, equalize it
         end
       end
 
     end
 
-    should "not create when POST is disallowed" do 
+    should "not create when POST is not allowed" do
       post_json "dragonfruits",{"number" => 35, "name" => "mia_hartmann@carterbarton.net"}
       assert_response :method_not_allowed
     end

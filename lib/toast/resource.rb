@@ -17,7 +17,6 @@ module Toast
     end
 
     def self.build params, request
-
       resource_name = params[:resource]
       id = params[:id]
       subresource_name = params[:subresource]
@@ -65,14 +64,11 @@ module Toast
     end
 
     def apply method, payload
-
-      raise MethodNotAllowed if self.model.toast_config.disallow_methods.include?(method.downcase)
-
       case method
       when "PUT","POST"
         self.send(method.downcase, payload)
       when "DELETE","GET"
-        self.send(method.downcase)
+         self.send(method.downcase)
       else
         raise MethodNotAllowed
       end
@@ -94,7 +90,5 @@ module Toast
 
       out
     end
-
   end
 end
-

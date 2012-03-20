@@ -6,8 +6,8 @@ class Banana < ActiveRecord::Base
 
   acts_as_resource {
 
-    writables :name, :number
-    readables :curvature, :coconuts, :apple, :dragonfruit
+    writables :name, :number, :coconuts
+    readables :curvature, :apple, :dragonfruit
 
     collections :find_some, :all, :query
     pass_params_to :query

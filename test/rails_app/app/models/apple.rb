@@ -10,6 +10,8 @@ class Apple < ActiveRecord::Base
     resource.in_collection do
       readables :number
     end
+
+    resource.deletable
   end
 
   has_many :bananas

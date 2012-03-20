@@ -6,8 +6,9 @@ class Coconut < ActiveRecord::Base
   has_many :dragonfruits, :through => :coconut_dragonfruits
 
   acts_as_resource do |r|
+    r.namespace = "fruits"
     r.writables = :name, :number
     r.collections = :all
-    r.namespace = "fruits"
+    r.postable
   end
 end

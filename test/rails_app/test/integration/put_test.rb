@@ -148,14 +148,5 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :bad_request
 
     end
-
-    should "not update when PUT is disallowed" do
-
-      d1 = Dragonfruit.create :number => 35, :name => "mia_hartmann@carterbarton.net"
-
-      put_json "dragonfruits/#{d1.id}", {:number => 24, :name => "mia_hartmann@carterbarton.net"}      
-      assert_response :method_not_allowed
-    end
-
   end
 end
