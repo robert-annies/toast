@@ -24,6 +24,23 @@ module Toast
         # raised when DB is not setup yet. (rake db:schema:load)
       end
 
+      # Monkey patch the request class for Rails 3.0, Rack 1.2
+      # Backport from Rack 1.3
+      if Rack.release == "1.2"
+        class Rack::Request
+          def base_url
+            url = scheme + "://"
+            url << host
+
+            if scheme == "https" && port != 443 ||
+                scheme == "http" && port != 80
+              url << ":#{port}"
+            end
+
+            url
+          end
+        end
+      end
     end
   end
 end
