@@ -40,7 +40,7 @@ module Toast
               end
 
         rsc.media_type = request.media_type
-        rsc.base_uri = request.base_url
+        rsc.base_uri = request.base_url + request.script_name
 
         rsc
       rescue NameError
