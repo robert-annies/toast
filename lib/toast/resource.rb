@@ -7,7 +7,7 @@ module Toast
   class UnsupportedMediaType < Exception; end
 
   # Represents a resource. There are following resource types as sub classes:
-  # Record, RootCollection, Association, Single
+  # Record, Collection, Association, Single
   class Resource
 
     attr_accessor :media_type, :base_uri
@@ -30,7 +30,7 @@ module Toast
         rsc = if id.nil? and model.toast_config.singles.include?(subresource_name)
                 Toast::Single.new(model, subresource_name, params.clone)
               elsif id.nil?
-                Toast::RootCollection.new(model, subresource_name, params.clone)
+                Toast::Collection.new(model, subresource_name, params.clone)
               elsif subresource_name.nil?
                 Toast::Record.new(model, id, format)
               elsif model.toast_config.exposed_associations.include? subresource_name

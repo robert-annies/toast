@@ -1,12 +1,12 @@
 module Toast
-  class RootCollection < Resource
-    
+  class Collection < Resource
+
     attr_reader :model
-    
+
     def initialize model, subresource_name, params
-      
+
       subresource_name ||= "all"
-      
+
       unless model.toast_config.collections.include? subresource_name
         raise ResourceNotFound
       end
@@ -18,8 +18,8 @@ module Toast
     end
 
     def get
-       
-      records = if @model.toast_config.pass_params_to.include?(@collection) 
+
+      records = if @model.toast_config.pass_params_to.include?(@collection)
                   @model.send(@collection, @params)
                 else
                   @model.send(@collection)
@@ -29,9 +29,9 @@ module Toast
       when "html"
         {
           :template => "resources/#{model.to_s.pluralize.underscore}",
-          :locals => { model.to_s.pluralize.underscore.to_sym => records } 
+          :locals => { model.to_s.pluralize.underscore.to_sym => records }
         }
-      when "json"        
+      when "json"
         {
           :json => records.map{|r|
             r.exposed_attributes(:in_collection => true).
@@ -59,7 +59,7 @@ module Toast
         raise UnsupportedMediaType
       end
 
-      begin 
+      begin
         payload = ActiveSupport::JSON.decode(payload)
       rescue
         raise PayloadFormatError
@@ -72,16 +72,16 @@ module Toast
       (@model.toast_config.readables - @model.toast_config.writables + ["uri"]).each do |rof|
         payload.delete(rof)
       end
-      
+
       begin
-        record = @model.create! payload              
+        record = @model.create! payload
 
         {
           :json => record.exposed_attributes.merge( uri_fields(record) ),
           :location => self.base_uri + record.uri_fullpath,
           :status => :created
         }
-        
+
       rescue ActiveRecord::RecordInvalid => e
         # model validation failed
         raise PayloadInvalid.new(e.message)

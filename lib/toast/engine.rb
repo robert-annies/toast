@@ -1,6 +1,6 @@
 require 'toast/active_record_extensions.rb'
 require 'toast/resource.rb'
-require 'toast/root_collection'
+require 'toast/collection'
 require 'toast/association'
 require 'toast/record'
 require 'toast/single'
