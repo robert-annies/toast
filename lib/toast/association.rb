@@ -1,6 +1,6 @@
 module Toast
   class Association < Resource
-    
+
     attr_reader :model
 
     def initialize model, id, subresource_name, format
@@ -16,13 +16,13 @@ module Toast
 
       @associate_model = Resource.get_class_by_resource_name subresource_name
       @associate_model.uri_base = @model.uri_base
-      
+
     end
 
     def get
       result = @record.send(@assoc)
 
-      if result.is_a? Array 
+      if result.is_a? Array
         {
           :json => result.map{|r|
             r.exposed_attributes(:in_collection => true).
@@ -41,7 +41,7 @@ module Toast
     end
 
     def put payload
-      raise MethodNotAllowed 
+      raise MethodNotAllowed
     end
 
     def post payload
@@ -51,7 +51,7 @@ module Toast
         raise UnsupportedMediaType
       end
 
-      begin 
+      begin
         payload = ActiveSupport::JSON.decode(payload)
       rescue
         raise PayloadFormatError
@@ -59,7 +59,7 @@ module Toast
 
       unless payload.is_a? Hash
         raise PayloadFormatError
-      end 
+      end
 
 
       # silently ignore all exposed readable, but not writable fields
@@ -67,16 +67,16 @@ module Toast
         payload.delete(rof)
       end
 
-      
+
       begin
         record = @record.send(@assoc).create! payload
-      
+
         {
           :json => record.exposed_attributes.merge( uri_fields(record) ),
           :location => self.base_uri + record.uri_fullpath,
           :status => :created
         }
-      
+
       rescue ActiveRecord::RecordInvalid => e
         # model validation failed
         raise PayloadInvalid.new(e.message)
