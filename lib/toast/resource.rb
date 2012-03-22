@@ -83,10 +83,10 @@ module Toast
                         record.class.toast_config.exposed_associations
 
       exposed_assoc.each do |assoc|
-        out[assoc] = "#{self.base_uri}#{record.uri_fullpath}/#{assoc}"
+        out[assoc] = "#{self.base_uri}#{record.uri_path}/#{assoc}"
       end
 
-      out["uri"] = self.base_uri + record.uri_fullpath
+      out["uri"] = self.base_uri + record.uri_path
 
       out
     end

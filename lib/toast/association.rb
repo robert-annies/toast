@@ -73,7 +73,7 @@ module Toast
 
         {
           :json => record.exposed_attributes.merge( uri_fields(record) ),
-          :location => self.base_uri + record.uri_fullpath,
+          :location => self.base_uri + record.uri_path,
           :status => :created
         }
 

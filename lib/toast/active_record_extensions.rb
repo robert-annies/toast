@@ -26,7 +26,7 @@ module Toast
       # add instance methods
       self.class_eval do
         # Return the path segment of the URI of this record
-        def uri_fullpath
+        def uri_path
           "/" +
             (self.class.toast_config.namespace ? self.class.toast_config.namespace+"/" : "") +
             self.class.to_s.pluralize.underscore + "/" +
