@@ -30,8 +30,8 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :ok
 
       get "apples"
-      assert_same_elements [{"number" => 133, "uri" => "http://www.example.com/apples/#{a2.id}"},
-                            {"number" => 123, "uri" => "http://www.example.com/apples/#{a3.id}"}],
+      assert_same_elements [{"number" => 133, "self" => "http://www.example.com/apples/#{a2.id}"},
+                            {"number" => 123, "self" => "http://www.example.com/apples/#{a3.id}"}],
                            json_response
 
 
@@ -41,7 +41,7 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       get "apples"
 
-      assert_equal([{"number" => 133, "uri" => "http://www.example.com/apples/#{a2.id}"}],
+      assert_equal([{"number" => 133, "self" => "http://www.example.com/apples/#{a2.id}"}],
                    json_response)
 
 
@@ -50,7 +50,7 @@ class ToastTest < ActionDispatch::IntegrationTest
     should "not be deleted when DELETE is disallowed" do
 
       d1 = Dragonfruit.create :number => 35, :name => "mia_hartmann@carterbarton.net"
-
+      
       delete "dragonfruits/#{d1.id}"
       assert_response :method_not_allowed
 

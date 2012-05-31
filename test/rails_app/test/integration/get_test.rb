@@ -36,16 +36,16 @@ class ToastTest < ActionDispatch::IntegrationTest
       get "apples/#{a1.id}"
       assert_response :ok
       assert_equal({
-                     "uri" => "http://www.example.com/apples/#{a1.id}",
+                     "self" => "http://www.example.com/apples/#{a1.id}",
                      "number" => 45,
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
-      get "bananas/#{b1.id}"
+      get "bananas/#{b1.id}", nil, accept("application/banana-v1")
       assert_response :ok
       assert_equal({
-                     "uri" => "http://www.example.com/bananas/#{b1.id}",
+                     "self" => "http://www.example.com/bananas/#{b1.id}",
                      "number" => 895,
                      "name" => "tommie.rohan@kub.name",
                      "curvature" => 8.18,
@@ -58,11 +58,11 @@ class ToastTest < ActionDispatch::IntegrationTest
     should "respond on class methods returning single instance" do
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
-
-      get "apples/first"
+      
+      get "apples/first", nil,  {'HTTP_ACCEPT'=>'application/apple+json'}
       assert_response :ok
       assert_equal({
-                     "uri" => "http://www.example.com/apples/#{a1.id}",
+                     "self" => "http://www.example.com/apples/#{a1.id}",
                      "number" => 45,
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
                      "name" => "loyce.donnelly@daugherty.info"
@@ -106,10 +106,10 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       get "apples"
       assert_response :ok
-      assert_same_elements( [ { "number" => 45, "uri" => "http://www.example.com/apples/#{a1.id}" },
-                              { "number" => 133, "uri" => "http://www.example.com/apples/#{a2.id}" },
-                              { "number" => 465, "uri" => "http://www.example.com/apples/#{a3.id}" },
-                              { "number" => 13, "uri" => "http://www.example.com/apples/#{a4.id}" }
+      assert_same_elements( [ { "number" => 45, "self" => "http://www.example.com/apples/#{a1.id}" },
+                              { "number" => 133, "self" => "http://www.example.com/apples/#{a2.id}" },
+                              { "number" => 465, "self" => "http://www.example.com/apples/#{a3.id}" },
+                              { "number" => 13, "self" => "http://www.example.com/apples/#{a4.id}" }
                             ], json_response)
 
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
@@ -117,7 +117,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      get "bananas/find_some"
+      get "bananas/find_some", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_same_elements( [ { "number" => 45,
@@ -126,14 +126,14 @@ class ToastTest < ActionDispatch::IntegrationTest
                                 "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
                                 "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
-                                "uri" => "http://www.example.com/bananas/#{b1.id}" },
+                                "self" => "http://www.example.com/bananas/#{b1.id}" },
                               { "number" => 13,
                                 "name" => "chadd.lind@abshire.com",
                                 "curvature" => 8.18,
                                 "apple" => "http://www.example.com/bananas/#{b4.id}/apple",
                                 "coconuts" => "http://www.example.com/bananas/#{b4.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b4.id}/dragonfruit" ,
-                                "uri" => "http://www.example.com/bananas/#{b4.id}" }
+                                "self" => "http://www.example.com/bananas/#{b4.id}" }
                             ], json_response)
 
     end
@@ -144,7 +144,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      get "bananas/query?gt=100"
+      get "bananas/query?gt=100", nil, accept("application/bananas-v1")
       assert_response :ok
       
       assert_same_elements( [ { "number" => 133,
@@ -153,14 +153,14 @@ class ToastTest < ActionDispatch::IntegrationTest
                                 "curvature" => 8.18,
                                 "coconuts" =>    "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
-                                "uri" =>         "http://www.example.com/bananas/#{b2.id}" },
+                                "self" =>         "http://www.example.com/bananas/#{b2.id}" },
                               { "number" => 465,
                                 "name" => "ruth@balistreri.com",
                                 "apple" =>       "http://www.example.com/bananas/#{b3.id}/apple",
                                 "curvature" => 8.18,
                                 "coconuts" =>    "http://www.example.com/bananas/#{b3.id}/coconuts" ,                                         
                                 "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit" ,
-                                "uri" =>         "http://www.example.com/bananas/#{b3.id}" }
+                                "self" =>         "http://www.example.com/bananas/#{b3.id}" }
                             ], json_response)    
     end
 
@@ -181,7 +181,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       a2.bananas = [b2, b4]
       
 
-      get "apples/#{a1.id}/bananas"
+      get "apples/#{a1.id}/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
       assert_equal [{"number" => 45,
                       "name" => "loyce.donnelly@daugherty.info",
@@ -189,7 +189,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                       "curvature" => 8.18,
                       "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit",
-                      "uri" => "http://www.example.com/bananas/#{b1.id}" },
+                      "self" => "http://www.example.com/bananas/#{b1.id}" },
 
                     {"number" => 465,
                       "name" => "ruth@balistreri.com",
@@ -197,10 +197,10 @@ class ToastTest < ActionDispatch::IntegrationTest
                       "apple" =>  "http://www.example.com/bananas/#{b3.id}/apple",
                       "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
-                      "uri" => "http://www.example.com/bananas/#{b3.id}"}], json_response
+                      "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
 
 
-      get "apples/#{a2.id}/bananas"
+      get "apples/#{a2.id}/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
       assert_equal [{"number" => 145,
                       "name" => "theresa@deckowsipes.net",
@@ -208,14 +208,14 @@ class ToastTest < ActionDispatch::IntegrationTest
                       "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
                       "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit",
-                      "uri" => "http://www.example.com/bananas/#{b2.id}" },
+                      "self" => "http://www.example.com/bananas/#{b2.id}" },
                     {"number" => 13,
                       "curvature" => 8.18,
                       "name" => "chadd.lind@abshire.com",
                       "apple" => "http://www.example.com/bananas/#{b4.id}/apple",
                       "coconuts" => "http://www.example.com/bananas/#{b4.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b4.id}/dragonfruit",
-                      "uri" => "http://www.example.com/bananas/#{b4.id}"}], json_response
+                      "self" => "http://www.example.com/bananas/#{b4.id}"}], json_response
 
     end
     

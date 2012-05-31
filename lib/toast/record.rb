@@ -3,22 +3,24 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, id, format
+    def initialize model, id, format, config_in, config_out
       @model = model
       @record = model.find(id) rescue raise(ResourceNotFound.new)
       @format = format
+      @config_in = config_in
+      @config_out = config_out
     end
 
-    def post payload
+    def post payload, media_type
       raise MethodNotAllowed
     end
 
     # get, put, delete, post return a Hash that can be used as
     # argument for ActionController#render
 
-    def put payload
+    def put payload, media_type
 
-      if self.media_type != @model.toast_config.media_type
+      if media_type != @config_in.media_type
         raise UnsupportedMediaType
       end
 
@@ -33,21 +35,24 @@ module Toast
       end
 
       # ignore all exposed readable, but not writable fields
-      (@model.toast_config.readables - @model.toast_config.writables + ["uri"]).each do |rof|
+      (@config_in.readables - @config_in.writables + ["self"]).each do |rof|
         payload.delete(rof)
       end
-
+      
       # set the virtual attributes
-      (payload.keys.to_set - @record.attribute_names.to_set).each do |vattr|
+      (@config_in.writables - @record.attribute_names -  @config_in.exposed_associations).each do |vattr|
         @record.send("#{vattr}=", payload.delete(vattr))
       end
-
+      
       # mass-update for the rest
       @record.update_attributes payload
-      {
-        :json => @record.exposed_attributes.merge( uri_fields(@record) ),
+      {        
+        :json => @record.represent( @config_out.exposed_attributes,
+                                    @config_out.exposed_associations,
+                                    @base_uri ),
         :status => :ok,
-        :location => self.base_uri + @record.uri_path
+        :location => self.base_uri + @record.uri_path,
+        :content_type => @config_out.media_type
       }
     end
 
@@ -60,8 +65,11 @@ module Toast
         }
       when "json"
         {
-          :json => @record.exposed_attributes.merge( uri_fields(@record) ),
-          :status => :ok
+          :json => @record.represent( @config_out.exposed_attributes,
+                                      @config_out.exposed_associations,
+                                      @base_uri ),
+          :status => :ok,
+          :content_type => @config_out.media_type
         }
       else
         raise ResourceNotFound
@@ -69,7 +77,7 @@ module Toast
     end
 
     def delete
-      raise MethodNotAllowed unless @model.toast_config.deletable?
+      raise MethodNotAllowed unless @config_out.deletable?
 
       @record.destroy
       {

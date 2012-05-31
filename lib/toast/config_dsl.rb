@@ -3,7 +3,7 @@ module Toast
 
     class Base
       include Blockenspiel::DSL
-      dsl_attr_accessor :media_type, :has_many, :namespace
+      dsl_attr_accessor :namespace, :media_type
 
       def initialize model
         @model = model
@@ -11,11 +11,11 @@ module Toast
         @writables = []
         @collections = []
         @singles = []
-        @media_type = "application/json"
         @deletable = false
         @postable = false
         @pass_params_to = []
         @in_collection = ConfigDSL::InCollection.new model, self
+        @media_type = "application/json"
       end
 
       def exposed_attributes
@@ -107,11 +107,13 @@ module Toast
     class InCollection
       include Blockenspiel::DSL
 
+      dsl_attr_accessor :media_type
+
       def initialize model, base_config
         @model = model
+        @media_type = "application/json"
         @readables = base_config.readables # must assign a reference
         @writables = base_config.writables # must assign a reference
-        @media_type = "application/json"
       end
 
       def readables= readables
@@ -127,10 +129,20 @@ module Toast
       def writables *arg
         self.writables = 42
       end
-
+      
       def writables= arg
         puts
         puts "Toast Config Warning (#{model.class}): Defining \"writables\" in collection definition has no effect."
+        puts
+      end
+
+      def namespace *arg
+        self.writables = 42
+      end
+
+      def namespace= arg
+        puts
+        puts "Toast Config Warning (#{model.class}): Defining \"namespace\" in collection definition has no effect."
         puts
       end
 
@@ -143,6 +155,7 @@ module Toast
         assocs = @model.reflect_on_all_associations.map{|a| a.name.to_s}
         (@readables + @writables).uniq.select{|f| assocs.include?(f)}
       end
+
     end
 
 

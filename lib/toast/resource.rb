@@ -5,12 +5,13 @@ module Toast
   class PayloadInvalid < Exception; end
   class PayloadFormatError < Exception; end
   class UnsupportedMediaType < Exception; end
+  class RequestedVersionNotDefined < Exception; end
 
   # Represents a resource. There are following resource types as sub classes:
   # Record, Collection, Association, Single
   class Resource
 
-    attr_accessor :media_type, :base_uri
+    attr_accessor :prefered_media_type, :base_uri, :payload_content_type
 
     def initialize
       raise 'ToastResource#new: use #build to create an instance'
@@ -22,25 +23,56 @@ module Toast
       subresource_name = params[:subresource]
       format = params[:format]
 
+      #### Debugging stop
+      # binding.pry if $halt
+      ###
+
       begin
-
+        
+        # determine model
         model = get_class_by_resource_name resource_name
+        
+        # determine config for representation 
+        #  config_in: cosumed representation
+        #  config_out: produced representation
+        config_out = model.toast_config request.accept_media_types.prefered
+        config_in = model.toast_config request.media_type
 
-        # decide which sub type
-        rsc = if id.nil? and model.toast_config.singles.include?(subresource_name)
-                Toast::Single.new(model, subresource_name, params.clone)
+        #  ... or in case of an association request
+        config_assoc_src = model.toast_config request.headers["Assoc-source-type"]
+        
+        # base URI for returned object
+        base_uri = request.base_url + request.script_name + 
+          (config_out.namespace ? "/" + config_out.namespace : "")
+
+        # decide which sub resource type
+        rsc = if id.nil? and config_out.singles.include?(subresource_name)
+                Toast::Single.new(model, subresource_name, params.clone, config_in, config_out)
               elsif id.nil?
-                Toast::Collection.new(model, subresource_name, params.clone)
+                Toast::Collection.new(model, subresource_name, params.clone, config_in, config_out)
               elsif subresource_name.nil?
-                Toast::Record.new(model, id, format)
-              elsif model.toast_config.exposed_associations.include? subresource_name
-                Toast::Association.new(model, id, subresource_name, format)
+                Toast::Record.new(model, id, format, config_in, config_out)
+              elsif (config_assoc_src && config_assoc_src.exposed_associations.include?(subresource_name))
+                
+                # determine associated model
+                assoc_model = get_class_by_resource_name subresource_name
+                
+                # determine config for representation of assoc. model                
+                assoc_config_out = assoc_model.toast_config request.accept_media_types.prefered
+                assoc_config_in = assoc_model.toast_config request.media_type
+                                
+                # change base URI to associated record
+                base_uri = request.base_url + request.script_name + 
+                  (assoc_config_out.namespace ? "/" + assoc_config_out.namespace : "")
+
+                Toast::Association.new(model, id, subresource_name, format, config_assoc_src, 
+                                       assoc_model, assoc_config_in, assoc_config_out)
               else
                 raise ResourceNotFound
               end
 
-        rsc.media_type = request.media_type
-        rsc.base_uri = request.base_url + request.script_name
+        # set base to be prepended to URIs
+        rsc.base_uri = base_uri
 
         rsc
       rescue NameError
@@ -63,10 +95,10 @@ module Toast
       end
     end
 
-    def apply method, payload
+    def apply method, payload, payload_media_type
       case method
-      when "PUT","POST"
-        self.send(method.downcase, payload)
+      when "PUT","POST"        
+        self.send(method.downcase, payload, payload_media_type)
       when "DELETE","GET"
          self.send(method.downcase)
       else
@@ -86,7 +118,7 @@ module Toast
         out[assoc] = "#{self.base_uri}#{record.uri_path}/#{assoc}"
       end
 
-      out["uri"] = self.base_uri + record.uri_path
+      out["self"] = self.base_uri + record.uri_path
 
       out
     end

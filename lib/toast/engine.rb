@@ -6,6 +6,7 @@ require 'toast/record'
 require 'toast/single'
 
 require 'action_dispatch/http/request'
+require 'rack/accept_media_types'
 
 module Toast
   class Engine < Rails::Engine

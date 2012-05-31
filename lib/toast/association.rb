@@ -3,8 +3,9 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, id, subresource_name, format
-      unless model.toast_config.exposed_associations.include? subresource_name
+    def initialize model, id, subresource_name, format, config, assoc_model, assoc_config_in, assoc_config_out
+      
+      unless config.exposed_associations.include? subresource_name
         raise ResourceNotFound
       end
 
@@ -13,28 +14,35 @@ module Toast
       @assoc = subresource_name
       @format = format
       @is_collection = [:has_many, :has_and_belongs_to_many].include? @model.reflect_on_association(@assoc.to_sym).macro
-
-      @associate_model = Resource.get_class_by_resource_name subresource_name
-      @associate_model.uri_base = @model.uri_base
+      @config = config
+      @associate_model = assoc_model
+      @associate_config_in = assoc_config_in
+      @associate_config_out = assoc_config_out
 
     end
 
     def get
       result = @record.send(@assoc)
 
+      raise ResourceNotFound if result.nil?
+
       if result.is_a? Array
         {
           :json => result.map{|r|
-            r.exposed_attributes(:in_collection => true).
-            merge( uri_fields(r, true) )
+            r.represent( @associate_config_out.in_collection.exposed_attributes,
+                         @associate_config_out.in_collection.exposed_associations,
+                         @base_uri )
           },
-          :status => :ok
+          :status => :ok,
+          :content_type => @associate_config_out.in_collection.media_type
         }
       else
         {
-          :json => result.exposed_attributes(:in_collection => true).
-                   merge( uri_fields(result) ),
-          :status => :ok
+          :json =>  result.represent( @associate_config_out.exposed_attributes,
+                                      @associate_config_out.exposed_associations,
+                                      @base_uri ),
+          :status => :ok,
+          :content_type => @associate_config_out.media_type
         }
       end
 
@@ -44,10 +52,10 @@ module Toast
       raise MethodNotAllowed
     end
 
-    def post payload
-      raise MethodNotAllowed unless @model.toast_config.writables.include? @assoc
+    def post payload, media_type
+      raise MethodNotAllowed unless @config.writables.include? @assoc
 
-      if self.media_type != @associate_model.toast_config.media_type
+      if media_type != @associate_config_in.media_type
         raise UnsupportedMediaType
       end
 
@@ -63,18 +71,20 @@ module Toast
 
 
       # silently ignore all exposed readable, but not writable fields
-      (@associate_model.toast_config.readables - @associate_model.toast_config.writables).each do |rof|
+      (@associate_config_in.readables - @associate_config_in.writables).each do |rof|
         payload.delete(rof)
       end
-
 
       begin
         record = @record.send(@assoc).create! payload
 
         {
-          :json => record.exposed_attributes.merge( uri_fields(record) ),
+          :json => record.represent( @associate_config_out.exposed_attributes,
+                                     @associate_config_out.exposed_associations,
+                                     @base_uri ),
           :location => self.base_uri + record.uri_path,
-          :status => :created
+          :status => :created,
+          :content_type => @associate_config_out.media_type
         }
 
       rescue ActiveRecord::RecordInvalid => e

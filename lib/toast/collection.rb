@@ -3,11 +3,11 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, subresource_name, params
+    def initialize model, subresource_name, params, config_in, config_out
 
       subresource_name ||= "all"
 
-      unless model.toast_config.collections.include? subresource_name
+      unless config_out.collections.include? subresource_name
         raise ResourceNotFound
       end
 
@@ -15,11 +15,13 @@ module Toast
       @collection = subresource_name
       @params = params
       @format = params[:format]
+      @config_out = config_out
+      @config_in = config_in
     end
 
     def get
 
-      records = if @model.toast_config.pass_params_to.include?(@collection)
+      records = if @config_out.pass_params_to.include?(@collection)
                   @model.send(@collection, @params)
                 else
                   @model.send(@collection)
@@ -34,10 +36,12 @@ module Toast
       when "json"
         {
           :json => records.map{|r|
-            r.exposed_attributes(:in_collection => true).
-            merge( uri_fields(r, true) )
+            r.represent( @config_out.in_collection.exposed_attributes,
+                         @config_out.in_collection.exposed_associations,
+                         @base_uri )
           },
-          :status => :ok
+          :status => :ok,
+          :content_type => @config_out.in_collection.media_type
         }
       else
         raise ResourceNotFound
@@ -48,15 +52,15 @@ module Toast
       raise MethodNotAllowed
     end
 
-    def post payload
-      raise MethodNotAllowed unless @model.toast_config.postable?
+    def post payload, media_type
+      raise MethodNotAllowed unless @config_in.postable?
+
+      if media_type != @config_in.media_type
+        raise UnsupportedMediaType
+      end
 
       if @collection != "all"
         raise MethodNotAllowed
-      end
-
-      if self.media_type != @model.toast_config.media_type
-        raise UnsupportedMediaType
       end
 
       begin
@@ -69,7 +73,7 @@ module Toast
       end
 
       # silently ignore all exposed readable, but not writable fields
-      (@model.toast_config.readables - @model.toast_config.writables + ["uri"]).each do |rof|
+      (@config_in.readables - @config_in.writables + ["self"]).each do |rof|
         payload.delete(rof)
       end
 
@@ -77,9 +81,12 @@ module Toast
         record = @model.create! payload
 
         {
-          :json => record.exposed_attributes.merge( uri_fields(record) ),
-          :location => self.base_uri + record.uri_path,
-          :status => :created
+          :json => record.represent( @config_out.exposed_attributes,
+                                     @config_out.exposed_associations,
+                                     @base_uri ),
+          :location => @base_uri + record.uri_path,
+          :status => :created,
+          :content_type => @config_out.media_type
         }
 
       rescue ActiveRecord::RecordInvalid => e

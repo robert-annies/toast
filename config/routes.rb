@@ -5,17 +5,25 @@ Rails.application.routes.draw do
 
     resource_name = model.to_s.pluralize.underscore
 
-    match("#{model.toast_config.namespace}/#{resource_name}(/:id(/:subresource))" => 'toast#catch_all', 
-          :constraints => { :id => /\d+/ }, 
-          :resource => resource_name,
-          :as => resource_name,
-          :defaults => { :format => 'json' })
-    
-    match("#{model.toast_config.namespace}/#{resource_name}/:subresource" => 'toast#catch_all', 
-          :resource => resource_name,
-          :defaults => { :format => 'json' })
+    namespaces = []
+
+    # routes must be defined for all defined namespaces of a model
+    model.toast_configs.each do |tc|
+      # once per namespace
+      next if namespaces.include? tc.namespace
+        
+      namespaces << tc.namespace
+      
+      match("#{tc.namespace}/#{resource_name}(/:id(/:subresource))" => 'toast#catch_all',
+            :constraints => { :id => /\d+/ },
+            :resource => resource_name,
+            :as => resource_name,
+            :defaults => { :format => 'json' })
+
+      match("#{tc.namespace}/#{resource_name}/:subresource" => 'toast#catch_all',
+            :resource => resource_name,
+            :defaults => { :format => 'json' })
+    end
   end
 
 end
-
-

@@ -32,13 +32,13 @@ class ToastTest < ActionDispatch::IntegrationTest
       post_json "fruits/coconuts", record1
       assert_response :created
       uri1 = @response.header["Location"]
-      record1.merge! "uri" => uri1
+      record1.merge! "self" => uri1
       assert_equal record1, json_response
 
       post_json "fruits/coconuts", record2
       assert_response :created
       uri2 = @response.header["Location"]
-      record2.merge! "uri" => uri2
+      record2.merge! "self" => uri2
       assert_equal record2, json_response
 
       get "fruits/coconuts"
@@ -95,17 +95,17 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_response :created
 
       assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name",
-                     "uri" => "http://www.example.com/fruits/coconuts/3"}, json_response)
+                     "self" => "http://www.example.com/fruits/coconuts/3"}, json_response)
 
       c3 = Coconut.find_by_number 123
-      assert_equal "http://www.example.com/fruits/coconuts/#{c3.id}", json_response["uri"]
+      assert_equal "http://www.example.com/fruits/coconuts/#{c3.id}", json_response["self"]
 
       get "bananas/#{b1.id}/coconuts"
       assert_response :ok
 
-      assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "uri" => "http://www.example.com/fruits/coconuts/#{c1.id}"},
-                            {"number" => 906, "name" => "genesis@jacobs.biz", "uri" => "http://www.example.com/fruits/coconuts/#{c2.id}"},
-                            {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "uri" => "http://www.example.com/fruits/coconuts/#{c3.id}"}],
+      assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "self" => "http://www.example.com/fruits/coconuts/#{c1.id}"},
+                            {"number" => 906, "name" => "genesis@jacobs.biz", "self" => "http://www.example.com/fruits/coconuts/#{c2.id}"},
+                            {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "self" => "http://www.example.com/fruits/coconuts/#{c3.id}"}],
                            json_response
     end
 

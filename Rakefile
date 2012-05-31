@@ -27,6 +27,8 @@ representation format is JSON."
     gem.files = Dir["{lib}/**/*", "{app}/**/*", "{config}/**/*"]
 
     gem.add_dependency 'blockenspiel', '~> 0.4.2'
+    gem.add_dependency 'rack-accept-media-types', '~> 0.9'	
+    
   end
 rescue LoadError
   puts "Please install jeweler first"

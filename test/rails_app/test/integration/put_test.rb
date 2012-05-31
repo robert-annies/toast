@@ -33,20 +33,22 @@ class ToastTest < ActionDispatch::IntegrationTest
       a1.bananas << b3
 
       put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12,
-                                    "apple" => "nono" , "uri"=>"nono"}
-      assert_response :ok
+                                    "apple" => "nono" , "self"=>"nono"}, 
+               "application/banana-v2"
 
-      get "bananas/#{b4.id}"
+      assert_response :ok
+   
+      get "bananas/#{b4.id}",  nil, accept("application/banana-v1")
       assert_equal({"number"=>2211,
                      "name"=> "linda@pacocha.name",
                      "curvature" => 8.18,
                      "apple" => "http://www.example.com/bananas/#{b4.id}/apple",
                      "coconuts" => "http://www.example.com/bananas/#{b4.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b4.id}/dragonfruit" ,
-                     "uri" => "http://www.example.com/bananas/#{b4.id}"},
+                     "self" => "http://www.example.com/bananas/#{b4.id}"},
                    json_response)
 
-      put_json "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}, "application/json+apple"
+      put_json "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}, "application/apple+json"
       assert_response :ok
 
       a1.reload
@@ -55,7 +57,7 @@ class ToastTest < ActionDispatch::IntegrationTest
     should "partially update" do
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
 
-      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name"}
+      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name"}, "application/banana-v1"
       assert_response :ok
 
       get "bananas/#{b2.id}"
@@ -65,7 +67,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "curvature" => 8.18,
                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
-                     "uri" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
+                     "self" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
 
     end
     
@@ -74,8 +76,8 @@ class ToastTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 43, :name => "dandre@ondricka.uk"
       b2.apple = a1
       b2.save
-
-      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name", "apple_id" => 666}
+      
+      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name", "apple_id" => 666}, "application/banana-v1"
       assert_response :ok
       
       b2.reload
@@ -88,7 +90,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "curvature" => 8.18,
                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
-                     "uri" => "http://www.example.com/bananas/#{b2.id}"}, json_response)      
+                     "self" => "http://www.example.com/bananas/#{b2.id}"}, json_response)      
     end
 
 
@@ -105,19 +107,19 @@ class ToastTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 245, :name => "heather@lockmankreiger.biz"
 
       # x-www-form-url-encoded
-      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}, {"CONTENT_TYPE" => "application/x-www-form-urlencoded"}
+      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"},  {"CONTENT_TYPE"=>"x-www-form-urlencoded"}
       assert_response :unsupported_media_type
 
       # xml
-      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml, {"CONTENT_TYPE"=> "application/xml"}
+      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,   {"CONTENT_TYPE"=>"application/xml"}
       assert_response :unsupported_media_type
 
       # should be application/apple+json
-      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_json, {"CONTENT_TYPE"=> "application/json"}
+      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_json,   {"CONTENT_TYPE"=>"application/json"}
       assert_response :unsupported_media_type
 
       # payload is XML but content type is json+apple
-      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml, {"CONTENT_TYPE"=> "application/json+apple"}
+      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,  {"CONTENT_TYPE"=>"application/apple+json"}
       assert_response :bad_request
       
            
@@ -144,7 +146,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       end
 
       # put Array
-      put_json "bananas/#{b2.id}", ["foobar",42]
+      put_json "bananas/#{b2.id}", ["foobar",42], "application/banana-v1"
       assert_response :bad_request
 
     end

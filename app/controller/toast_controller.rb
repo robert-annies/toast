@@ -6,7 +6,7 @@ class ToastController < ApplicationController
 
       @resource = Toast::Resource.build( params, request )
 
-      render @resource.apply(request.method, request.body.read)
+      render @resource.apply(request.method, request.body.read, request.content_type)
 
     rescue Toast::ResourceNotFound => e
       return head(:not_found)

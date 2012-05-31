@@ -26,9 +26,13 @@ class ActiveSupport::TestCase
     put uri, payload.to_json, (media.nil? ? {"CONTENT_TYPE"=>"application/json"} :  {"CONTENT_TYPE"=> media} )
   end
 
+  def accept type
+    {'HTTP_ACCEPT' => type}
+  end
+
   # sets the global $halt to true. helpful to stop with "debugger" or "pry" in library code
   def halt
-    puts "setting halt marker"
+    puts "->> setting halt marker <<-"
     $halt = true
   end
 

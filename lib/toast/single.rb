@@ -13,9 +13,11 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, subresource_name, params
+    def initialize model, subresource_name, params, config_in, config_out
+      @config_in = config_in
+      @config_out = config_out
 
-      unless model.toast_config.singles.include? subresource_name
+      unless @config_out.singles.include? subresource_name
         raise ResourceNotFound
       end
 
@@ -23,14 +25,14 @@ module Toast
       @params = params
       @format = params[:format]
 
-      @record = if @model.toast_config.pass_params_to.include?(subresource_name)
+
+      @record = if @config_out.pass_params_to.include?(subresource_name)
                   @model.send(subresource_name, @params)
                 else
                   @model.send(subresource_name)
                 end
-
-      raise ResourceNotFound if @record.nil?
-
+      
+      raise ResourceNotFound if @record.nil?      
     end
 
     def get
@@ -42,7 +44,9 @@ module Toast
         }
       when "json"
         {
-          :json => @record.exposed_attributes.merge( uri_fields(@record) ),
+          :json => @record.represent( @config_out.exposed_attributes,
+                                      @config_out.exposed_associations,
+                                      @base_uri ),
           :status => :ok
         }
       else

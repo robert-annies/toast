@@ -1,7 +1,7 @@
 class Apple < ActiveRecord::Base
 
   acts_as_resource do |resource|
-    resource.media_type = "application/json+apple"
+    resource.media_type = "application/apple+json"
     resource.writables = :name, :number
     resource.readables = :bananas
     resource.collections = :all
