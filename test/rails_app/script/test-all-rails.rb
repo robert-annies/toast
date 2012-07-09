@@ -13,7 +13,7 @@ for rails_version in RAILS_VERSIONS
   
   ENV["TOAST_TEST_RAILS_VERSION"] = rails_version
   `rm Gemfile.lock`
-  `bundle install`
+  `bundle install --path vendor/gems`
 
   puts "="*60
   puts "Running test suite with Ruby #{RUBY_VERSION} and Rails #{`bundle show rails`.split('-').last}"
