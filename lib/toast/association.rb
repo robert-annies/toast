@@ -22,6 +22,11 @@ module Toast
     end
 
     def get
+
+      unless @record.class.reflect_on_all_associations.detect{|a| a.name.to_s == @assoc}
+        raise "Toast Error: Association '#{@assoc}' not found in model '#{@record.class}'"
+      end
+
       result = @record.send(@assoc)
 
       raise ResourceNotFound if result.nil?

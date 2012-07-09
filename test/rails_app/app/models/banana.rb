@@ -21,7 +21,7 @@ class Banana < ActiveRecord::Base
   }
 
   acts_as_resource {
-    # add :color, removed :find_some
+    # add :color, removed :less_than_100
     media_type "application/banana-v2"
 
     writables :name, :number, :coconuts

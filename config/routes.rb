@@ -14,7 +14,7 @@ Rails.application.routes.draw do
         
       namespaces << tc.namespace
       
-      match("#{tc.namespace}/#{resource_name}(/:id(/:subresource))" => 'toast#catch_all',
+      match("#{tc.namespace}/#{resource_name}(/:id(/:subresource(/:scope)))" => 'toast#catch_all',
             :constraints => { :id => /\d+/ },
             :resource => resource_name,
             :as => resource_name,

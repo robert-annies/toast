@@ -22,11 +22,7 @@ module Toast
       id = params[:id]
       subresource_name = params[:subresource]
       format = params[:format]
-
-      #### Debugging stop
-      # binding.pry if $halt
-      ###
-
+      scope = params[:scope]
       begin
         
         # determine model
@@ -39,7 +35,7 @@ module Toast
         config_in = model.toast_config request.media_type
 
         #  ... or in case of an association request
-        config_assoc_src = model.toast_config request.headers["Assoc-source-type"]
+        config_assoc_src = model.toast_config request.headers["Assoc-source-type"] # ?
         
         # base URI for returned object
         base_uri = request.base_url + request.script_name + 
@@ -66,14 +62,21 @@ module Toast
                 base_uri = request.base_url + request.script_name + 
                   (assoc_config_out.namespace ? "/" + assoc_config_out.namespace : "")
 
-                Toast::Association.new(model, id, subresource_name, format, config_assoc_src, 
-                                       assoc_model, assoc_config_in, assoc_config_out)
+                if scope.nil?
+                  Toast::Association.new(model, id, subresource_name, format, config_assoc_src, 
+                                         assoc_model, assoc_config_in, assoc_config_out)
+                else 
+                  Toast::ScopedAssociation.new(model, id, subresource_name, scope, params.clone,
+                                               assoc_config_in, assoc_config_out)                                               
+                end
               else
                 raise ResourceNotFound
               end
 
         # set base to be prepended to URIs
         rsc.base_uri = base_uri
+
+        
 
         rsc
       rescue NameError

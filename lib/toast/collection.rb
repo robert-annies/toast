@@ -3,7 +3,7 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, subresource_name, params, config_in, config_out
+    def initialize model_or_relation, subresource_name, params, config_in, config_out
 
       subresource_name ||= "all"
 
@@ -11,7 +11,11 @@ module Toast
         raise ResourceNotFound
       end
 
-      @model = model
+      @target_model = (model_or_relation.klass rescue false) ? 
+                       model_or_relation.klass :
+                       model_or_relation
+ 
+      @model_or_relation = model_or_relation
       @collection = subresource_name
       @params = params
       @format = params[:format]
@@ -20,34 +24,43 @@ module Toast
     end
 
     def get
-      unless @model.respond_to?(@collection)
-        raise "Toast Error: Cannot find class method '#{@collection}' of model '#{@model}', which is configured in 'acts_as_resource > collections'."
+
+      unless @model_or_relation.respond_to?(@collection)
+        raise "Toast Error: Cannot find class method '#{@collection}' of model '#{@model_or_relation}', which is configured in 'acts_as_resource > collections'."
       end
       
-      records = if @config_out.pass_params_to.include?(@collection)
-                  if @model.method(@collection).arity != 1
-                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
+      # FIXME: This is a lot of hallooballoo to check if the #send
+      #        will be successful, but if it's not checked the error
+      #        message is not helpful to find the error.
+
+      records = if @config_out.pass_params_to.include?(@collection)                                  
+                  if @target_model.method(@collection).arity != 1  
+                    raise "Toast Error: Class method '#{@collection}' of model '#{@target_model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
                   end
-                  @model.send(@collection, @params)
+                  # fetch results 
+                  @model_or_relation.send(@collection, @params)
+
                 else
-                  if @model.method(@collection).arity > 0
-                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must not accept any parameter, as configured by 'acts_as_resource'"
+
+                  if @target_model.method(@collection).arity > 0
+                    raise "Toast Error: Class method '#{@collection}' of model '#{@model_or_relation}' must not accept any parameter, as configured by 'acts_as_resource'"
                   end
-                  @model.send(@collection)
+                  # fetch results
+                  @model_or_relation.send(@collection)
                 end
 
       case @format
       when "html"
         {
-          :template => "resources/#{model.to_s.pluralize.underscore}",
-          :locals => { model.to_s.pluralize.underscore.to_sym => records }
+          :template => "resources/#{@target_model.to_s.pluralize.underscore}",
+          :locals => { @target_model.to_s.pluralize.underscore.to_sym => records }
         }
       when "json"
         {
           :json => records.map{|r|
             r.represent( @config_out.in_collection.exposed_attributes,
                          @config_out.in_collection.exposed_associations,
-                         @base_uri )
+                         self.base_uri )
           },
           :status => :ok,
           :content_type => @config_out.in_collection.media_type
@@ -87,13 +100,13 @@ module Toast
       end
 
       begin
-        record = @model.create! payload
+        record = @model_or_relation.create! payload
 
         {
           :json => record.represent( @config_out.exposed_attributes,
                                      @config_out.exposed_associations,
-                                     @base_uri ),
-          :location => @base_uri + record.uri_path,
+                                     self.base_uri ),
+          :location => self.base_uri + record.uri_path,
           :status => :created,
           :content_type => @config_out.media_type
         }

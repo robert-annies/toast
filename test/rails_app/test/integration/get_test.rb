@@ -288,32 +288,53 @@ class ToastTest < ActionDispatch::IntegrationTest
       
     end
 
-    # should "respond to virtual associations" do
+    should "respond to scoped associations" do
       
-    #   e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
-    #     eg.bananas << (b1,b2,b3 = Banana.create!([{:number => 450, :name => "loyce.donnelly@daugherty.info"},
-    #                                   {:number => 12, :name => "camilla@leffler.ca"},
-    #                                   {:number => 45, :name => "ruth@balistreri.com"}]))
-    #   end
+      b1=b2=b3=nil
+
+      e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
+        eg.bananas << (b1,b2,b3 = Banana.create!([{:number => 450, :name => "loyce.donnelly@daugherty.info"},
+                                      {:number => 12, :name => "camilla@leffler.ca"},
+                                      {:number => 45, :name => "ruth@balistreri.com"}]))
+      end
+
+      get "eggplants/#{e1.id}/bananas/less_than_100"
+      assert_response :ok
+      assert_equal [{"number" => 12,
+                      "name" => "camilla@leffler.ca",
+                      "curvature" => 8.18,
+                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
+                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts",
+                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit",
+                      "self" => "http://www.example.com/bananas/#{b2.id}" },
+                    {"number" => 45,
+                      "curvature" => 8.18,
+                      "name" =>  "ruth@balistreri.com",
+                      "apple" => "http://www.example.com/bananas/#{b3.id}/apple",
+                      "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
+                      "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
+                      "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
       
-    #   get "eggplants/#{e1.id}/bananas_scoped?lower=100"
-    #   assert_response :ok
-    #   assert_equal [{"number" => 145,
-    #                   "name" => "theresa@deckowsipes.net",
-    #                   "curvature" => 8.18,
-    #                   "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
-    #                   "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts",
-    #                   "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit",
-    #                   "self" => "http://www.example.com/bananas/#{b2.id}" },
-    #                 {"number" => 13,
-    #                   "curvature" => 8.18,
-    #                   "name" => "chadd.lind@abshire.com",
-    #                   "apple" => "http://www.example.com/bananas/#{b3.id}/apple",
-    #                   "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
-    #                   "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
-    #                   "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
+      get "eggplants/#{e1.id}/bananas/query?gt=40"
+      assert_response :ok
       
-    # end
+
+      assert_equal [{"number" => 450,
+                      "name" =>  "loyce.donnelly@daugherty.info",
+                      "curvature" => 8.18,
+                      "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
+                      "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts",
+                      "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit",
+                      "self" => "http://www.example.com/bananas/#{b1.id}" },
+                    {"number" => 45,
+                      "curvature" => 8.18,
+                      "name" =>  "ruth@balistreri.com",
+                      "apple" => "http://www.example.com/bananas/#{b3.id}/apple",
+                      "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
+                      "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
+                      "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
+
+    end
 
     
   end # context GET
