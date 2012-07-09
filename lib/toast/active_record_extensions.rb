@@ -44,7 +44,7 @@ module Toast
         # Like ActiveRecord::Base.attributes, but result Hash includes
         # only attributes from the list _attr_names_ plus the
         # associations _assoc_names_ as links and the 'self' link
-        def represent attr_names, assoc_names, base_uri
+        def represent attr_names, assoc_names, base_uri, media_type
           props = {}
 
           attr_names.each do |name| 
@@ -56,6 +56,14 @@ module Toast
           
           assoc_names.each do |name| 
             props[name] = "#{base_uri}#{self.uri_path}/#{name}"
+            
+            # collections (scopes) actiing on associacions:    
+            if self.class.reflect_on_association(name.to_sym).collection?               
+              self.send(name).klass.toast_config(media_type).collections.each do |collection_name|
+                next if collection_name == "all"
+                props[name+":"+collection_name] = "#{base_uri}#{self.uri_path}/#{name}/#{collection_name}"
+              end
+            end
           end
           
           props["self"] = base_uri + self.uri_path

@@ -36,7 +36,8 @@ module Toast
           :json => result.map{|r|
             r.represent( @associate_config_out.in_collection.exposed_attributes,
                          @associate_config_out.in_collection.exposed_associations,
-                         @base_uri )
+                         @base_uri,
+                         @associate_config_out.media_type )
           },
           :status => :ok,
           :content_type => @associate_config_out.in_collection.media_type
@@ -45,7 +46,8 @@ module Toast
         {
           :json =>  result.represent( @associate_config_out.exposed_attributes,
                                       @associate_config_out.exposed_associations,
-                                      @base_uri ),
+                                      @base_uri,
+                                      @associate_config_out.media_type),
           :status => :ok,
           :content_type => @associate_config_out.media_type
         }
@@ -86,7 +88,8 @@ module Toast
         {
           :json => record.represent( @associate_config_out.exposed_attributes,
                                      @associate_config_out.exposed_associations,
-                                     @base_uri ),
+                                     @base_uri,
+                                     @associate_config_out.media_type),
           :location => self.base_uri + record.uri_path,
           :status => :created,
           :content_type => @associate_config_out.media_type

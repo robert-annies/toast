@@ -60,7 +60,8 @@ module Toast
           :json => records.map{|r|
             r.represent( @config_out.in_collection.exposed_attributes,
                          @config_out.in_collection.exposed_associations,
-                         self.base_uri )
+                         self.base_uri,
+                         @config_out.media_type)
           },
           :status => :ok,
           :content_type => @config_out.in_collection.media_type
@@ -105,7 +106,8 @@ module Toast
         {
           :json => record.represent( @config_out.exposed_attributes,
                                      @config_out.exposed_associations,
-                                     self.base_uri ),
+                                     self.base_uri,
+                                     @config_out.media_type),
           :location => self.base_uri + record.uri_path,
           :status => :created,
           :content_type => @config_out.media_type

@@ -54,7 +54,8 @@ module Toast
       {        
         :json => @record.represent( @config_out.exposed_attributes,
                                     @config_out.exposed_associations,
-                                    @base_uri ),
+                                    @base_uri,
+                                    @config_out.media_type ),
         :status => :ok,
         :location => self.base_uri + @record.uri_path,
         :content_type => @config_out.media_type
@@ -72,7 +73,8 @@ module Toast
         {
           :json => @record.represent( @config_out.exposed_attributes,
                                       @config_out.exposed_associations,
-                                      @base_uri ),
+                                      @base_uri,
+                                      @config_out.media_type),
           :status => :ok,
           :content_type => @config_out.media_type
         }

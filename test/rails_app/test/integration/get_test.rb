@@ -39,6 +39,8 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "self" => "http://www.example.com/apples/#{a1.id}",
                      "number" => 45,
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
+                     "bananas:query"=>"http://www.example.com/apples/#{a1.id}/bananas/query",
+                     "bananas:less_than_100"=> "http://www.example.com/apples/#{a1.id}/bananas/less_than_100",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
@@ -65,6 +67,8 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "self" => "http://www.example.com/apples/#{a1.id}",
                      "number" => 45,
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
+                     "bananas:less_than_100"=> "http://www.example.com/apples/#{a1.id}/bananas/less_than_100",
+                     "bananas:query"=>"http://www.example.com/apples/#{a1.id}/bananas/query",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
@@ -284,7 +288,10 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_equal({ "number" => 45, 
                      "self" => "http://www.example.com/apples/1",
                      "name" =>  "loyce.donnelly@daugherty.info",
-                     "bananas"=>"http://www.example.com/apples/1/bananas"}, json_response)
+                     "bananas"=>"http://www.example.com/apples/1/bananas",
+                     "bananas:query"=>"http://www.example.com/apples/1/bananas/query",
+                     "bananas:less_than_100"=> "http://www.example.com/apples/1/bananas/less_than_100"},
+                   json_response)
       
     end
 
@@ -297,6 +304,18 @@ class ToastTest < ActionDispatch::IntegrationTest
                                       {:number => 12, :name => "camilla@leffler.ca"},
                                       {:number => 45, :name => "ruth@balistreri.com"}]))
       end
+
+      get "eggplants/first" 
+      assert_response :ok
+      assert_equal(
+                   {"self"=>"http://www.example.com/eggplants/1",
+                     "number"=>92,
+                     "potato"=>"http://www.example.com/eggplants/1/potato",
+                     "dfruits"=>"http://www.example.com/eggplants/1/dfruits",
+                     "name"=>"stephanie@wehner.info",
+                     "bananas"=>"http://www.example.com/eggplants/1/bananas",
+                     "bananas:less_than_100" => "http://www.example.com/eggplants/1/bananas/less_than_100",
+                     "bananas:query" => "http://www.example.com/eggplants/1/bananas/query" }, json_response)
 
       get "eggplants/#{e1.id}/bananas/less_than_100"
       assert_response :ok

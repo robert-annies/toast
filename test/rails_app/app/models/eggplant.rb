@@ -6,5 +6,6 @@ class Eggplant < ActiveRecord::Base
   acts_as_resource do 
     media_type     "application/eggplant_+json"
     readables      :name, :number,  :dfruits, :potato , :bananas 
+    singles        :first
   end
 end
