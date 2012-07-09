@@ -58,8 +58,10 @@ module Toast
             props[name] = "#{base_uri}#{self.uri_path}/#{name}"
             
             # collections (scopes) actiing on associacions:    
-            if self.class.reflect_on_association(name.to_sym).collection?               
-              self.send(name).klass.toast_config(media_type).collections.each do |collection_name|
+            
+            reflect = self.class.reflect_on_association(name.to_sym)            
+            if reflect.collection?
+              reflect.klass.toast_config(media_type).collections.each do |collection_name|
                 next if collection_name == "all"
                 props[name+":"+collection_name] = "#{base_uri}#{self.uri_path}/#{name}/#{collection_name}"
               end

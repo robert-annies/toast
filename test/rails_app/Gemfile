@@ -9,12 +9,10 @@ source 'http://rubygems.org'
 
 rails_version = ENV["TOAST_TEST_RAILS_VERSION"] ? ENV["TOAST_TEST_RAILS_VERSION"] : "3.2.6"
 
-gem 'rails', "~> #{rails_version}"
+gem 'rails', "#{rails_version}"
 gem 'sqlite3', '~> 1.3.5'
-gem 'toast', :path => "../.."
+gem 'pry-rails'
 
-group 'test', 'development' do
-  gem 'ffaker'
-  gem 'shoulda'
-  gem 'pry-rails'
-end
+gemspec :path => "../.."
+
+
