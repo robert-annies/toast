@@ -1,32 +1,31 @@
 Summary
 =======
 
-Toast is an extension to Ruby on Rails that lets you expose any
-ActiveRecord model as a resource according to the REST paradigm. The
-representation format is JSON.
+Toast is an extension to Ruby on Rails to build web services with low
+programming effort in coherent way.  Toast exends ActiveRecord such
+that each model can be declared to be a web resource, exposing defined
+attributes for reading and writing using HTTP.
 
-In contrast to other plugins, gems and Rails' inbuilt REST features
-toast takes a data centric approach: Tell the model to be a resource
-and what attributes and associations are to be exposed. That's it. No
-controller boiler plate code for every model, no routing setup.
+Its main features are:
 
-Toast is a Rails engine that runs one generic controller and a sets up
-the routing according to the definition in the models, which is
-denoted using a block oriented DSL.
+  * declaration of web resources based on ActiveRecord models
+  * generic controller handles all actions
+  * automated routing
+  * exposing data values with JSON maps 
+  * exposing associations by links (URLs)
 
-REST is more than some pretty URIs, the use of the HTTP verbs and
-response codes. It's on the toast user to invent media types that
-control the application's state and introduce semantics. With toast you
-can build REST services or tightly coupled server-client applications,
-which ever suits the task best. That's why TOAST stands for:
-
->  **TOast Ain't reST**
+WARNING
+=======
 
 *Be careful*: This version is experimental and probably not bullet
-proof. As soon as the gem is loaded a controller with ready routing
-is enabled serving the annotated model's data records for reading,
-updating and deleting. There are no measures to prevent XSS and CSFR
-attacks.
+proof. As soon as the gem is loaded a controller with ready routing is
+enabled serving the annotated model's data records through the
+Toast controller.
+
+Version 1.0.0 of Toast will mark a production ready implementation,
+which will be finished within 2012. Until then  API/DSL changes must
+be expected with each minor update. 
+
 
 Example
 =======
@@ -40,14 +39,14 @@ Let the table `bananas` have the following schema:
        t.integer  "apple_id"
      end
 
-and let a corresponding model class have a *resourceful_model* annotation:
+and let a corresponding model class have a *acts_as_resource* annotation:
 
      class Banana < ActiveRecord::Base
        belongs_to :apple
        has_many :coconuts
        scope :find_some, where("number < 100")
 
-       resourceful_model do
+       acts_as_resource do
          # attributes or association names
          readables :coconuts, :apple
 	 writables :name, :number	 
@@ -57,11 +56,11 @@ and let a corresponding model class have a *resourceful_model* annotation:
        end
      end
 
-The above definition inside the `resourceful_model` block exposes the
+The above definition inside the `acts_as_resource` block exposes the
 records of the model Banana automatically via a generic controller to
 the outside world, accepting and delivering JSON representations of
 the records. Let the associated models Apple and Coconut be
-exposed as a resource, too.
+exposed as a resource, too:
 
 ### Get a collection
     GET /bananas
@@ -85,7 +84,7 @@ exposed as a resource, too.
                 "coconuts": "http://www.example.com/bananas/23/coconuts",
                 "apple": "http://www.example.com/bananas/23/apple" }'
 
-### Get a associated collection
+### Get an associated collection
     "GET" /bananas/23/coconuts
     --> 200, '[{COCNUT},{COCONUT},...]',
 
@@ -117,7 +116,7 @@ exposed as a resource, too.
     DELETE /bananas/23
     --> 200
 
-More details and configuration options are documented in the manual... (_comming soon_)
+More details and configuration options are documented in the manual.
 
 Installation
 ============
@@ -156,3 +155,16 @@ the tests you need to
    Or you may call `rake test` from the root directory of the working
    copy. This will reinstall the toast gem before running tests
    automatically.
+
+
+Remarks
+=======
+
+REST is more than some pretty URIs, the use of the HTTP verbs and
+response codes. It's on the Toast user to invent meaningful media
+types that control the application's state and introduce
+semantics. With toast you can build REST services or tightly coupled
+server-client applications, which ever suits the task best. That's why
+TOAST stands for:
+
+>  **TOast Ain't reST**

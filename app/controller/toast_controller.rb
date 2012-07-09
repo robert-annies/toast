@@ -25,7 +25,7 @@ class ToastController < ApplicationController
 
     rescue Exception => e
       log_exception e
-      raise e if Rails.env == "test"
+      puts e if Rails.env == "test"
       return head(:internal_server_error)
     end
 

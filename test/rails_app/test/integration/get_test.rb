@@ -117,7 +117,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      get "bananas/find_some", nil, accept("application/bananas-v1")
+      get "bananas/less_than_100", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_same_elements( [ { "number" => 45,
@@ -266,5 +266,55 @@ class ToastTest < ActionDispatch::IntegrationTest
     end    
 
 
+    should "respond to assoications not maned like the class" do
+      e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
+        eg.potato = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info" 
+        eg.dfruits = Dragonfruit.create!([{:number => 133, :name => "camilla@leffler.ca"},
+                                           { :number => 465, :name => "ruth@balistreri.com"}])
+      end  
+        
+      get "eggplants/#{e1.id}/dfruits"
+      
+      assert_response :ok
+      assert_equal [{"self" => "http://www.example.com/dragonfruits/1"},
+                    {"self" => "http://www.example.com/dragonfruits/2"}], json_response
+      
+      get "eggplants/#{e1.id}/potato"      
+      assert_response :ok
+      assert_equal({ "number" => 45, 
+                     "self" => "http://www.example.com/apples/1",
+                     "name" =>  "loyce.donnelly@daugherty.info",
+                     "bananas"=>"http://www.example.com/apples/1/bananas"}, json_response)
+      
+    end
+
+    # should "respond to virtual associations" do
+      
+    #   e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
+    #     eg.bananas << (b1,b2,b3 = Banana.create!([{:number => 450, :name => "loyce.donnelly@daugherty.info"},
+    #                                   {:number => 12, :name => "camilla@leffler.ca"},
+    #                                   {:number => 45, :name => "ruth@balistreri.com"}]))
+    #   end
+      
+    #   get "eggplants/#{e1.id}/bananas_scoped?lower=100"
+    #   assert_response :ok
+    #   assert_equal [{"number" => 145,
+    #                   "name" => "theresa@deckowsipes.net",
+    #                   "curvature" => 8.18,
+    #                   "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
+    #                   "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts",
+    #                   "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit",
+    #                   "self" => "http://www.example.com/bananas/#{b2.id}" },
+    #                 {"number" => 13,
+    #                   "curvature" => 8.18,
+    #                   "name" => "chadd.lind@abshire.com",
+    #                   "apple" => "http://www.example.com/bananas/#{b3.id}/apple",
+    #                   "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
+    #                   "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
+    #                   "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
+      
+    # end
+
+    
   end # context GET
 end

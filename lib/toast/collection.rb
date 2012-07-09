@@ -20,10 +20,19 @@ module Toast
     end
 
     def get
-
+      unless @model.respond_to?(@collection)
+        raise "Toast Error: Cannot find class method '#{@collection}' of model '#{@model}', which is configured in 'acts_as_resource > collections'."
+      end
+      
       records = if @config_out.pass_params_to.include?(@collection)
+                  if @model.method(@collection).arity != 1
+                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
+                  end
                   @model.send(@collection, @params)
                 else
+                  if @model.method(@collection).arity > 0
+                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must not accept any parameter, as configured by 'acts_as_resource'"
+                  end
                   @model.send(@collection)
                 end
 

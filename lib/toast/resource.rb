@@ -53,9 +53,10 @@ module Toast
               elsif subresource_name.nil?
                 Toast::Record.new(model, id, format, config_in, config_out)
               elsif (config_assoc_src && config_assoc_src.exposed_associations.include?(subresource_name))
-                
+
                 # determine associated model
-                assoc_model = get_class_by_resource_name subresource_name
+                assoc_model = 
+                  model.reflect_on_all_associations.detect{|a| a.name.to_s == subresource_name}.klass
                 
                 # determine config for representation of assoc. model                
                 assoc_config_out = assoc_model.toast_config request.accept_media_types.prefered

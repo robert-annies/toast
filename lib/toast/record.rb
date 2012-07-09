@@ -41,6 +41,11 @@ module Toast
       
       # set the virtual attributes
       (@config_in.writables - @record.attribute_names -  @config_in.exposed_associations).each do |vattr|
+
+        unless (@record.respond_to?("#{vattr}=") && @record.method("#{vattr}=").arity == 1)
+          raise "Toast Error: Connot find setter '#{@record.class}##{vattr}='"
+        end
+
         @record.send("#{vattr}=", payload.delete(vattr))
       end
       

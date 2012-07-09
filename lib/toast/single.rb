@@ -25,10 +25,20 @@ module Toast
       @params = params
       @format = params[:format]
 
+      unless @model.respond_to?(subresource_name)
+        raise "Toast Error: Cannot find class method '#{@model}.#{subresource_name}', which is configured in 'acts_as_resource > singles'."
+      end
 
       @record = if @config_out.pass_params_to.include?(subresource_name)
+                  if @model.method(subresource_name).arity != 1
+                    raise "Toast Error: Class method '#{@model}.#{subresource_name}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
+                  end
                   @model.send(subresource_name, @params)
                 else
+                  if(@model.method(subresource_name).arity < -1 or 
+                     @model.method(subresource_name).arity > 0)
+                    raise "Toast Error: Class method '#{@model}.#{subresource_name}' must be callable w/o parameters"
+                  end
                   @model.send(subresource_name)
                 end
       

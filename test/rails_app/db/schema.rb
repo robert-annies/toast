@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(:version => 20110531095445) do
     t.integer  "number"
     t.integer  "apple_id"
     t.integer  "dragonfruit_id"
+    t.integer  "eggplant_id"    
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -51,6 +52,13 @@ ActiveRecord::Schema.define(:version => 20110531095445) do
     t.integer  "number"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "eggplant_id"
   end
 
+  create_table "eggplants", :force => true do |t|
+    t.integer  "potato_id"
+    t.string   "name"
+    t.integer  "number"
+  end
+ 
 end

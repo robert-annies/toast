@@ -10,7 +10,7 @@ class Banana < ActiveRecord::Base
     writables :name, :number, :coconuts
     readables :curvature, :apple, :dragonfruit
 
-    collections :find_some, :all, :query
+    collections :less_than_100, :all, :query
     singles :first
 
     pass_params_to :query
@@ -36,7 +36,7 @@ class Banana < ActiveRecord::Base
     }
   }
 
-  scope :find_some, where("number < 100")
+  scope :less_than_100, where("number < 100")
 
 
   def self.query params

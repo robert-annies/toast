@@ -12,7 +12,7 @@ end
 for rails_version in RAILS_VERSIONS
   
   ENV["TOAST_TEST_RAILS_VERSION"] = rails_version
-  puts `bundle install`
+  `bundle install`
 
   puts "="*60
   puts "Running test suite with Ruby #{RUBY_VERSION} and Rails #{`bundle show rails`.split('-').last}"
