@@ -27,7 +27,7 @@ representation format is JSON or can be anything"
              "lib/toast/record.rb",
              "lib/toast/resource.rb",
              "lib/toast/single.rb",
-             "lib/toast/scoped_associations.rb"]
+             "lib/toast/scoped_association.rb"]
   s.homepage = "https://github.com/robokopp/toast"
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.6}
