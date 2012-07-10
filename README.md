@@ -14,7 +14,10 @@ Its main features are:
   * exposing data values with JSON maps 
   * exposing associations by links (URLs)
 
-Toast works with Ruby on Rails >= 3.1.0 (currently tested up to 3.2.6)
+Toast works with 
+
+  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.6)
+  * Ruby 1.8.7 and 1.9.3
 
 WARNING
 =======
