@@ -63,7 +63,7 @@ module Toast
             if reflect.collection?
               reflect.klass.toast_config(media_type).collections.each do |collection_name|
                 next if collection_name == "all"
-                props[collection_name] = "#{base_uri}#{self.uri_path}/#{name}/#{collection_name}"
+                props[name+":"+collection_name] = "#{base_uri}#{self.uri_path}/#{name}/#{collection_name}"
               end
             end
           end
