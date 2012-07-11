@@ -16,6 +16,8 @@ module Toast
         @pass_params_to = []
         @in_collection = ConfigDSL::InCollection.new model, self
         @media_type = "application/json"
+
+        @model.attr_accessible []
       end
 
       def exposed_attributes
