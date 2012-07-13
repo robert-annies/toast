@@ -93,5 +93,12 @@ module Toast
       }
     end
 
+    def link l
+      raise MethodNotAllowed
+    end
+
+    def unlink l
+      raise MethodNotAllowed
+    end
   end
 end

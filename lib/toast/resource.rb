@@ -6,6 +6,7 @@ module Toast
   class PayloadFormatError < Exception; end
   class UnsupportedMediaType < Exception; end
   class RequestedVersionNotDefined < Exception; end
+  class ResourceNotAcceptable < Exception; end
 
   # Represents a resource. There are following resource types as sub classes:
   # Record, Collection, Association, Single
@@ -99,12 +100,22 @@ module Toast
       end
     end
 
-    def apply method, payload, payload_media_type
+    def apply method, payload, payload_media_type, link_path_info
       case method
-      when "PUT","POST"        
-        self.send(method.downcase, payload, payload_media_type)
-      when "DELETE","GET"
-         self.send(method.downcase)
+      when "PUT","POST"
+        if link_path_info
+          self.link link_path_info
+        else
+          self.send(method.downcase, payload, payload_media_type)
+        end
+      when "DELETE"
+        if link_path_info
+          self.unlink link_path_info
+        else
+          self.delete
+        end
+      when "GET"
+        self.get        
       else
         raise MethodNotAllowed
       end

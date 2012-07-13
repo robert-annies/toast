@@ -13,7 +13,7 @@
 |     | update subresource: attribute, success | ok     |         |
 =end
 
-class ToastTest < ActionDispatch::IntegrationTest
+class PutTest < ActionDispatch::IntegrationTest
 
   include ModelFactory
 
@@ -148,6 +148,54 @@ class ToastTest < ActionDispatch::IntegrationTest
       # put Array
       put_json "bananas/#{b2.id}", ["foobar",42], "application/banana-v1"
       assert_response :bad_request
+
+    end
+
+    should "add records to belongs_to associations" do
+
+      b1 = Banana.create!
+      b1.create_dragonfruit! {|d| d.number = 93} # to be replaced
+      b1.save
+
+      b2 = Banana.create!
+
+      d1 = Dragonfruit.create! {|d| d.number = 39}
+
+      put "/bananas/#{b1.id}/dragonfruit", nil, {"LINK" => "http://www.example.com/dragonfruits/#{d1.id}"}
+      assert_response :ok
+
+      b1.reload
+      assert_equal d1, b1.dragonfruit
+
+      # type mismatch
+      put "/bananas/#{b1.id}/dragonfruit", nil, {"LINK" => "http://www.example.com/bananas/#{b1.id}"}
+      assert_response :not_acceptable
+
+      # not found
+      put "/bananas/#{b1.id}/dragonfruit", nil, {"LINK" => "http://www.example.com/dragonfruits/999"}
+      assert_response :not_found
+
+    end
+
+    should "add records to has_one associations" do
+
+      b2 = Banana.create!
+      d1 = Dragonfruit.create! {|d| d.number = 39}
+
+      put "/dragonfruits/#{d1.id}/banana", nil, {"LINK" => "http://www.example.com/bananas/#{b2.id}"}
+      assert_response :ok
+      b2.reload
+      assert_equal b2, d1.banana
+
+
+      # type mismatch
+      c1 = Coconut.create!
+      put "/dragonfruits/#{d1.id}/banana", nil, {"LINK" => "http://www.example.com/coconuts/#{c1.id}"}
+      assert_response :not_acceptable
+
+      # not found
+      put "/dragonfruits/#{d1.id}/banana", nil, {"LINK" => "http://www.example.com/bananas/999"}
+      assert_response :not_found
 
     end
   end

@@ -6,7 +6,12 @@ class ToastController < ApplicationController
 
       @resource = Toast::Resource.build( params, request )
 
-      render @resource.apply(request.method, request.body.read, request.content_type)
+      unless request.headers["LINK"].nil?
+        # extract "path_info" from link header
+        request.headers["LINK"] =~ /(#{request.protocol + request.host + request.script_name})(.*)/
+      end
+
+      render @resource.apply(request.method, request.body.read, request.content_type, $2)
 
     rescue Toast::ResourceNotFound => e
       return head(:not_found)
@@ -22,6 +27,9 @@ class ToastController < ApplicationController
 
     rescue Toast::UnsupportedMediaType => e
       return head(:unsupported_media_type)
+
+    rescue Toast::ResourceNotAcceptable => e
+      return head(:not_acceptable)
 
     rescue Exception => e
       log_exception e

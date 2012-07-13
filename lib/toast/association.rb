@@ -104,5 +104,61 @@ module Toast
     def delete
       raise MethodNotAllowed
     end
+
+    def link link_path_info
+
+      slash, link_resource_name, link_id = link_path_info.split('/')
+      link_model = Resource.get_class_by_resource_name(link_resource_name)
+      link_record = link_model.find(link_id)
+
+      if @model.reflect_on_association(@assoc.to_sym).collection?
+        # has_many, hbtm
+         @record.send(@assoc) << link_record
+      else
+        # has_one, belongs_to
+        @record.send(@assoc+"=",link_record)
+        @record.save
+      end
+
+      {
+        :nothing => true,
+        :status => :ok
+      }
+
+    rescue ActiveRecord::AssociationTypeMismatch
+      raise Toast::ResourceNotAcceptable
+    rescue ActiveRecord::RecordNotFound
+      raise Toast::ResourceNotFound
+    end
+
+    def unlink link_path_info
+
+      slash, link_resource_name, link_id = link_path_info.split('/')
+      link_model = Resource.get_class_by_resource_name(link_resource_name)
+      link_record = link_model.find(link_id)
+
+      if @model.reflect_on_association(@assoc.to_sym).collection?
+        # has_many, hbtm
+        @record.send(@assoc).delete(link_record) unless link_record.nil?
+      else
+
+        # has_one, belongs_to
+        if @record.send(@assoc) == link_record
+          @record.send(@assoc+"=",nil)
+          @record.save!
+        end
+      end
+
+      {
+        :nothing => true,
+        :status => :ok
+      }
+    rescue ActiveRecord::RecordNotFound
+      # link_record not linked: nothing to be done
+      {
+        :nothing => true,
+        :status => :ok
+      }
+    end
   end
 end

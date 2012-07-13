@@ -61,4 +61,8 @@ ActiveRecord::Schema.define(:version => 20110531095445) do
     t.integer  "number"
   end
  
+  create_table "apples_eggplants", :force => true, :id => false do |t|
+    t.integer "apple_id"
+    t.integer "eggplant_id"
+  end
 end

@@ -16,13 +16,13 @@ require 'test_helper'
 
 =end
 
-class ToastTest < ActionDispatch::IntegrationTest
+class GetTest < ActionDispatch::IntegrationTest
 
   include ModelFactory
 
   def setup
     # clear all
-    [Apple, Banana, Coconut, Dragonfruit, Coconut, CoconutDragonfruit].each {|m| m.delete_all}
+    [Apple, Banana, Coconut, Dragonfruit, Coconut, CoconutDragonfruit, Eggplant].each {|m| m.delete_all}
   end
 
   # Replace this with your real tests.
@@ -41,6 +41,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
                      "bananas:query"=>"http://www.example.com/apples/#{a1.id}/bananas/query",
                      "bananas:less_than_100"=> "http://www.example.com/apples/#{a1.id}/bananas/less_than_100",
+                     "eggplants"=>"http://www.example.com/apples/#{a1.id}/eggplants",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
@@ -56,23 +57,24 @@ class ToastTest < ActionDispatch::IntegrationTest
                      "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit" ,
                    }, json_response)
     end
-    
+
     should "respond on class methods returning single instance" do
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
-      
+
       get "apples/first", nil,  {'HTTP_ACCEPT'=>'application/apple+json'}
       assert_response :ok
       assert_equal({
                      "self" => "http://www.example.com/apples/#{a1.id}",
                      "number" => 45,
+                     "eggplants"=>"http://www.example.com/apples/#{a1.id}/eggplants",
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
                      "bananas:less_than_100"=> "http://www.example.com/apples/#{a1.id}/bananas/less_than_100",
                      "bananas:query"=>"http://www.example.com/apples/#{a1.id}/bananas/query",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
-      
+
     end
 
     should "respond with '404 Not found' on non existing resources" do
@@ -86,7 +88,7 @@ class ToastTest < ActionDispatch::IntegrationTest
       get "apples/9999"
       assert_response :not_found
 
-      # unknown model 
+      # unknown model
       assert_raise ActionController::RoutingError do
         get "hamburgers/133"
       end
@@ -141,7 +143,7 @@ class ToastTest < ActionDispatch::IntegrationTest
                             ], json_response)
 
     end
-    
+
     should "respond on collections with params" do
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
@@ -150,7 +152,7 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       get "bananas/query?gt=100", nil, accept("application/bananas-v1")
       assert_response :ok
-      
+
       assert_same_elements( [ { "number" => 133,
                                 "name" => "camilla@leffler.ca" ,
                                 "apple" =>       "http://www.example.com/bananas/#{b2.id}/apple",
@@ -162,10 +164,10 @@ class ToastTest < ActionDispatch::IntegrationTest
                                 "name" => "ruth@balistreri.com",
                                 "apple" =>       "http://www.example.com/bananas/#{b3.id}/apple",
                                 "curvature" => 8.18,
-                                "coconuts" =>    "http://www.example.com/bananas/#{b3.id}/coconuts" ,                                         
+                                "coconuts" =>    "http://www.example.com/bananas/#{b3.id}/coconuts" ,
                                 "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit" ,
                                 "self" =>         "http://www.example.com/bananas/#{b3.id}" }
-                            ], json_response)    
+                            ], json_response)
     end
 
     should "respond on has_many associations" do
@@ -183,7 +185,7 @@ class ToastTest < ActionDispatch::IntegrationTest
 
       a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
       a2.bananas = [b2, b4]
-      
+
 
       get "apples/#{a1.id}/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
@@ -222,44 +224,44 @@ class ToastTest < ActionDispatch::IntegrationTest
                       "self" => "http://www.example.com/bananas/#{b4.id}"}], json_response
 
     end
-    
-    should "respond with HTML on .html for single resources" do       
+
+    should "respond with HTML on .html for single resources" do
       a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
 
-      get "apples/#{a1.id}.html"      
-      
+      get "apples/#{a1.id}.html"
+
       assert_response :ok
       assert_equal "text/html", @response.content_type
 
       assert_select "table>tr" do
         assert_select "td", 2
         assert_select "td", "camilla@leffler.ca"
-        assert_select "td", "133"        
-      end                        
+        assert_select "td", "133"
+      end
     end
 
-    should "respond with HTML on .html for resource collections" do       
+    should "respond with HTML on .html for resource collections" do
       a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
-      
-      get "apples.html"      
-      
+
+      get "apples.html"
+
       assert_response :ok
       assert_equal "text/html", @response.content_type
-      
+
       assert_select "ul" do
         assert_select "li", 2
         assert_select "li", "camilla@leffler.ca 133"
         assert_select "li", "ruth@balistreri.com 465"
-      end                        
-    end    
-    
-    should "respond with XML on .xml for single resources" do       
+      end
+    end
+
+    should "respond with XML on .xml for single resources" do
       a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
-      
 
-      get "apples/#{a1.id}.xml"      
+
+      get "apples/#{a1.id}.xml"
 
       assert_response :ok
       assert_equal "application/xml", @response.content_type
@@ -267,52 +269,57 @@ class ToastTest < ActionDispatch::IntegrationTest
       assert_select "apple>name", "camilla@leffler.ca"
       assert_select "apple>number", "133"
 
-    end    
+    end
 
 
-    should "respond to assoications not maned like the class" do
+    should "respond to assoications not named like the class" do
       e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
-        eg.potato = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info" 
+        eg.potato = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
         eg.dfruits = Dragonfruit.create!([{:number => 133, :name => "camilla@leffler.ca"},
                                            { :number => 465, :name => "ruth@balistreri.com"}])
-      end  
-        
+      end
+
       get "eggplants/#{e1.id}/dfruits"
-      
+
       assert_response :ok
-      assert_equal [{"self" => "http://www.example.com/dragonfruits/1"},
-                    {"self" => "http://www.example.com/dragonfruits/2"}], json_response
-      
-      get "eggplants/#{e1.id}/potato"      
+      assert_equal [{"self" => "http://www.example.com/dragonfruits/1",
+                     "banana"=>"http://www.example.com/dragonfruits/1/banana"},
+                    {"self" => "http://www.example.com/dragonfruits/2",
+                     "banana"=>"http://www.example.com/dragonfruits/2/banana"}], json_response
+
+      get "eggplants/#{e1.id}/potato"
       assert_response :ok
-      assert_equal({ "number" => 45, 
+      assert_equal({ "number" => 45,
                      "self" => "http://www.example.com/apples/1",
                      "name" =>  "loyce.donnelly@daugherty.info",
+                     "eggplants"=>"http://www.example.com/apples/1/eggplants",
                      "bananas"=>"http://www.example.com/apples/1/bananas",
                      "bananas:query"=>"http://www.example.com/apples/1/bananas/query",
                      "bananas:less_than_100"=> "http://www.example.com/apples/1/bananas/less_than_100"},
                    json_response)
-      
+
     end
 
     should "respond to scoped associations" do
-      
+
       b1=b2=b3=nil
 
-      e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
+      e1 = Eggplant.create! do |eg|
+        eg.number = 92;  eg.name = "stephanie@wehner.info"
         eg.bananas << (b1,b2,b3 = Banana.create!([{:number => 450, :name => "loyce.donnelly@daugherty.info"},
                                       {:number => 12, :name => "camilla@leffler.ca"},
                                       {:number => 45, :name => "ruth@balistreri.com"}]))
       end
 
-      get "eggplants/first" 
+      get "eggplants/first"
       assert_response :ok
       assert_equal(
                    {"self"=>"http://www.example.com/eggplants/1",
+                     "name"=>"stephanie@wehner.info",
                      "number"=>92,
                      "potato"=>"http://www.example.com/eggplants/1/potato",
                      "dfruits"=>"http://www.example.com/eggplants/1/dfruits",
-                     "name"=>"stephanie@wehner.info",
+                     "apples"=>"http://www.example.com/eggplants/1/apples",
                      "bananas"=>"http://www.example.com/eggplants/1/bananas",
                      "bananas:less_than_100" => "http://www.example.com/eggplants/1/bananas/less_than_100",
                      "bananas:query" => "http://www.example.com/eggplants/1/bananas/query" }, json_response)
@@ -333,10 +340,10 @@ class ToastTest < ActionDispatch::IntegrationTest
                       "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
                       "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
                       "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
-      
+
       get "eggplants/#{e1.id}/bananas/query?gt=40"
       assert_response :ok
-      
+
 
       assert_equal [{"number" => 450,
                       "name" =>  "loyce.donnelly@daugherty.info",
@@ -355,6 +362,6 @@ class ToastTest < ActionDispatch::IntegrationTest
 
     end
 
-    
+
   end # context GET
 end

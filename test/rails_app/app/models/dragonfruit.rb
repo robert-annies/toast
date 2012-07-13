@@ -7,6 +7,7 @@ class Dragonfruit < ActiveRecord::Base
   belongs_to :eggplant
 
   acts_as_resource {
+    writables :banana
     collections :all
   }
 

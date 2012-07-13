@@ -122,5 +122,13 @@ module Toast
     def delete
       raise MethodNotAllowed
     end
+
+    def link l
+      raise MethodNotAllowed
+    end
+
+    def unlink l
+      raise MethodNotAllowed
+    end
   end
 end

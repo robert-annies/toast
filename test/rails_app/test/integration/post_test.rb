@@ -13,7 +13,7 @@ require 'test_helper'
 |        |                                        |        |         |
 =end
 
-class ToastTest < ActionDispatch::IntegrationTest
+class PostTest < ActionDispatch::IntegrationTest
 
   include ModelFactory
 
@@ -131,5 +131,65 @@ class ToastTest < ActionDispatch::IntegrationTest
     end
 
 
+    should "add records to has_many associations" do
+      b1=nil; b2=nil; e1=nil; e2=nil
+
+      a1 = Apple.create do |a|
+        a.bananas << (b1 = Banana.create!)
+        a.bananas << (b2 = Banana.create!)
+      end
+
+      b3 = Banana.create!
+
+      post "/apples/#{a1.id}/bananas", nil, {"LINK" => "http://www.example.com/bananas/#{b3.id}"}
+      assert_response :ok
+
+      a1.reload
+      assert_same_elements [b1, b2, b3], a1.bananas
+
+      # type mismatch
+      c1 = Coconut.create!
+      post "/apples/#{a1.id}/bananas", nil, {"LINK" => "http://www.example.com/coconuts/#{c1.id}"}
+      assert_response :not_acceptable
+
+      # not found
+      post "/apples/#{a1.id}/bananas", nil, {"LINK" => "http://www.example.com/babanas/999"}
+      assert_response :not_found
+
+    end
+
+    should "add records to hbtm associations" do
+      e1=nil; e2=nil
+
+      a2 = Apple.create do |a|
+        a.eggplants << (e1 = Eggplant.create!)
+        a.eggplants << (e2 = Eggplant.create!)
+      end
+
+      e3 = Eggplant.create!
+      a3 = Apple.create!
+      a4 = Apple.create!
+
+      post "/apples/#{a2.id}/eggplants", nil, {"LINK" => "http://www.example.com/eggplants/#{e3.id}"}
+      assert_response :ok
+      post "/eggplants/#{e3.id}/apples", nil, {"LINK" => "http://www.example.com/apples/#{a3.id}"}
+      assert_response :ok
+      post "/eggplants/#{e3.id}/apples", nil, {"LINK" => "http://www.example.com/apples/#{a4.id}"}
+      assert_response :ok
+
+      a2.reload; e3.reload
+      assert_same_elements [e1, e2, e3], a2.eggplants
+      assert_same_elements [a2, a3, a4], e3.apples
+
+      # type mismatch
+      c1 = Coconut.create!
+      post "/apples/#{a2.id}/eggplants", nil, {"LINK" => "http://www.example.com/coconuts/#{c1.id}"}
+      assert_response :not_acceptable
+
+      # not found
+      post "/apples/#{a2.id}/eggplants", nil, {"LINK" => "http://www.example.com/eggplants/999"}
+      assert_response :not_found
+
+    end
   end # context POST requests
 end
