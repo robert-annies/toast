@@ -86,11 +86,18 @@ module Toast
     def delete
       raise MethodNotAllowed unless @config_out.deletable?
 
-      @record.destroy
-      {
-        :nothing => true,
-        :status => :ok
-      }
+      if @record.destroy
+        {
+          :nothing => true,
+          :status => :ok
+        }
+      else
+        {
+          :nothing => true,
+          :status => :conflict
+        }
+      end
+
     end
 
     def link l
