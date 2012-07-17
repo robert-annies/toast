@@ -28,16 +28,16 @@ module Toast
       unless @model_or_relation.respond_to?(@collection)
         raise "Toast Error: Cannot find class method '#{@collection}' of model '#{@model_or_relation}', which is configured in 'acts_as_resource > collections'."
       end
-      
+
       # FIXME: This is a lot of hallooballoo to check if the #send
       #        will be successful, but if it's not checked the error
       #        message is not helpful to find the error.
 
-      records = if @config_out.pass_params_to.include?(@collection)                                  
-                  if @target_model.method(@collection).arity != 1  
+      records = if @config_out.pass_params_to.include?(@collection)
+                  if @target_model.method(@collection).arity**2 != 1
                     raise "Toast Error: Class method '#{@collection}' of model '#{@target_model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
                   end
-                  # fetch results 
+                  # fetch results
                   @model_or_relation.send(@collection, @params)
 
                 else
