@@ -17,6 +17,7 @@ class ToastController < ApplicationController
       return head(:not_found)
 
     rescue Toast::PayloadInvalid => e
+      raise e if Rails.env == "test"
       return render :text => e.message, :status => :forbidden
 
     rescue Toast::PayloadFormatError => e
