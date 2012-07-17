@@ -78,12 +78,9 @@ module Toast
     def post payload, media_type
       raise MethodNotAllowed unless @config_in.postable?
 
+
       if media_type != @config_in.media_type
         raise UnsupportedMediaType
-      end
-
-      if @collection != "all"
-        raise MethodNotAllowed
       end
 
       begin
@@ -100,8 +97,18 @@ module Toast
         payload.delete(rof)
       end
 
+
       begin
-        record = @model_or_relation.create! payload
+
+        if @collection != "all"
+          # post on scope?
+          record = @model_or_relation.create! payload do |obj|
+            hook = @config_in.before_scoped_create[@collection]
+            obj.send(hook) if hook
+          end
+        else
+          record = @model_or_relation.create! payload
+        end
 
         {
           :json => record.represent( @config_out.exposed_attributes,

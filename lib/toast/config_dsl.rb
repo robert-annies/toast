@@ -14,6 +14,7 @@ module Toast
         @deletable = false
         @postable = false
         @pass_params_to = []
+        @before_scoped_create = {}
         @in_collection = ConfigDSL::InCollection.new model, self
         @media_type = "application/json"
 
@@ -74,6 +75,17 @@ module Toast
       def pass_params_to *arg
         return(@pass_params_to) if arg.empty?
         self.pass_params_to = arg
+      end
+
+      def before_scoped_create= arg
+        for key in arg.keys
+          @before_scoped_create[key.to_s] = arg[key].to_sym
+        end
+      end
+
+      def before_scoped_create arg={}
+        return(@before_scoped_create) if arg.empty?
+        self.before_scoped_create = arg
       end
 
       def collections= collections=[]
