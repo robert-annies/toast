@@ -55,7 +55,7 @@ module Toast
 
     end
 
-    def put payload
+    def put payload, media_type
       raise MethodNotAllowed
     end
 
