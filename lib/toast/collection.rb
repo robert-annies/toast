@@ -8,13 +8,16 @@ module Toast
       subresource_name ||= "all"
 
       unless config_out.collections.include? subresource_name
+        if subresource_name == "all"
+          ToastController.logger.debug "\n\tToast Debug: you may want to declare 'collections :all' in model '#{model_or_relation}' to enable delivery of the collection '/#{model_or_relation.to_s.underscore.pluralize}'\n"
+        end
         raise ResourceNotFound
       end
 
-      @target_model = (model_or_relation.klass rescue false) ? 
+      @target_model = (model_or_relation.klass rescue false) ?
                        model_or_relation.klass :
                        model_or_relation
- 
+
       @model_or_relation = model_or_relation
       @collection = subresource_name
       @params = params
