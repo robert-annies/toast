@@ -15,14 +15,14 @@ module Toast
     # configure our plugin on boot. other extension points such
     # as configuration, rake tasks, etc, are also available
     initializer "toast.initialize" do |app|
-      # Add 'restful_model' declaration to ActiveRecord::Base
+      # Add 'acts_as_resource' declaration to ActiveRecord::Base
       ActiveRecord::Base.extend Toast::ActiveRecordExtensions
 
       # Load all models in app/models early to setup routing
       begin
         Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require m }
 
-      rescue 
+      rescue
         # raised when DB is not setup yet. (rake db:schema:load)
       end
 
