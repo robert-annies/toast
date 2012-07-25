@@ -11,8 +11,11 @@ rails_version = ENV["TOAST_TEST_RAILS_VERSION"] ? ENV["TOAST_TEST_RAILS_VERSION"
 
 gem 'rails', "#{rails_version}"
 gem 'sqlite3', '~> 1.3.5'
-gem 'pry-rails'
+
+group :test do
+  gem 'shoulda'
+  gem 'pry-rails'
+end
 
 gemspec :path => "../.."
-
 

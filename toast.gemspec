@@ -31,9 +31,8 @@ representation format is JSON or can be anything"
   s.homepage = "https://github.com/robokopp/toast"
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.6}
-  s.add_development_dependency('shoulda')
   s.add_dependency('rails','>= 3.1.0')
   s.add_dependency('blockenspiel','~> 0.4.2')
-  s.add_dependency('rack-accept-media-types','~> 0.9') 
+  s.add_dependency('rack-accept-media-types','~> 0.9')
   s.add_dependency('ffaker')
 end
