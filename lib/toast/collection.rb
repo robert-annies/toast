@@ -107,7 +107,7 @@ module Toast
           # post on scope?
           record = @model_or_relation.create! payload do |obj|
             hook = @config_in.before_scoped_create[@collection]
-            obj.send(hook) if hook
+            obj.send(hook, @model_or_relation.proxy_association.owner) if hook
           end
         else
           record = @model_or_relation.create! payload
