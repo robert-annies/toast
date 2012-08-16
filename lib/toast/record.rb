@@ -34,11 +34,14 @@ module Toast
         raise PayloadFormatError
       end
 
-      # ignore all exposed readable, but not writable fields
-      (@config_in.readables - @config_in.writables + ["self"]).each do |rof|
+      # ignore:
+      # * all exposed readable, but not writable fields
+      # * all associations
+      # * self
+      ((@config_in.readables - @config_in.writables) + @config_in.exposed_associations + ["self"]).each do |rof|
         payload.delete(rof)
       end
-      
+
       # set the virtual attributes
       (@config_in.writables - @record.attribute_names -  @config_in.exposed_associations).each do |vattr|
 
@@ -48,10 +51,10 @@ module Toast
 
         @record.send("#{vattr}=", payload.delete(vattr))
       end
-      
+
       # mass-update for the rest
       @record.update_attributes payload
-      {        
+      {
         :json => @record.represent( @config_out.exposed_attributes,
                                     @config_out.exposed_associations,
                                     @base_uri,

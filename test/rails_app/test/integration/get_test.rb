@@ -39,8 +39,6 @@ class GetTest < ActionDispatch::IntegrationTest
                      "self" => "http://www.example.com/apples/#{a1.id}",
                      "number" => 45,
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
-                     "bananas:query"=>"http://www.example.com/apples/#{a1.id}/bananas/query",
-                     "bananas:less_than_100"=> "http://www.example.com/apples/#{a1.id}/bananas/less_than_100",
                      "eggplants"=>"http://www.example.com/apples/#{a1.id}/eggplants",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
@@ -69,8 +67,6 @@ class GetTest < ActionDispatch::IntegrationTest
                      "number" => 45,
                      "eggplants"=>"http://www.example.com/apples/#{a1.id}/eggplants",
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
-                     "bananas:less_than_100"=> "http://www.example.com/apples/#{a1.id}/bananas/less_than_100",
-                     "bananas:query"=>"http://www.example.com/apples/#{a1.id}/bananas/query",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
@@ -293,75 +289,9 @@ class GetTest < ActionDispatch::IntegrationTest
                      "self" => "http://www.example.com/apples/1",
                      "name" =>  "loyce.donnelly@daugherty.info",
                      "eggplants"=>"http://www.example.com/apples/1/eggplants",
-                     "bananas"=>"http://www.example.com/apples/1/bananas",
-                     "bananas:query"=>"http://www.example.com/apples/1/bananas/query",
-                     "bananas:less_than_100"=> "http://www.example.com/apples/1/bananas/less_than_100"},
+                     "bananas"=>"http://www.example.com/apples/1/bananas"},
                    json_response)
 
     end
-
-    should "respond to scoped associations" do
-
-      b1=b2=b3=nil
-
-      e1 = Eggplant.create! do |eg|
-        eg.number = 92;  eg.name = "stephanie@wehner.info"
-        eg.bananas << (b1,b2,b3 = Banana.create!([{:number => 450, :name => "loyce.donnelly@daugherty.info"},
-                                      {:number => 12, :name => "camilla@leffler.ca"},
-                                      {:number => 45, :name => "ruth@balistreri.com"}]))
-      end
-
-      get "eggplants/first"
-      assert_response :ok
-      assert_equal(
-                   {"self"=>"http://www.example.com/eggplants/1",
-                     "name"=>"stephanie@wehner.info",
-                     "number"=>92,
-                     "potato"=>"http://www.example.com/eggplants/1/potato",
-                     "dfruits"=>"http://www.example.com/eggplants/1/dfruits",
-                     "apples"=>"http://www.example.com/eggplants/1/apples",
-                     "bananas"=>"http://www.example.com/eggplants/1/bananas",
-                     "bananas:less_than_100" => "http://www.example.com/eggplants/1/bananas/less_than_100",
-                     "bananas:query" => "http://www.example.com/eggplants/1/bananas/query" }, json_response)
-
-      get "eggplants/#{e1.id}/bananas/less_than_100"
-      assert_response :ok
-      assert_equal [{"number" => 12,
-                      "name" => "camilla@leffler.ca",
-                      "curvature" => 8.18,
-                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
-                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts",
-                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit",
-                      "self" => "http://www.example.com/bananas/#{b2.id}" },
-                    {"number" => 45,
-                      "curvature" => 8.18,
-                      "name" =>  "ruth@balistreri.com",
-                      "apple" => "http://www.example.com/bananas/#{b3.id}/apple",
-                      "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
-                      "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
-                      "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
-
-      get "eggplants/#{e1.id}/bananas/query?gt=40"
-      assert_response :ok
-
-
-      assert_equal [{"number" => 450,
-                      "name" =>  "loyce.donnelly@daugherty.info",
-                      "curvature" => 8.18,
-                      "apple" => "http://www.example.com/bananas/#{b1.id}/apple",
-                      "coconuts" => "http://www.example.com/bananas/#{b1.id}/coconuts",
-                      "dragonfruit" => "http://www.example.com/bananas/#{b1.id}/dragonfruit",
-                      "self" => "http://www.example.com/bananas/#{b1.id}" },
-                    {"number" => 45,
-                      "curvature" => 8.18,
-                      "name" =>  "ruth@balistreri.com",
-                      "apple" => "http://www.example.com/bananas/#{b3.id}/apple",
-                      "coconuts" => "http://www.example.com/bananas/#{b3.id}/coconuts",
-                      "dragonfruit" => "http://www.example.com/bananas/#{b3.id}/dragonfruit",
-                      "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
-
-    end
-
-
   end # context GET
 end

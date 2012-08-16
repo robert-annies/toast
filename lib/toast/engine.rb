@@ -4,7 +4,6 @@ require 'toast/collection'
 require 'toast/association'
 require 'toast/record'
 require 'toast/single'
-require 'toast/scoped_association'
 
 require 'action_dispatch/http/request'
 require 'rack/accept_media_types'

@@ -11,10 +11,10 @@ Rails.application.routes.draw do
     model.toast_configs.each do |tc|
       # once per namespace
       next if namespaces.include? tc.namespace
-        
+
       namespaces << tc.namespace
-      
-      match("#{tc.namespace}/#{resource_name}(/:id(/:subresource(/:scope)))" => 'toast#catch_all',
+
+      match("#{tc.namespace}/#{resource_name}(/:id(/:subresource))" => 'toast#catch_all',
             :constraints => { :id => /\d+/ },
             :resource => resource_name,
             :as => resource_name,

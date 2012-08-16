@@ -3,22 +3,18 @@ module Toast
 
     attr_reader :model
 
-    def initialize model_or_relation, subresource_name, params, config_in, config_out
+    def initialize model, subresource_name, params, config_in, config_out
 
       subresource_name ||= "all"
 
       unless config_out.collections.include? subresource_name
         if subresource_name == "all"
-          ToastController.logger.debug "\n\tToast Debug: you may want to declare 'collections :all' in model '#{model_or_relation}' to enable delivery of the collection '/#{model_or_relation.to_s.underscore.pluralize}'\n"
+          ToastController.logger.debug "\n\tToast Debug: you may want to declare 'collections :all' in model '#{model}' to enable delivery of the collection '/#{model.to_s.underscore.pluralize}'\n"
         end
         raise ResourceNotFound
       end
 
-      @target_model = (model_or_relation.klass rescue false) ?
-                       model_or_relation.klass :
-                       model_or_relation
-
-      @model_or_relation = model_or_relation
+      @model = model
       @collection = subresource_name
       @params = params
       @format = params[:format]
@@ -28,8 +24,8 @@ module Toast
 
     def get
 
-      unless @model_or_relation.respond_to?(@collection)
-        raise "Toast Error: Cannot find class method '#{@collection}' of model '#{@model_or_relation}', which is configured in 'acts_as_resource > collections'."
+      unless @model.respond_to?(@collection)
+        raise "Toast Error: Cannot find class method '#{@collection}' of model '#{@model}', which is configured in 'acts_as_resource > collections'."
       end
 
       # FIXME: This is a lot of hallooballoo to check if the #send
@@ -37,26 +33,26 @@ module Toast
       #        message is not helpful to find the error.
 
       records = if @config_out.pass_params_to.include?(@collection)
-                  if @target_model.method(@collection).arity**2 != 1
-                    raise "Toast Error: Class method '#{@collection}' of model '#{@target_model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
+                  if @model.method(@collection).arity**2 != 1
+                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
                   end
                   # fetch results
-                  @model_or_relation.send(@collection, @params)
+                  @model.send(@collection, @params)
 
                 else
 
-                  if @target_model.method(@collection).arity > 0
-                    raise "Toast Error: Class method '#{@collection}' of model '#{@model_or_relation}' must not accept any parameter, as configured by 'acts_as_resource'"
+                  if @model.method(@collection).arity > 0
+                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must not accept any parameter, as configured by 'acts_as_resource'"
                   end
                   # fetch results
-                  @model_or_relation.send(@collection)
+                  @model.send(@collection)
                 end
 
       case @format
       when "html"
         {
-          :template => "resources/#{@target_model.to_s.pluralize.underscore}",
-          :locals => { @target_model.to_s.pluralize.underscore.to_sym => records }
+          :template => "resources/#{@model.to_s.pluralize.underscore}",
+          :locals => { @model.to_s.pluralize.underscore.to_sym => records }
         }
       when "json"
         {
@@ -103,15 +99,7 @@ module Toast
 
       begin
 
-        if @collection != "all"
-          # post on scope?
-          record = @model_or_relation.new payload
-          hook = @config_in.before_scoped_create[@collection]
-          record.send(hook, @model_or_relation.proxy_association.owner) if hook
-          record.save!
-        else
-          record = @model_or_relation.create! payload
-        end
+        record = @model.create! payload
 
         {
           :json => record.represent( @config_out.exposed_attributes,

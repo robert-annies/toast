@@ -23,13 +23,13 @@ module Toast
       id = params[:id]
       subresource_name = params[:subresource]
       format = params[:format]
-      scope = params[:scope]
+
       begin
-        
+
         # determine model
         model = get_class_by_resource_name resource_name
-        
-        # determine config for representation 
+
+        # determine config for representation
         #  config_in: cosumed representation
         #  config_out: produced representation
         config_out = model.toast_config request.accept_media_types.prefered
@@ -37,9 +37,9 @@ module Toast
 
         #  ... or in case of an association request
         config_assoc_src = model.toast_config request.headers["Assoc-source-type"] # ?
-        
+
         # base URI for returned object
-        base_uri = request.base_url + request.script_name + 
+        base_uri = request.base_url + request.script_name +
           (config_out.namespace ? "/" + config_out.namespace : "")
 
         # decide which sub resource type
@@ -52,24 +52,21 @@ module Toast
               elsif (config_assoc_src && config_assoc_src.exposed_associations.include?(subresource_name))
 
                 # determine associated model
-                assoc_model = 
+                assoc_model =
                   model.reflect_on_all_associations.detect{|a| a.name.to_s == subresource_name}.klass
-                
-                # determine config for representation of assoc. model                
+
+                # determine config for representation of assoc. model
                 assoc_config_out = assoc_model.toast_config request.accept_media_types.prefered
                 assoc_config_in = assoc_model.toast_config request.media_type
-                                
+
                 # change base URI to associated record
-                base_uri = request.base_url + request.script_name + 
+                base_uri = request.base_url + request.script_name +
                   (assoc_config_out.namespace ? "/" + assoc_config_out.namespace : "")
 
-                if scope.nil?
-                  Toast::Association.new(model, id, subresource_name, format, config_assoc_src, 
-                                         assoc_model, assoc_config_in, assoc_config_out)
-                else 
-                  Toast::ScopedAssociation.new(model, id, subresource_name, scope, params.clone,
-                                               assoc_config_in, assoc_config_out)                                               
-                end
+
+                Toast::Association.new(model, id, subresource_name, format, config_assoc_src,
+                                       assoc_model, assoc_config_in, assoc_config_out)
+
               else
                 raise ResourceNotFound
               end
@@ -77,7 +74,7 @@ module Toast
         # set base to be prepended to URIs
         rsc.base_uri = base_uri
 
-        
+
 
         rsc
       rescue NameError
@@ -115,7 +112,7 @@ module Toast
           self.delete
         end
       when "GET"
-        self.get        
+        self.get
       else
         raise MethodNotAllowed
       end
