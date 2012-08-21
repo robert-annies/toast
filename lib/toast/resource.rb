@@ -64,7 +64,7 @@ module Toast
                   (assoc_config_out.namespace ? "/" + assoc_config_out.namespace : "")
 
 
-                Toast::Association.new(model, id, subresource_name, format, config_assoc_src,
+                Toast::Association.new(model, id, subresource_name, params.clone, format, config_assoc_src,
                                        assoc_model, assoc_config_in, assoc_config_out)
 
               else

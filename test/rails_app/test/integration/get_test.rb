@@ -1,21 +1,4 @@
 require 'test_helper'
-
-
-# Test Cases Overview
-=begin
-|     |                                        | status | comment |
-|-----+----------------------------------------+--------+---------|
-| GET | single record by ID success            | ok     |         |
-|     | single record ID not found             | ok     |         |
-|     | single record instance by class method | ok     |         |
-|     | default root collection success        | ok     |         |
-|     | other root collection (a scope)        | ok     |         |
-|     | collection with params                 | ok     |         |
-|     | subresource: association collection    | ok     |         |
-|     | subresource: attribute                 | ok     |         |
-
-=end
-
 class GetTest < ActionDispatch::IntegrationTest
 
   include ModelFactory
@@ -25,9 +8,9 @@ class GetTest < ActionDispatch::IntegrationTest
     [Apple, Banana, Coconut, Dragonfruit, Coconut, CoconutDragonfruit, Eggplant].each {|m| m.delete_all}
   end
 
-  # Replace this with your real tests.
-  context "GET requests for single resources" do
-    should "respond successfully on existing records" do
+
+  context "Single resources" do
+    should "be GET-able" do
 
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
@@ -56,7 +39,7 @@ class GetTest < ActionDispatch::IntegrationTest
                    }, json_response)
     end
 
-    should "respond on class methods returning single instance" do
+    should "be GET-able as single finders with 'collections' directive" do
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
 
@@ -69,11 +52,41 @@ class GetTest < ActionDispatch::IntegrationTest
                      "bananas" => "http://www.example.com/apples/#{a1.id}/bananas",
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
-
-
     end
 
-    should "respond with '404 Not found' on non existing resources" do
+    should "be formatted by views according to the URI format suffix: .html" do
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+
+      get "apples/#{a1.id}.html"
+
+      assert_response :ok
+      assert_equal "text/html", @response.content_type
+
+      assert_select "table>tr" do
+        assert_select "td", 2
+        assert_select "td", "camilla@leffler.ca"
+        assert_select "td", "133"
+      end
+    end
+
+    should "be formatted by views according to URI format suffix: .xml" do
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
+
+
+      get "apples/#{a1.id}.xml"
+
+      assert_response :ok
+      assert_equal "application/xml", @response.content_type
+
+      assert_select "apple>name", "camilla@leffler.ca"
+      assert_select "apple>number", "133"
+
+    end
+  end
+
+  context "Request for non-existing resources" do
+    should "be responded with '404 Not found'" do
 
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
@@ -97,10 +110,11 @@ class GetTest < ActionDispatch::IntegrationTest
       assert_raise ActionController::RoutingError do
         get "ActiveRecord%3A%3ABases/133"
       end
-
     end
+  end # context non-existing
 
-    should "respond on collections" do
+  context "Resource collections" do
+    should "be GET-able" do
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       a3 = Apple.create :number => 465, :name => "ruth@balistreri.com"
@@ -140,7 +154,7 @@ class GetTest < ActionDispatch::IntegrationTest
 
     end
 
-    should "respond on collections with params" do
+    should "be GET-able and process URI parameters with 'pass_params_to' directive" do
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
@@ -166,7 +180,25 @@ class GetTest < ActionDispatch::IntegrationTest
                             ], json_response)
     end
 
-    should "respond on has_many associations" do
+    should "be formatted by views according to URI format suffix: .html" do
+      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
+      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
+
+      get "apples.html"
+
+      assert_response :ok
+      assert_equal "text/html", @response.content_type
+
+      assert_select "ul" do
+        assert_select "li", 2
+        assert_select "li", "camilla@leffler.ca 133"
+        assert_select "li", "ruth@balistreri.com 465"
+      end
+    end
+
+  end # collections
+  context "Collection associations" do
+    should "be GET-able" do
 
       c1 = Coconut.create :number => 831, :name => "bertram.schuster@stantonjacobs.com"
       c2 = Coconut.create :number => 9571, :name => "roscoe.daniel@kub.net"
@@ -221,54 +253,8 @@ class GetTest < ActionDispatch::IntegrationTest
 
     end
 
-    should "respond with HTML on .html for single resources" do
-      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
 
-      get "apples/#{a1.id}.html"
-
-      assert_response :ok
-      assert_equal "text/html", @response.content_type
-
-      assert_select "table>tr" do
-        assert_select "td", 2
-        assert_select "td", "camilla@leffler.ca"
-        assert_select "td", "133"
-      end
-    end
-
-    should "respond with HTML on .html for resource collections" do
-      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
-      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
-
-      get "apples.html"
-
-      assert_response :ok
-      assert_equal "text/html", @response.content_type
-
-      assert_select "ul" do
-        assert_select "li", 2
-        assert_select "li", "camilla@leffler.ca 133"
-        assert_select "li", "ruth@balistreri.com 465"
-      end
-    end
-
-    should "respond with XML on .xml for single resources" do
-      a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
-      a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
-
-
-      get "apples/#{a1.id}.xml"
-
-      assert_response :ok
-      assert_equal "application/xml", @response.content_type
-
-      assert_select "apple>name", "camilla@leffler.ca"
-      assert_select "apple>number", "133"
-
-    end
-
-
-    should "respond to assoications not named like the class" do
+    should "be GET-able when not named like the target class" do
       e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
         eg.potato = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
         eg.dfruits = Dragonfruit.create!([{:number => 133, :name => "camilla@leffler.ca"},
@@ -293,5 +279,20 @@ class GetTest < ActionDispatch::IntegrationTest
                    json_response)
 
     end
-  end # context GET
+
+    should "be GET-able and process URI parameters with 'pass_params_to' directive" do
+
+      a1 = Apple.create(:number => 133, :name => "camilla@leffler.ca") do |a|
+        a.eggplants.build {|e| e.number = 23; e.name = "Travis Jakubowski"}
+        a.eggplants.build {|e| e.number = 123; e.name = "Wanda Wilkinson"}
+        a.eggplants.build {|e| e.number = 4000; e.name = "Fredy Wolf V"}
+        a.eggplants.build {|e| e.number = 101; e.name = "Catharine Walter"}
+      end
+
+      get "apples/#{a1.id}/eggplants?greater_than=100"
+      assert_response :ok
+      assert_same_elements ["Wanda Wilkinson","Fredy Wolf V","Catharine Walter"], json_response.map{|x| x['name']}
+
+    end
+  end # context 'collections'
 end

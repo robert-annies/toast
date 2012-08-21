@@ -3,8 +3,8 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, id, subresource_name, format, config, assoc_model, assoc_config_in, assoc_config_out
-      
+    def initialize model, id, subresource_name, params, format, config, assoc_model, assoc_config_in, assoc_config_out
+
       unless config.exposed_associations.include? subresource_name
         raise ResourceNotFound
       end
@@ -18,7 +18,7 @@ module Toast
       @associate_model = assoc_model
       @associate_config_in = assoc_config_in
       @associate_config_out = assoc_config_out
-
+      @params = params
     end
 
     def get
@@ -27,11 +27,16 @@ module Toast
         raise "Toast Error: Association '#{@assoc}' not found in model '#{@record.class}'"
       end
 
-      result = @record.send(@assoc)
+      result =
+        if @config.pass_params_to.include?(@assoc)
+          @record.send(@assoc).find_by_params(@params)
+        else
+          @record.send(@assoc)
+        end
 
       raise ResourceNotFound if result.nil?
 
-      if result.is_a? Array
+      if result.is_a? ActiveRecord::Relation or result.is_a? Array
         {
           :json => result.map{|r|
             r.represent( @associate_config_out.in_collection.exposed_attributes,
