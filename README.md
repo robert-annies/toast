@@ -2,7 +2,7 @@ Summary
 =======
 
 Toast is an extension to Ruby on Rails to build web services with low
-programming effort in a coherent way.  Toast exends ActiveRecord such
+programming effort in a coherent way.  Toast extends ActiveRecord such
 that each model can be declared to be a web resource, exposing defined
 attributes for reading and writing using HTTP.
 
@@ -11,13 +11,15 @@ Its main features are:
   * declaration of web resources based on ActiveRecord models
   * generic controller handles all actions
   * automated routing
-  * exposing data values with JSON maps 
+  * exposing data values with JSON maps
   * exposing associations by links (URLs)
 
-Toast works with 
+Toast works with
 
-  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.6)
+  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.8)
   * Ruby 1.8.7 and 1.9.3
+
+See the [User Manual](https://github.com/robokopp/toast/wiki/User-Manual) for a detailed description.
 
 WARNING
 =======
@@ -28,7 +30,7 @@ enabled serving the annotated model's data records.
 
 Version 1.0.0 of Toast is planned to be a production-ready implementation,
 which will be finished within 2012. Until then API/DSL changes must
-be expected with each minor update. 
+be expected with each minor update.
 
 Example
 =======
@@ -47,14 +49,14 @@ and let a corresponding model class have a *acts_as_resource* annotation:
      class Banana < ActiveRecord::Base
        belongs_to :apple
        has_many :coconuts
-       
+
        scope :less_than_100, where("number < 100")
 
        acts_as_resource do
          # exposed attributes or association names
          readables :coconuts, :apple
-         writables :name, :number	 
-	 
+         writables :name, :number
+
          # exposed class methods of Banana returning an Array of Banana records
          collections :less_than_100, :all
        end
@@ -130,7 +132,7 @@ With bundler from  (rubygems.org)
 
 the latest Git:
 
-    gem "toast", :git => "https://github.com/robokopp/toast.git"	
+    gem "toast", :git => "https://github.com/robokopp/toast.git"
 
 Remarks
 =======
