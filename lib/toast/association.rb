@@ -88,8 +88,12 @@ module Toast
       end
 
       begin
+        reflection = @model.reflect_on_association(@assoc.to_sym)
 
-        if @config.pass_params_to.include?(@assoc)
+        if(@config.pass_params_to.include?(@assoc) and
+           reflection.options[:extend] and
+           reflection.options[:extend].detect{|e| e.method_defined? :create!})
+
           record = @record.send(@assoc).create! payload, @params
         else
           record = @record.send(@assoc).create! payload
@@ -122,9 +126,12 @@ module Toast
 
       reflection = @model.reflect_on_association(@assoc.to_sym)
 
-      if reflection.collection?
+      if(reflection.collection? )
         # has_many, hbtm
-        if @config.pass_params_to.include?(@assoc)
+        if( @config.pass_params_to.include?(@assoc) and
+            reflection.options[:extend] and
+            reflection.options[:extend].detect{|e| e.method_defined? :<<})
+
           @record.send(@assoc).<<(link_record,@params)
         else
           @record.send(@assoc) << link_record
