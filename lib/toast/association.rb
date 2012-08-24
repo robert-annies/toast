@@ -88,8 +88,12 @@ module Toast
       end
 
       begin
-        record = @record.send(@assoc).create! payload
 
+        if @config.pass_params_to.include?(@assoc)
+          record = @record.send(@assoc).create! payload, @params
+        else
+          record = @record.send(@assoc).create! payload
+        end
         {
           :json => record.represent( @associate_config_out.exposed_attributes,
                                      @associate_config_out.exposed_associations,
@@ -116,9 +120,15 @@ module Toast
       link_model = Resource.get_class_by_resource_name(link_resource_name)
       link_record = link_model.find(link_id)
 
-      if @model.reflect_on_association(@assoc.to_sym).collection?
+      reflection = @model.reflect_on_association(@assoc.to_sym)
+
+      if reflection.collection?
         # has_many, hbtm
-         @record.send(@assoc) << link_record
+        if @config.pass_params_to.include?(@assoc)
+          @record.send(@assoc).<<(link_record,@params)
+        else
+          @record.send(@assoc) << link_record
+        end
       else
         # has_one, belongs_to
         @record.send(@assoc+"=",link_record)
