@@ -48,8 +48,8 @@ module Toast
           props = {}
 
           attr_names.each do |name|
-            unless self.respond_to?(name) && self.method(name).arity == 0
-              raise "Toast Error: Connot find instance method '#{self.class}##{name}' of arity 0"
+            unless self.respond_to?(name)
+              raise "Toast Error: Connot find instance method '#{self.class}##{name}'"
             end
             props[name] = self.send(name)
           end
