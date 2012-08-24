@@ -27,8 +27,12 @@ module Toast
         raise "Toast Error: Association '#{@assoc}' not found in model '#{@record.class}'"
       end
 
+      reflection = @model.reflect_on_association(@assoc.to_sym)
+
       result =
-        if @config.pass_params_to.include?(@assoc)
+        if(@config.pass_params_to.include?(@assoc) and
+           reflection.options[:extend] and
+           reflection.options[:extend].detect{|e| e.method_defined? :find_by_params} )
           @record.send(@assoc).find_by_params(@params)
         else
           @record.send(@assoc)
