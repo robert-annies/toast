@@ -92,7 +92,7 @@ module Toast
       if @record.destroy
         {
           :nothing => true,
-          :status => :ok
+          :status => :no_content
         }
       else
         {
