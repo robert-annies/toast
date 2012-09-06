@@ -33,11 +33,11 @@ class PutTest < ActionDispatch::IntegrationTest
       a1.bananas << b3
 
       put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12,
-                                    "apple" => "nono" , "self"=>"nono"}, 
+                                    "apple" => "nono" , "self"=>"nono"},
                "application/banana-v2"
 
       assert_response :ok
-   
+
       get "bananas/#{b4.id}",  nil, accept("application/banana-v1")
       assert_equal({"number"=>2211,
                      "name"=> "linda@pacocha.name",
@@ -70,16 +70,16 @@ class PutTest < ActionDispatch::IntegrationTest
                      "self" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
 
     end
-    
+
     should "not update non-writable attributes" do
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
       a1 = Apple.create :number => 43, :name => "dandre@ondricka.uk"
       b2.apple = a1
       b2.save
-      
+
       put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name", "apple_id" => 666}, "application/banana-v1"
       assert_response :ok
-      
+
       b2.reload
       assert_equal a1.id, b2.apple_id
 
@@ -90,7 +90,7 @@ class PutTest < ActionDispatch::IntegrationTest
                      "curvature" => 8.18,
                      "coconuts" => "http://www.example.com/bananas/#{b2.id}/coconuts" ,
                      "dragonfruit" => "http://www.example.com/bananas/#{b2.id}/dragonfruit" ,
-                     "self" => "http://www.example.com/bananas/#{b2.id}"}, json_response)      
+                     "self" => "http://www.example.com/bananas/#{b2.id}"}, json_response)
     end
 
 
@@ -121,14 +121,14 @@ class PutTest < ActionDispatch::IntegrationTest
       # payload is XML but content type is json+apple
       put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,  {"CONTENT_TYPE"=>"application/apple+json"}
       assert_response :bad_request
-      
-           
-      # payload is XML but content type is json 
-      # 
+
+
+      # payload is XML but content type is json
+      #
       # This causes a decoding exception before ToastController can catch it, in Rails 3.1.x
       # put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml, {"CONTENT_TYPE" => "application/json"}
       # assert_response :bad_request
-      
+
     end
 
     should "not accept bad data" do
@@ -140,7 +140,7 @@ class PutTest < ActionDispatch::IntegrationTest
       assert_raise StandardError do
         begin
           put "bananas/#{b2.id}", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
-        rescue 
+        rescue
           raise StandardError  # different rails version raise different exceptions, equalize it
         end
       end
@@ -162,7 +162,7 @@ class PutTest < ActionDispatch::IntegrationTest
       d1 = Dragonfruit.create! {|d| d.number = 39}
 
       put "/bananas/#{b1.id}/dragonfruit", nil, {"LINK" => "http://www.example.com/dragonfruits/#{d1.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       b1.reload
       assert_equal d1, b1.dragonfruit
@@ -183,7 +183,7 @@ class PutTest < ActionDispatch::IntegrationTest
       d1 = Dragonfruit.create! {|d| d.number = 39}
 
       put "/dragonfruits/#{d1.id}/banana", nil, {"LINK" => "http://www.example.com/bananas/#{b2.id}"}
-      assert_response :ok
+      assert_response :no_content
       b2.reload
       assert_equal b2, d1.banana
 

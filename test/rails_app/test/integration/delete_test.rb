@@ -27,7 +27,7 @@ class DeleteTest < ActionDispatch::IntegrationTest
 
 
       delete "apples/#{a1.id}"
-      assert_response :ok
+      assert_response :no_content
 
       get "apples"
       assert_same_elements [{"number" => 133, "self" => "http://www.example.com/apples/#{a2.id}"},
@@ -36,7 +36,7 @@ class DeleteTest < ActionDispatch::IntegrationTest
 
 
       delete "apples/#{a3.id}"
-      assert_response :ok
+      assert_response :no_content
 
 
       get "apples"
@@ -68,9 +68,9 @@ class DeleteTest < ActionDispatch::IntegrationTest
       end
 
       delete "/apples/#{a1.id}/bananas",nil, {"LINK" => "http://www.example.com/bananas/#{b1.id}"}
-      assert_response :ok
+      assert_response :no_content
       delete "/apples/#{a1.id}/bananas",nil, {"LINK" => "http://www.example.com/bananas/#{b3.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       a1.reload
       assert_same_elements [b1,b2,b3,b4], Banana.all
@@ -78,7 +78,7 @@ class DeleteTest < ActionDispatch::IntegrationTest
 
       # not linked anymore (DELETE is idempotent)
       delete "/apples/#{a1.id}/bananas",nil, {"LINK" => "http://www.example.com/bananas/#{b3.id}"}
-      assert_response :ok
+      assert_response :no_content
       a1.reload
       assert_same_elements [b2,b4], a1.bananas
 
@@ -99,9 +99,9 @@ class DeleteTest < ActionDispatch::IntegrationTest
       e3.apples << (a4 = Apple.create)
 
       delete "/apples/#{a1.id}/eggplants",nil, {"LINK" => "http://www.example.com/eggplants/#{e1.id}"}
-      assert_response :ok
+      assert_response :no_content
       delete "/apples/#{a1.id}/eggplants",nil, {"LINK" => "http://www.example.com/eggplants/#{e3.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       a1.reload
       e1.reload
@@ -113,7 +113,7 @@ class DeleteTest < ActionDispatch::IntegrationTest
 
       # not linked anymore (DELETE is idempotent)
       delete "/apples/#{a1.id}/eggplants",nil, {"LINK" => "http://www.example.com/eggplants/#{e3.id}"}
-      assert_response :ok
+      assert_response :no_content
       a1.reload
       assert_same_elements [e2,e4],    a1.eggplants
     end
@@ -123,14 +123,14 @@ class DeleteTest < ActionDispatch::IntegrationTest
       b1 = Banana.create! {|b| b.dragonfruit = d1}
 
       delete "/bananas/#{b1.id}/dragonfruit", nil, {"LINK" => "http://www.example.com/dragonfruits/#{d1.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       b1.reload
       assert_equal nil, b1.dragonfruit
 
       # not linked anymore (DELETE is idempotent)
       delete "/bananas/#{b1.id}/dragonfruit", nil, {"LINK" => "http://www.example.com/dragonfruits/#{d1.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       b1.reload
       assert_equal nil, b1.dragonfruit
@@ -142,14 +142,14 @@ class DeleteTest < ActionDispatch::IntegrationTest
       b1 = Banana.create! {|b| b.dragonfruit = d1}
 
       delete "/dragonfruits/#{d1.id}/banana", nil, {"LINK" => "http://www.example.com/bananas/#{b1.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       d1.reload
       assert_equal nil, d1.banana
 
       # not linked anymore (DELETE is idempotent)
       delete "/dragonfruits/#{d1.id}/banana", nil, {"LINK" => "http://www.example.com/bananas/#{b1.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       d1.reload
       assert_equal nil, d1.banana

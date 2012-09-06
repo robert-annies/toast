@@ -142,7 +142,7 @@ class PostTest < ActionDispatch::IntegrationTest
       b3 = Banana.create!
 
       post "/apples/#{a1.id}/bananas", nil, {"LINK" => "http://www.example.com/bananas/#{b3.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       a1.reload
       assert_same_elements [b1, b2, b3], a1.bananas
@@ -171,11 +171,11 @@ class PostTest < ActionDispatch::IntegrationTest
       a4 = Apple.create!
 
       post "/apples/#{a2.id}/eggplants", nil, {"LINK" => "http://www.example.com/eggplants/#{e3.id}"}
-      assert_response :ok
+      assert_response :no_content
       post "/eggplants/#{e3.id}/apples", nil, {"LINK" => "http://www.example.com/apples/#{a3.id}"}
-      assert_response :ok
+      assert_response :no_content
       post "/eggplants/#{e3.id}/apples", nil, {"LINK" => "http://www.example.com/apples/#{a4.id}"}
-      assert_response :ok
+      assert_response :no_content
 
       a2.reload; e3.reload
       assert_same_elements [e1, e2, e3], a2.eggplants
