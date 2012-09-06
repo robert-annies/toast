@@ -62,6 +62,9 @@ module Toast
         }
       end
 
+
+    rescue ActiveRecord::RecordNotFound
+      raise ResourceNotFound
     end
 
     def put payload, media_type
@@ -148,7 +151,7 @@ module Toast
 
       {
         :nothing => true,
-        :status => :ok
+        :status => :no_content
       }
 
     rescue ActiveRecord::AssociationTypeMismatch
@@ -177,14 +180,10 @@ module Toast
 
       {
         :nothing => true,
-        :status => :ok
+        :status => :no_content
       }
     rescue ActiveRecord::RecordNotFound
-      # link_record not linked: nothing to be done
-      {
-        :nothing => true,
-        :status => :ok
-      }
+      raise ResourceNotFound
     end
   end
 end
