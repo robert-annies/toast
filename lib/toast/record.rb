@@ -51,7 +51,7 @@ module Toast
       end
 
       # mass-update for the rest
-      @record.update_attributes payload
+      @record.update_attributes! payload
       {
         :json => @record.represent( @config_out.exposed_attributes,
                                     @config_out.exposed_associations,
@@ -61,6 +61,10 @@ module Toast
         :location => self.base_uri + @record.uri_path,
         :content_type => @config_out.media_type
       }
+
+    rescue ActiveRecord::RecordInvalid => e
+      # model validation failed
+      raise PayloadInvalid.new(e.message)
     end
 
     def get
