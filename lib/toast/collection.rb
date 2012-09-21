@@ -91,11 +91,10 @@ module Toast
         raise PayloadFormatError
       end
 
-      # silently ignore all exposed readable, but not writable fields
-      ((@config_in.readables - @config_in.writables) +  @config_in.exposed_associations + ["self"]).each do |rof|
-        payload.delete(rof)
-      end
-
+      payload.delete_if {|key,value|
+        !@config_in.writables.include?(key) or
+        @config_in.exposed_associations.include?(key)
+      }
 
       begin
 

@@ -88,15 +88,10 @@ module Toast
         raise PayloadFormatError
       end
 
-      # ignore:
-      # * all exposed readable, but not writable fields
-      # * all associations
-      # * self
-      ((@associate_config_in.readables - @associate_config_in.writables) +
-       @associate_config_in.exposed_associations + ["self"]).each do |rof|
-        payload.delete(rof)
-      end
-
+      payload.delete_if {|key,value|
+        !@associate_config_in.writables.include?(key) or
+        @associate_config_in.exposed_associations.include?(key)
+      }
 
       begin
         reflection = @model.reflect_on_association(@assoc.to_sym)

@@ -34,13 +34,11 @@ module Toast
         raise PayloadFormatError
       end
 
-      # ignore:
-      # * all exposed readable, but not writable fields
-      # * all associations
-      # * self
-      ((@config_in.readables - @config_in.writables) + @config_in.exposed_associations + ["self"]).each do |rof|
-        payload.delete(rof)
-      end
+      # ignore all not explicitly writable attribute
+      payload.delete_if {|key,value|
+        !@config_in.writables.include?(key) or
+        @config_in.exposed_associations.include?(key)
+      }
 
       # set the virtual attributes
       (@config_in.writables - @record.attribute_names -  @config_in.exposed_associations).each do |vattr|
