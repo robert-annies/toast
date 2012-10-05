@@ -83,6 +83,17 @@ class GetTest < ActionDispatch::IntegrationTest
       assert_select "apple>number", "133"
 
     end
+
+    should "respond with serialized JSON objects and arrays" do
+      c1 = Coconut.create!(:object => {'carrot'=>'red', 'apple'=> 'green'},
+                           :array =>  [11,0.2, nil, "moon"])
+
+      get "fruits/coconuts/#{c1.id}"
+      assert_response :ok
+      assert_equal({"apple"=>"green", "carrot"=>"red"},  json_response['object'])
+      assert_equal([11,0.2, nil, "moon"],  json_response['array'])
+
+    end
   end
 
   context "Request for non-existing resources" do
@@ -294,5 +305,7 @@ class GetTest < ActionDispatch::IntegrationTest
       assert_same_elements ["Wanda Wilkinson","Fredy Wolf V","Catharine Walter"], json_response.map{|x| x['name']}
 
     end
+
+
   end # context 'collections'
 end

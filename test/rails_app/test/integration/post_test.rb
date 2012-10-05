@@ -26,13 +26,23 @@ class PostTest < ActionDispatch::IntegrationTest
   context "POST requests" do
     should "create resources" do
 
-      record1 = {"number" => 3482, "name" => "Colton Kautzer"}
-      record2 = {"number" => 3382, "name" => "Rickie Leffler"}
+      record1 = {
+        "number" => 3482, "name" => "Colton Kautzer",
+        "array" => [0.2, 8, 'sun', nil, Time.utc(2000,"jan",1,20,15,1) ],
+        "object" => {'carrot' => 'red', 'apple' => 'green'}
+      }
+
+      record2 = {
+        "number" => 3382, "name" => "Rickie Leffler",
+        "array" => [1,2,3], "object" => {}}
 
       post_json "fruits/coconuts", record1
       assert_response :created
       uri1 = @response.header["Location"]
+
       record1.merge! "self" => uri1
+      record1['array'][4] = Time.utc(2000,"jan",1,20,15,1).strftime("%Y-%m-%dT%H:%M:%SZ")
+
       assert_equal record1, json_response
 
       post_json "fruits/coconuts", record2
@@ -95,7 +105,8 @@ class PostTest < ActionDispatch::IntegrationTest
       assert_response :created
 
       assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name",
-                     "self" => "http://www.example.com/fruits/coconuts/3"}, json_response)
+                     "self" => "http://www.example.com/fruits/coconuts/3",
+                     "array" => [], "object" => {}}, json_response)
 
       c3 = Coconut.find_by_number 123
       assert_equal "http://www.example.com/fruits/coconuts/#{c3.id}", json_response["self"]
@@ -103,9 +114,12 @@ class PostTest < ActionDispatch::IntegrationTest
       get "bananas/#{b1.id}/coconuts"
       assert_response :ok
 
-      assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "self" => "http://www.example.com/fruits/coconuts/#{c1.id}"},
-                            {"number" => 906, "name" => "genesis@jacobs.biz", "self" => "http://www.example.com/fruits/coconuts/#{c2.id}"},
-                            {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "self" => "http://www.example.com/fruits/coconuts/#{c3.id}"}],
+      assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "self" => "http://www.example.com/fruits/coconuts/#{c1.id}",
+                              "array" => [], "object" => {}},
+                            {"number" => 906, "name" => "genesis@jacobs.biz", "self" => "http://www.example.com/fruits/coconuts/#{c2.id}",
+                              "array" => [], "object" => {}},
+                            {"number" => 123, "name" => "eriberto_morar@kochmraz.name", "self" => "http://www.example.com/fruits/coconuts/#{c3.id}",
+                              "array" => [], "object" => {}}],
                            json_response
     end
 

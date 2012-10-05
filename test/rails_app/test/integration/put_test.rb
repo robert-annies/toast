@@ -26,6 +26,9 @@ class PutTest < ActionDispatch::IntegrationTest
   context "PUT requests" do
     should "update resources" do
 
+      c1 = Coconut.create!(:object => {'carrot'=>'red', 'apple'=> 'green'},
+                           :array =>  [11,0.2, nil, "moon" ])
+
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
@@ -52,6 +55,15 @@ class PutTest < ActionDispatch::IntegrationTest
       assert_response :ok
 
       a1.reload
+
+      put_json "fruits/coconuts/#{c1.id}", {:number => 3, :array => ['a',Time.utc(2000,"jan",1,20,15,1)]}, "application/json"
+      assert_response :ok
+
+      c1.reload
+      assert_equal Time.utc(2000,"jan",1,20,15,1), c1.array.last
+
+      # i wouldn't expect that Time object's rocket operator works with the ISO-time
+
     end
 
     should "partially update" do

@@ -41,6 +41,8 @@ ActiveRecord::Schema.define(:version => 20110531095445) do
   create_table "coconuts", :force => true do |t|
     t.string   "name"
     t.integer  "number"
+    t.text     "object"
+    t.text     "array"
     t.string   "hidden", :default => "Capetown"
     t.integer  "banana_id"
     t.datetime "created_at"
