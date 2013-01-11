@@ -48,7 +48,7 @@ module Toast
               elsif id.nil?
                 Toast::Collection.new(model, subresource_name, params.clone, config_in, config_out)
               elsif subresource_name.nil?
-                Toast::Record.new(model, id, format, config_in, config_out)
+                Toast::Record.new(model, id, format, params.clone, config_in, config_out)
               elsif (config_assoc_src && config_assoc_src.exposed_associations.include?(subresource_name))
 
                 # determine associated model

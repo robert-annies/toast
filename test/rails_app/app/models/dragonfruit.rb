@@ -9,6 +9,10 @@ class Dragonfruit < ActiveRecord::Base
   acts_as_resource {
     writables :banana
     collections :all
+    pass_params_to :self
   }
+
+  attr_accessor :current_user
+
 
 end

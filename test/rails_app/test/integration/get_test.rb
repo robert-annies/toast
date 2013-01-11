@@ -269,16 +269,18 @@ class GetTest < ActionDispatch::IntegrationTest
       e1 = Eggplant.create({:number => 92, :name => "stephanie@wehner.info"}) do |eg|
         eg.potato = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
         eg.dfruits = Dragonfruit.create!([{:number => 133, :name => "camilla@leffler.ca"},
-                                           { :number => 465, :name => "ruth@balistreri.com"}])
+                                          {:number => 465, :name => "ruth@balistreri.com"}])
       end
 
       get "eggplants/#{e1.id}/dfruits"
 
       assert_response :ok
       assert_equal [{"self" => "http://www.example.com/dragonfruits/1",
-                     "banana"=>"http://www.example.com/dragonfruits/1/banana"},
+                      "banana"=>"http://www.example.com/dragonfruits/1/banana",
+                      "number" => nil},
                     {"self" => "http://www.example.com/dragonfruits/2",
-                     "banana"=>"http://www.example.com/dragonfruits/2/banana"}], json_response
+                      "banana"=>"http://www.example.com/dragonfruits/2/banana",
+                    "number" => nil}], json_response
 
       get "eggplants/#{e1.id}/potato"
       assert_response :ok

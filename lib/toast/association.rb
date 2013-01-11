@@ -165,9 +165,18 @@ module Toast
       link_model = Resource.get_class_by_resource_name(link_resource_name)
       link_record = link_model.find(link_id)
 
+      reflection = @model.reflect_on_association(@assoc.to_sym)
+
       if @model.reflect_on_association(@assoc.to_sym).collection?
         # has_many, hbtm
-        @record.send(@assoc).delete(link_record) unless link_record.nil?
+        if( @config.pass_params_to.include?(@assoc) and
+            reflection.options[:extend] and
+            reflection.options[:extend].detect{|e| e.method_defined? :delete})
+
+          @record.send(@assoc).delete(link_record,@params)
+        else
+          @record.send(@assoc).delete(link_record) unless link_record.nil?
+        end
       else
 
         # has_one, belongs_to

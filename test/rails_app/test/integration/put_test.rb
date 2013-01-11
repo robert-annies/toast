@@ -210,5 +210,16 @@ class PutTest < ActionDispatch::IntegrationTest
       assert_response :not_found
 
     end
+
+
+    should 'pass URI params to update_attibutes! if configured' do
+
+      d1 = Dragonfruit.create! {|d| d.number = 39}
+
+      put_json "/dragonfruits/#{d1.id}?write=true", {:number => 3}
+      assert_response :ok
+      assert_equal 3, d1.reload.number
+    end
+
   end
 end

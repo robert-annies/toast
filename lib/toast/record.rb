@@ -3,12 +3,13 @@ module Toast
 
     attr_reader :model
 
-    def initialize model, id, format, config_in, config_out
+    def initialize model, id, format, params, config_in, config_out
       @model = model
       @record = model.find(id) rescue raise(ResourceNotFound.new)
       @format = format
       @config_in = config_in
       @config_out = config_out
+      @params = params
     end
 
     def post payload, media_type
@@ -51,7 +52,13 @@ module Toast
       end
 
       # mass-update for the rest
-      @record.update_attributes! payload
+      if @config_in.pass_params_to.include? 'self'
+        # parameter passing
+        @record.update_attributes! payload, @params
+      else
+        @record.update_attributes! payload
+      end
+
       {
         :json => @record.represent( @config_out.exposed_attributes,
                                     @config_out.exposed_associations,
