@@ -14,5 +14,12 @@ class Dragonfruit < ActiveRecord::Base
 
   attr_accessor :current_user
 
+  def update_attributes! attrs, params
 
+    if params['number']
+      self.update_attribute :number, params['number'].to_i
+    end
+
+    super attrs
+  end
 end

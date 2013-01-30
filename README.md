@@ -16,7 +16,7 @@ Its main features are:
 
 Toast works with
 
-  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.8)
+  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.11)
   * Ruby 1.8.7 and 1.9.3
 
 See the [User Manual](https://github.com/robokopp/toast/wiki/User-Manual) for a detailed description.

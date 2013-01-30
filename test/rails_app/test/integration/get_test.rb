@@ -276,11 +276,9 @@ class GetTest < ActionDispatch::IntegrationTest
 
       assert_response :ok
       assert_equal [{"self" => "http://www.example.com/dragonfruits/1",
-                      "banana"=>"http://www.example.com/dragonfruits/1/banana",
-                      "number" => nil},
+                      "banana"=>"http://www.example.com/dragonfruits/1/banana"},
                     {"self" => "http://www.example.com/dragonfruits/2",
-                      "banana"=>"http://www.example.com/dragonfruits/2/banana",
-                    "number" => nil}], json_response
+                      "banana"=>"http://www.example.com/dragonfruits/2/banana"}], json_response
 
       get "eggplants/#{e1.id}/potato"
       assert_response :ok
