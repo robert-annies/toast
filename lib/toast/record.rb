@@ -69,7 +69,7 @@ module Toast
         :content_type => @config_out.media_type
       }
 
-    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotUnique => e
       # model validation failed
       raise PayloadInvalid.new(e.message)
     end
