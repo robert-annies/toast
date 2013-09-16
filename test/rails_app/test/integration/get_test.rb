@@ -1,8 +1,6 @@
 require 'test_helper'
 class GetTest < ActionDispatch::IntegrationTest
 
-  include ModelFactory
-
   def setup
     # clear all
     [Apple, Banana, Coconut, Dragonfruit, Coconut, CoconutDragonfruit, Eggplant].each {|m| m.delete_all}

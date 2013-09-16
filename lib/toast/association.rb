@@ -157,7 +157,6 @@ module Toast
     rescue ActiveRecord::RecordNotFound
       raise Toast::ResourceNotFound
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotUnique => e
-      binding.pry
       # model validation failed (join model used for linking)
       raise PayloadInvalid.new(e.message)
     end

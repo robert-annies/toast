@@ -15,8 +15,6 @@
 
 class PutTest < ActionDispatch::IntegrationTest
 
-  include ModelFactory
-
   def setup
     # clear all
     [Apple, Banana, Coconut, Dragonfruit, Coconut, CoconutDragonfruit].each {|m| m.delete_all}

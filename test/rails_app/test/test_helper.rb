@@ -1,8 +1,6 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
-
-require 'factory'
 require 'shoulda'
 
 class ActiveSupport::TestCase
@@ -17,7 +15,7 @@ class ActiveSupport::TestCase
   def json_response
     ActiveSupport::JSON.decode(@response.body)
   end
-  
+
   def post_json uri, payload, media=nil
     post uri, payload.to_json, (media.nil? ? {"CONTENT_TYPE"=>"application/json"} :  {"CONTENT_TYPE"=> media})
   end
