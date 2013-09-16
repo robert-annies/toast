@@ -125,7 +125,6 @@ module Toast
     end
 
     def link link_path_info
-
       slash, link_resource_name, link_id = link_path_info.split('/')
       link_model = Resource.get_class_by_resource_name(link_resource_name)
       link_record = link_model.find(link_id)
@@ -157,6 +156,10 @@ module Toast
       raise Toast::ResourceNotAcceptable
     rescue ActiveRecord::RecordNotFound
       raise Toast::ResourceNotFound
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotUnique => e
+      binding.pry
+      # model validation failed (join model used for linking)
+      raise PayloadInvalid.new(e.message)
     end
 
     def unlink link_path_info

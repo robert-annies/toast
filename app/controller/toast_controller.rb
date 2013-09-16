@@ -31,6 +31,9 @@ class ToastController < ApplicationController
     rescue Toast::ResourceNotAcceptable => e
       return head(:not_acceptable)
 
+    rescue Toast::Conflict => e
+      return render :text => e.message, :status => :conflict
+
     rescue Exception => e
       log_exception e
       puts e if Rails.env == "test"

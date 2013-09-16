@@ -47,7 +47,7 @@ module Toast
         unless (@record.respond_to?("#{vattr}=") && @record.method("#{vattr}=").arity == 1)
           raise "Toast Error: Connot find setter '#{@record.class}##{vattr}='"
         end
-
+        # FIXME: omitted virtual attributes are set to nil, omiited non-virtual attributes are ignored
         @record.send("#{vattr}=", payload.delete(vattr))
       end
 
