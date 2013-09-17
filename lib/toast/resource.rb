@@ -3,7 +3,7 @@ module Toast
   class ResourceNotFound < Exception; end
   class MethodNotAllowed < Exception; end
   class PayloadInvalid < Exception; end
-  class LinkInvalid < Exception; end
+  class Conflict < Exception; end
   class PayloadFormatError < Exception; end
   class UnsupportedMediaType < Exception; end
   class RequestedVersionNotDefined < Exception; end
