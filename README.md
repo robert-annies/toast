@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/toast.png)](http://badge.fury.io/rb/toast)
+
 Summary
 =======
 
@@ -16,8 +18,8 @@ Its main features are:
 
 Toast works with
 
-  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.11)
-  * Ruby 1.8.7 and 1.9.3
+  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.16)
+  * Ruby 1.8.7, 1.9.3, 2.0.0
 
 See the [User Manual](https://github.com/robokopp/toast/wiki/User-Manual) for a detailed description.
 
