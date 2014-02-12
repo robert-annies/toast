@@ -8,7 +8,6 @@ module Toast
     def acts_as_resource &block
 
       @toast_configs ||= Array.new
-
       @toast_configs << Toast::ConfigDSL::Base.new(self)
 
       Blockenspiel.invoke( block, @toast_configs.last)
@@ -30,6 +29,11 @@ module Toast
             tc.media_type == media_type || tc.in_collection.media_type == media_type
           end || @toast_configs.first
         end
+
+        def toast_resource_uri_prefix
+          @toast_resource_uri_prefix ||= self.to_s.pluralize.underscore
+        end
+
       end
 
       # add instance methods
@@ -37,7 +41,7 @@ module Toast
         # Return the path segment of the URI of this record
         def uri_path
           "/" +
-            self.class.to_s.pluralize.underscore + "/" +
+            self.class.toast_resource_uri_prefix + "/" +
             self.id.to_s
         end
 
@@ -72,9 +76,10 @@ module Toast
     def resourceful_model_options
       nil
     end
-    def resource_names
-      @@all_resourceful_resource_names
-    end
+  end
+
+  def self.resourceful_models
+    Module.constants.select{ |c| (eval c).respond_to?(:toast_config)}.sort.map{|c| c.constantize}
   end
 
 end
