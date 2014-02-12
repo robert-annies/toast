@@ -39,6 +39,8 @@ module App1
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
+
+    config.i18n.enforce_available_locales = false
   end
 end
 

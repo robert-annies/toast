@@ -5,8 +5,10 @@ when "1.8.7"
   RAILS_VERSIONS=["~> 3.1.0",  "~> 3.2.0"]
 when "1.9.3"
   RAILS_VERSIONS=["~> 3.1.0",  "~> 3.2.0"]
+when "2.0.0"
+  RAILS_VERSIONS=["~> 3.1.0",  "~> 3.2.0"]
 else
-  puts "Warning: Toast is currently only tested against Ruby 1.8.7 and 1.9.3, you have #{RUBY_VERSION}"
+  puts "Warning: Toast is currently only tested against Ruby 1.8.7, 1.9.3 and 2.0.0 you have #{RUBY_VERSION}"
 end
 
 for rails_version in RAILS_VERSIONS

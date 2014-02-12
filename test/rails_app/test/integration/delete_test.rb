@@ -22,7 +22,7 @@ class DeleteTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       a3 = Apple.create :number => 123, :name => "roy@hobgard.co"
-l
+
 
       delete "apples/#{a1.id}"
       assert_response :no_content
