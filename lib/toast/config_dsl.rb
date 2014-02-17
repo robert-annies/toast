@@ -44,9 +44,9 @@ module Toast
       end
 
       def writables= arg
-        @model.attr_accessible *arg
         @field_comments.merge! ConfigDSL.get_comments(arg, 'rw')
         @writables.push *ConfigDSL.normalize(arg,"writables")
+        @model.attr_accessible *@writables
       end
 
       # args: Array or :all, :except => Array
