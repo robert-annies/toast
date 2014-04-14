@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 $:.unshift File.expand_path("../lib", __FILE__)
 require "toast/version"
 
@@ -7,7 +6,7 @@ Gem::Specification.new do |s|
   s.version = Toast::VERSION
   s.description = "Toast is an extension to Ruby on Rails that lets you expose any
 ActiveRecord model as a resource according to the REST paradigm via a generic controller. The default
-representation format is JSON or can be anything"  
+representation format is JSON or can be anything"
   s.summary = "Toast adds a RESTful interface to ActiveRecord models in Ruby on Rails."
   s.authors = ["robokopp (Robert Anniés)"]
   s.email = "robokopp@fernwerk.net"
@@ -35,4 +34,5 @@ representation format is JSON or can be anything"
   s.add_dependency('blockenspiel','~> 0.4.2')
   s.add_dependency('rack-accept-media-types','~> 0.9')
   s.add_dependency('ffaker')
+  s.add_dependency('rack-link_headers', '~> 2.2.2')
 end

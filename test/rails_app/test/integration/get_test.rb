@@ -205,6 +205,112 @@ class GetTest < ActionDispatch::IntegrationTest
       end
     end
 
+    should "be paginated" do
+      bananas = 48.times.each do |i|
+        Banana.create :number => i
+      end
+
+      get "bananas?page=1", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 10, json_response.length
+      assert_equal (0..9).to_a, json_response.map{|x| x['number']}
+      assert_equal '<http://www.example.com/bananas?page=2>; rel="next"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+      get "bananas?page=2", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 10, json_response.length
+      assert_equal (10..19).to_a, json_response.map{|x| x['number']}
+
+      assert_equal '<http://www.example.com/bananas?page=3>; rel="next"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal '<http://www.example.com/bananas?page=1>; rel="prev"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+      get "bananas?page=5", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 8, json_response.length
+      assert_equal (40..47).to_a, json_response.map{|x| x['number']}
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal '<http://www.example.com/bananas?page=4>; rel="prev"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+      # page past last one
+      get "bananas?page=80", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 0, json_response.length
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal '<http://www.example.com/bananas?page=5>; rel="prev"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+      # query w/o matches
+      get "bananas/query?page=1&gt=9999"
+
+      assert_equal 0, json_response.length
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal '<http://www.example.com/bananas/query?gt=9999&page=1>; rel="first"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal '<http://www.example.com/bananas/query?gt=9999&page=1>; rel="last"',
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+      # no paging
+      get "bananas", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 48, json_response.length
+      assert_equal nil, @response.header["LINK"]
+
+    end
+
   end # collections
   context "Collection associations" do
     should "be GET-able" do
@@ -304,6 +410,100 @@ class GetTest < ActionDispatch::IntegrationTest
 
     end
 
+    should "be paginated" do
 
-  end # context 'collections'
+      apple = Apple.create
+
+      48.times.each do |i|
+        apple.bananas.create :number => i
+      end
+
+      get "apples/#{apple.id}/bananas?page=1", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 15, json_response.length
+      assert_equal (0..14).to_a, json_response.map{|x| x['number']}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=2>; rel=\"next\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"last\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"first\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+
+      get "apples/#{apple.id}/bananas?page=2", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 15, json_response.length
+      assert_equal (15..29).to_a, json_response.map{|x| x['number']}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=3>; rel=\"next\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"last\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"first\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"prev\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+      get "apples/#{apple.id}/bananas?page=4&extra=foo", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 3, json_response.length
+      assert_equal (45..47).to_a, json_response.map{|x| x['number']}
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?extra=foo&page=4>; rel=\"last\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?extra=foo&page=1>; rel=\"first\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?extra=foo&page=3>; rel=\"prev\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+
+      # page past last one
+      get "apples/#{apple.id}/bananas?page=80", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 0, json_response.length
+
+      assert_equal nil,
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"last\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"first\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+
+
+      assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"prev\"",
+                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+
+      # no paging
+      get "apples/#{apple.id}/bananas", nil, accept("application/bananas-v1")
+      assert_response :ok
+
+      assert_equal 48, json_response.length
+      assert_equal nil, @response.header["LINK"]
+
+    end
+
+  end # context 'collection associations'
 end

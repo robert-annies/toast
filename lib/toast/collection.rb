@@ -32,27 +32,33 @@ module Toast
       #        will be successful, but if it's not checked the error
       #        message is not helpful to find the error.
 
-      records = if @config_out.pass_params_to.include?(@collection)
-                  if @model.method(@collection).arity**2 != 1
-                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
-                  end
-                  # fetch results
-                  @model.send(@collection, @params)
+      if @config_out.pass_params_to.include?(@collection)
+        if @model.method(@collection).arity**2 != 1
+          raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must accept one parameter, as configured by 'acts_as_resource > pass_params_to'."
+        end
 
-                else
+        # fetch results
+        #binding.pry if $halt
+        records, pagination_info = paginate_query( @config_out, @collection,
+                                                   @model.send(@collection, @params),
+                                                   @params )
+      else
 
-                  if @model.method(@collection).arity > 0
-                    raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must not accept any parameter, as configured by 'acts_as_resource'"
-                  end
-                  # fetch results
-                  @model.send(@collection)
-                end
+        if @model.method(@collection).arity > 0
+          raise "Toast Error: Class method '#{@collection}' of model '#{@model}' must not accept any parameter, as configured by 'acts_as_resource'"
+        end
+
+        records, pagination_info = paginate_query( @config_out, @collection,
+                                                   @model.send(@collection=='all'? 'scoped': @collection), # #scoped ?: #all would trigger query too early
+                                                   @params )
+      end
 
       case @format
       when "html"
         {
           :template => "resources/#{@model.to_s.pluralize.underscore}",
-          :locals => { @model.to_s.pluralize.underscore.to_sym => records }
+          :locals => { @model.to_s.pluralize.underscore.to_sym => records,
+                       :pagination_info => pagination_info }
         }
       when "json"
         {
@@ -63,7 +69,8 @@ module Toast
                          @config_out.media_type)
           },
           :status => :ok,
-          :content_type => @config_out.in_collection.media_type
+          :content_type => @config_out.in_collection.media_type,
+          :pagination_info => pagination_info
         }
       else
         raise ResourceNotFound
@@ -127,5 +134,6 @@ module Toast
     def unlink l
       raise MethodNotAllowed
     end
+
   end
 end

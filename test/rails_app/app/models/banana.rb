@@ -6,11 +6,15 @@ class Banana < ActiveRecord::Base
 
   acts_as_resource {
     media_type "application/banana-v1"
-    
+
     writables :name, :number, :coconuts
     readables :curvature, :apple, :dragonfruit
 
     collections :less_than_100, :all, :query
+
+    paginate :all, :page_size => 10
+    paginate :query, :page_size => 30
+
     singles :first
 
     pass_params_to :query
@@ -29,7 +33,7 @@ class Banana < ActiveRecord::Base
 
     singles :first
     collections :query
-    pass_params_to :query    
+    pass_params_to :query
 
     in_collection {
       media_type "application/bananas-v2"

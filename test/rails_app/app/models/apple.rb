@@ -14,6 +14,8 @@ class Apple < ActiveRecord::Base
     resource.deletable
 
     resource.pass_params_to = :eggplants
+
+    resource.paginate :bananas, :page_size => 15
   end
 
   has_many :bananas

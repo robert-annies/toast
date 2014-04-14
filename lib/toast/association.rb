@@ -29,18 +29,24 @@ module Toast
 
       reflection = @model.reflect_on_association(@assoc.to_sym)
 
-      result =
+      if reflection.collection?
+
+
         if(@config.pass_params_to.include?(@assoc) and
            reflection.options[:extend] and
            reflection.options[:extend].detect{|e| e.method_defined? :find_by_params} )
-          @record.send(@assoc).find_by_params(@params)
+
+          result, pagination_info = paginate_query( @config, @assoc,
+                                                    @record.send(@assoc).find_by_params(@params), @params)
         else
-          @record.send(@assoc)
+
+          result, pagination_info = paginate_query( @config, @assoc,
+                                                    @record.send(@assoc), @params)
+
         end
 
-      raise ResourceNotFound if result.nil?
+        raise ResourceNotFound if result.nil?
 
-      if result.is_a? ActiveRecord::Relation or result.is_a? Array
         {
           :json => result.map{|r|
             r.represent( @associate_config_out.in_collection.exposed_attributes,
@@ -49,9 +55,23 @@ module Toast
                          @associate_config_out.media_type )
           },
           :status => :ok,
-          :content_type => @associate_config_out.in_collection.media_type
+          :content_type => @associate_config_out.in_collection.media_type,
+          :pagination_info => pagination_info
         }
+
       else
+
+        result =
+          if(@config.pass_params_to.include?(@assoc) and
+             reflection.options[:extend] and
+             reflectin.options[:extend].detect{|e| e.method_defined? :find_by_params} )
+            @record.send(@assoc).find_by_params(@params)
+          else
+            @record.send(@assoc)
+          end
+
+        raise ResourceNotFound if result.nil?
+
         {
           :json =>  result.represent( @associate_config_out.exposed_attributes,
                                       @associate_config_out.exposed_associations,

@@ -1,3 +1,5 @@
+require 'rack-link_headers'
+
 class ToastController < ApplicationController
 
   def catch_all
@@ -11,7 +13,37 @@ class ToastController < ApplicationController
         request.headers["LINK"] =~ /(#{request.protocol + request.host + request.script_name})(.*)/
       end
 
-      render @resource.apply(request.method, request.body.read, request.content_type, $2)
+      toast_response = @resource.apply(request.method, request.body.read, request.content_type, $2)
+
+      # pagination
+      if pi = toast_response[:pagination_info]
+        # URL w/o parameters
+
+        url =  request.url.split('?').first
+        qpar = request.query_parameters.clone
+
+        # change/add page parameter
+        link_header = []
+
+        if pi[:prev]
+          qpar[:page] = pi[:prev]
+          response.link "#{url}?#{qpar.to_query}", :rel => :prev
+        end
+
+        if pi[:next]
+          qpar[:page] = pi[:next]
+          response.link "#{url}?#{qpar.to_query}", :rel => :next
+        end
+
+        qpar[:page] = pi[:last]
+        response.link "#{url}?#{qpar.to_query}", :rel => :last
+
+        qpar[:page] = 1
+        response.link "#{url}?#{qpar.to_query}", :rel => :first
+
+      end
+
+      render toast_response
 
     rescue Toast::ResourceNotFound => e
       return head(:not_found)
@@ -20,6 +52,9 @@ class ToastController < ApplicationController
       return render :text => e.message, :status => :forbidden
 
     rescue Toast::PayloadFormatError => e
+      return head(:bad_request)
+
+    rescue Toast::BadRequest => e
       return head(:bad_request)
 
     rescue Toast::MethodNotAllowed => e

@@ -8,6 +8,7 @@ module Toast
   class UnsupportedMediaType < Exception; end
   class RequestedVersionNotDefined < Exception; end
   class ResourceNotAcceptable < Exception; end
+  class BadRequest < Exception; end
 
   # Represents a resource. There are following resource types as sub classes:
   # Record, Collection, Association, Single
@@ -134,6 +135,41 @@ module Toast
       out["self"] = self.base_uri + record.uri_path
 
       out
+    end
+
+
+    def paginate_query config, relation_name, relation, params
+
+      if pagination = config.paginations[relation_name] and params[:page] =~ /\d+/
+
+        raise Toast::BadRequest.new("Page 0 not defined. Paging starts with 1") if params[:page].to_i == 0
+
+        ps = pagination[:page_size].to_i
+        total = relation.count
+
+        page = params[:page].to_i
+        total_pages = (total/ps) + (total%ps == 0 ? 0 : 1)
+
+        pagination_info = {}
+
+        if total_pages > 0
+
+          if page > total_pages
+            pagination_info[:prev] = total_pages
+          else
+            pagination_info[:prev] = page - 1 unless page == 1
+            pagination_info[:next] = page + 1 if page < total_pages
+          end
+
+          pagination_info[:last] = total_pages
+        else
+          pagination_info[:last] = 1
+        end
+
+        [relation.limit(ps).offset((page-1) * ps), pagination_info]
+      else
+        [relation, nil]
+      end
     end
   end
 end

@@ -23,16 +23,21 @@ Toast works with
 
 See the [User Manual](https://github.com/robokopp/toast/wiki/User-Manual) for a detailed description.
 
+Status
+=====
+
+Toast is ready for production and is being used in productive
+applications since 2012. However, misconfigurations can have undesired
+effects.
+
 WARNING
 =======
 
-This version is experimental and probably not bullet
-proof. As soon as the gem is loaded a controller with ready routing is
-enabled serving the annotated model's data records.
+A soon the gem is loaded a controller with ready routing is enabled
+serving the annotated model's data records at least for reading for
+everybody.
 
-Version 1.0.0 of Toast is planned to be a production-ready implementation,
-which will be finished within 2012. Until then API/DSL changes must
-be expected with each minor update.
+You need to implement authorization yourself.
 
 Example
 =======

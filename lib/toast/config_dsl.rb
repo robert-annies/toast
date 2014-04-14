@@ -18,7 +18,7 @@ module Toast
         @in_collection = ConfigDSL::InCollection.new model, self
         @media_type = "application/json"
         @apidoc = {}
-
+        @paginations = {}
         @model.attr_accessible []
       end
 
@@ -112,12 +112,23 @@ module Toast
         @apidoc = arg
       end
 
+      def paginate collection_name, options={}
+        options.reverse_merge! :page_size => 30
+
+        @paginations[collection_name.to_s] = {:page_size => options[:page_size]}
+      end
+
       # non DSL methods
       dsl_methods false
 
       def field_comments
         @field_comments
       end
+
+      def paginations
+        @paginations
+      end
+
     end
 
     class InCollection
