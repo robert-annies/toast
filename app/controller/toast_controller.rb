@@ -41,6 +41,8 @@ class ToastController < ApplicationController
         qpar[:page] = 1
         response.link "#{url}?#{qpar.to_query}", :rel => :first
 
+        response.headers["X-Collection-Size"] = pi[:total].to_s
+
       end
 
       render toast_response

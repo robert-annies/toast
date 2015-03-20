@@ -150,7 +150,7 @@ module Toast
         page = params[:page].to_i
         total_pages = (total/ps) + (total%ps == 0 ? 0 : 1)
 
-        pagination_info = {}
+        pagination_info = {:total => total}
 
         if total_pages > 0
 
