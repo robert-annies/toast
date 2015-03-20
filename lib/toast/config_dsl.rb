@@ -159,7 +159,7 @@ module Toast
 
       def writables= arg
         puts
-        puts "Toast Config Warning (#{model.class}): Defining \"writables\" in collection definition has no effect."
+        puts "Toast Config Warning (#{@model.class}): Defining \"writables\" in collection definition has no effect."
         puts
       end
 
@@ -169,7 +169,7 @@ module Toast
 
       def namespace= arg
         puts
-        puts "Toast Config Warning (#{model.class}): Defining \"namespace\" in collection definition has no effect."
+        puts "Toast Config Warning (#{@model.class}): Defining \"namespace\" in collection definition has no effect."
         puts
       end
 
