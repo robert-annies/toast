@@ -19,7 +19,7 @@ module Toast
         @media_type = "application/json"
         @apidoc = {}
         @paginations = {}
-        @model.attr_accessible []
+        @model.attr_accessible [] if Rails::VERSION::MAJOR == 3
       end
 
       def exposed_attributes
@@ -46,7 +46,7 @@ module Toast
       def writables= arg
         @field_comments.merge! ConfigDSL.get_comments(arg, 'rw')
         @writables.push *ConfigDSL.normalize(arg,"writables")
-        @model.attr_accessible *@writables
+        @model.attr_accessible *@writables if Rails::VERSION::MAJOR == 3
       end
 
       # args: Array or :all, :except => Array

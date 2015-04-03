@@ -21,10 +21,10 @@ module Toast
     end
 
     def self.build params, request
-      resource_name = params[:resource]
-      id = params[:id]
+      resource_name    = params[:resource]
+      id               = params[:id]
       subresource_name = params[:subresource]
-      format = params[:format]
+      format           = params[:format]
 
       begin
 
@@ -39,6 +39,9 @@ module Toast
 
         #  ... or in case of an association request
         config_assoc_src = model.toast_config request.headers["Assoc-source-type"] # ?
+
+        # permit writable attributes for mass assignment (from Rails 4)
+        params.permit(config_in.writables) if Rails::VERSION::MAJOR > 3
 
         # base URI for returned object
         base_uri = request.base_url + request.script_name +
