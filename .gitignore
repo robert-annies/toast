@@ -1,3 +1,4 @@
 pkg
 doc
 bin
+test/summary.log

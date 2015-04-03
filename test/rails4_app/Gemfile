@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+gem 'rails', ENV["TOAST_TEST_RAILS_VERSION"] ? ENV["TOAST_TEST_RAILS_VERSION"] : "~> 4"
+gem 'sqlite3'
+gem 'toast', :path => '../..'
+
+group :development, :test do
+  gem 'pry-byebug', :platforms => [:mri_20]
+  gem 'pry-rails'
+  gem 'shoulda'
+end
