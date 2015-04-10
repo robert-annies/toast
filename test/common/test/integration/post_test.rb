@@ -24,6 +24,11 @@ class PostTest < ActionDispatch::IntegrationTest
   context "POST requests" do
     should "create resources" do
 
+      # different defaults for time precisions from Rails 4.1
+      if Rails::VERSION::MAJOR >= 4 and Rails::VERSION::MINOR >= 1
+        ActiveSupport::JSON::Encoding.time_precision = 0
+      end
+
       record1 = {
         "number" => 3482, "name" => "Colton Kautzer",
         "array" => [0.2, 8, 'sun', nil, Time.utc(2000,"jan",1,20,15,1) ],
@@ -34,7 +39,7 @@ class PostTest < ActionDispatch::IntegrationTest
         "number" => 3382, "name" => "Rickie Leffler",
         "array" => [1,2,3], "object" => {}}
 
-      post_json "fruits/coconuts", record1
+      post_json "/fruits/coconuts", record1
       assert_response :created
       uri1 = @response.header["Location"]
 
@@ -43,13 +48,13 @@ class PostTest < ActionDispatch::IntegrationTest
 
       assert_equal record1, json_response
 
-      post_json "fruits/coconuts", record2
+      post_json "/fruits/coconuts", record2
       assert_response :created
       uri2 = @response.header["Location"]
       record2.merge! "self" => uri2
       assert_equal record2, json_response
 
-      get "fruits/coconuts"
+      get "/fruits/coconuts"
       assert_same_elements [record1, record2], json_response
 
       get uri1
@@ -65,7 +70,7 @@ class PostTest < ActionDispatch::IntegrationTest
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
       # try to post a non-writable field to root collecton
-      post_json "fruits/coconuts", c0
+      post_json "/fruits/coconuts", c0
       assert_response :created
 
       c1 = Coconut.first
@@ -81,7 +86,7 @@ class PostTest < ActionDispatch::IntegrationTest
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
 
       # try to post a non-writable field to a association
-      post_json "bananas/#{b1.id}/coconuts", c0
+      post_json "/bananas/#{b1.id}/coconuts", c0
       assert_response :created
 
       c2 = Coconut.last
@@ -99,7 +104,7 @@ class PostTest < ActionDispatch::IntegrationTest
       b1 = Banana.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       b1.coconuts = [c1,c2]
 
-      post_json "bananas/#{b1.id}/coconuts", {"number" => 123, "name" => "eriberto_morar@kochmraz.name"}
+      post_json "/bananas/#{b1.id}/coconuts", {"number" => 123, "name" => "eriberto_morar@kochmraz.name"}
       assert_response :created
 
       assert_equal({"number" => 123, "name" => "eriberto_morar@kochmraz.name",
@@ -109,7 +114,7 @@ class PostTest < ActionDispatch::IntegrationTest
       c3 = Coconut.find_by_number 123
       assert_equal "http://www.example.com/fruits/coconuts/#{c3.id}", json_response["self"]
 
-      get "bananas/#{b1.id}/coconuts"
+      get "/bananas/#{b1.id}/coconuts"
       assert_response :ok
 
       assert_same_elements [{"number" => 103, "name" => "adaline@armstrong.com", "self" => "http://www.example.com/fruits/coconuts/#{c1.id}",
@@ -129,7 +134,7 @@ class PostTest < ActionDispatch::IntegrationTest
 
       assert_raise StandardError do
         begin
-          post "bananas/#{b1.id}/coconuts", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
+          post "/bananas/#{b1.id}/coconuts", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
         rescue
           raise StandardError  # diffirent rails version raise different exceptions, equalize it
         end
@@ -138,7 +143,7 @@ class PostTest < ActionDispatch::IntegrationTest
     end
 
     should "not create when POST is not allowed" do
-      post_json "dragonfruits",{"number" => 35, "name" => "mia_hartmann@carterbarton.net"}
+      post_json "/dragonfruits",{"number" => 35, "name" => "mia_hartmann@carterbarton.net"}
       assert_response :method_not_allowed
     end
 

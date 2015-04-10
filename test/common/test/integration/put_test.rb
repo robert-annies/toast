@@ -33,13 +33,13 @@ class PutTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 245, :name => "heather@lockmankreiger.biz"
       a1.bananas << b3
 
-      put_json "bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12,
+      put_json "/bananas/#{b4.id}", {"name" => "linda@pacocha.name", "number" => 2211, "curvature" => 0.12,
                                     "apple" => "nono" , "self"=>"nono"},
                "application/banana-v2"
 
       assert_response :ok
 
-      get "bananas/#{b4.id}",  nil, accept("application/banana-v1")
+      get "/bananas/#{b4.id}",  nil, accept("application/banana-v1")
       assert_equal({"number"=>2211,
                      "name"=> "linda@pacocha.name",
                      "curvature" => 8.18,
@@ -49,12 +49,12 @@ class PutTest < ActionDispatch::IntegrationTest
                      "self" => "http://www.example.com/bananas/#{b4.id}"},
                    json_response)
 
-      put_json "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}, "application/apple+json"
+      put_json "/apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}, "application/apple+json"
       assert_response :ok
 
       a1.reload
 
-      put_json "fruits/coconuts/#{c1.id}", {:number => 3, :array => ['a',Time.utc(2000,"jan",1,20,15,1)]}, "application/json"
+      put_json "/fruits/coconuts/#{c1.id}", {:number => 3, :array => ['a',Time.utc(2000,"jan",1,20,15,1)]}, "application/json"
       assert_response :ok
 
       c1.reload
@@ -67,10 +67,10 @@ class PutTest < ActionDispatch::IntegrationTest
     should "partially update" do
       b2 = Banana.create :number => 133, :name => "camilla@leffler.ca"
 
-      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name"}, "application/banana-v1"
+      put_json "/bananas/#{b2.id}", {"name" => "fatima@hills.name"}, "application/banana-v1"
       assert_response :ok
 
-      get "bananas/#{b2.id}"
+      get "/bananas/#{b2.id}"
       assert_equal({"number"=>133,
                      "name"=>"fatima@hills.name",
                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
@@ -87,13 +87,13 @@ class PutTest < ActionDispatch::IntegrationTest
       b2.apple = a1
       b2.save
 
-      put_json "bananas/#{b2.id}", {"name" => "fatima@hills.name", "apple_id" => 666}, "application/banana-v1"
+      put_json "/bananas/#{b2.id}", {"name" => "fatima@hills.name", "apple_id" => 666}, "application/banana-v1"
       assert_response :ok
 
       b2.reload
       assert_equal a1.id, b2.apple_id
 
-      get "bananas/#{b2.id}"
+      get "/bananas/#{b2.id}"
       assert_equal({"number"=>133,
                      "name"=>"fatima@hills.name",
                      "apple" => "http://www.example.com/bananas/#{b2.id}/apple",
@@ -107,7 +107,7 @@ class PutTest < ActionDispatch::IntegrationTest
     should "not create resources when id is not existing" do
       # discussable
 
-      put_json "bananas/3420", {"name" => "linda@pacocha.name", "number" => 2211}
+      put_json "/bananas/3420", {"name" => "linda@pacocha.name", "number" => 2211}
       assert_response :not_found
 
     end
@@ -117,19 +117,19 @@ class PutTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 245, :name => "heather@lockmankreiger.biz"
 
       # x-www-form-url-encoded
-      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"},  {"CONTENT_TYPE"=>"x-www-form-urlencoded"}
+      put "/bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"},  {"CONTENT_TYPE"=>"x-www-form-urlencoded"}
       assert_response :unsupported_media_type
 
       # xml
-      put "bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,   {"CONTENT_TYPE"=>"application/xml"}
+      put "/bananas/#{b2.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,   {"CONTENT_TYPE"=>"application/xml"}
       assert_response :unsupported_media_type
 
       # should be application/apple+json
-      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_json,   {"CONTENT_TYPE"=>"application/json"}
+      put "/apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_json,   {"CONTENT_TYPE"=>"application/json"}
       assert_response :unsupported_media_type
 
       # payload is XML but content type is json+apple
-      put "apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,  {"CONTENT_TYPE"=>"application/apple+json"}
+      put "/apples/#{a1.id}", {:number => 120, :name => "camilla@leffler.ca"}.to_xml,  {"CONTENT_TYPE"=>"application/apple+json"}
       assert_response :bad_request
 
 
@@ -149,14 +149,14 @@ class PutTest < ActionDispatch::IntegrationTest
       #    (assert_response :bad_request)
       assert_raise StandardError do
         begin
-          put "bananas/#{b2.id}", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
+          put "/bananas/#{b2.id}", "{\"number\" => 120, \"name => \"camilla@leffler.ca\"}",  {"CONTENT_TYPE"=> "application/json"}
         rescue
           raise StandardError  # different rails version raise different exceptions, equalize it
         end
       end
 
       # put Array
-      put_json "bananas/#{b2.id}", ["foobar",42], "application/banana-v1"
+      put_json "/bananas/#{b2.id}", ["foobar",42], "application/banana-v1"
       assert_response :bad_request
 
     end

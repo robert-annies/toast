@@ -23,21 +23,20 @@ class DeleteTest < ActionDispatch::IntegrationTest
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       a3 = Apple.create :number => 123, :name => "roy@hobgard.co"
 
-
-      delete "apples/#{a1.id}"
+      delete "/apples/#{a1.id}"
       assert_response :no_content
 
-      get "apples"
+      get "/apples"
       assert_same_elements [{"number" => 133, "self" => "http://www.example.com/apples/#{a2.id}"},
                             {"number" => 123, "self" => "http://www.example.com/apples/#{a3.id}"}],
                            json_response
 
 
-      delete "apples/#{a3.id}"
+      delete "/apples/#{a3.id}"
       assert_response :no_content
 
 
-      get "apples"
+      get "/apples"
 
       assert_equal([{"number" => 133, "self" => "http://www.example.com/apples/#{a2.id}"}],
                    json_response)
@@ -49,7 +48,7 @@ class DeleteTest < ActionDispatch::IntegrationTest
 
       d1 = Dragonfruit.create :number => 35, :name => "mia_hartmann@carterbarton.net"
 
-      delete "dragonfruits/#{d1.id}"
+      delete "/dragonfruits/#{d1.id}"
       assert_response :method_not_allowed
 
     end

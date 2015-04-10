@@ -14,7 +14,7 @@ class GetTest < ActionDispatch::IntegrationTest
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       b1 = Banana.create :number => 895, :name => "tommie.rohan@kub.name"
 
-      get "apples/#{a1.id}"
+      get "/apples/#{a1.id}"
       assert_response :ok
       assert_equal({
                      "self" => "http://www.example.com/apples/#{a1.id}",
@@ -24,7 +24,7 @@ class GetTest < ActionDispatch::IntegrationTest
                      "name" => "loyce.donnelly@daugherty.info"
                    }, json_response)
 
-      get "bananas/#{b1.id}", nil, accept("application/banana-v1")
+      get "/bananas/#{b1.id}", nil, accept("application/banana-v1")
       assert_response :ok
       assert_equal({
                      "self" => "http://www.example.com/bananas/#{b1.id}",
@@ -41,7 +41,7 @@ class GetTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 45, :name => "loyce.donnelly@daugherty.info"
       a2 = Apple.create :number => 133, :name => "camilla@leffler.ca"
 
-      get "apples/first", nil,  {'HTTP_ACCEPT'=>'application/apple+json'}
+      get "/apples/first", nil,  {'HTTP_ACCEPT'=>'application/apple+json'}
       assert_response :ok
       assert_equal({
                      "self" => "http://www.example.com/apples/#{a1.id}",
@@ -55,7 +55,7 @@ class GetTest < ActionDispatch::IntegrationTest
     should "be formatted by views according to the URI format suffix: .html" do
       a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
 
-      get "apples/#{a1.id}.html"
+      get "/apples/#{a1.id}.html"
 
       assert_response :ok
       assert_equal "text/html", @response.content_type
@@ -72,7 +72,7 @@ class GetTest < ActionDispatch::IntegrationTest
       a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
 
 
-      get "apples/#{a1.id}.xml"
+      get "/apples/#{a1.id}.xml"
 
       assert_response :ok
       assert_equal "application/xml", @response.content_type
@@ -86,7 +86,7 @@ class GetTest < ActionDispatch::IntegrationTest
       c1 = Coconut.create!(:object => {'carrot'=>'red', 'apple'=> 'green'},
                            :array =>  [11,0.2, nil, "moon"])
 
-      get "fruits/coconuts/#{c1.id}"
+      get "/fruits/coconuts/#{c1.id}"
       assert_response :ok
       assert_equal({"apple"=>"green", "carrot"=>"red"},  json_response['object'])
       assert_equal([11,0.2, nil, "moon"],  json_response['array'])
@@ -103,21 +103,21 @@ class GetTest < ActionDispatch::IntegrationTest
       d1 = Dragonfruit.create :number => 92, :name => "stephanie@wehner.info"
 
       # unknown id
-      get "apples/9999"
+      get "/apples/9999"
       assert_response :not_found
 
       # unknown model
       assert_raise ActionController::RoutingError do
-        get "hamburgers/133"
+        get "/hamburgers/133"
       end
 
       # known model but not restful
-      get "dragonfruits/92"
+      get "/dragonfruits/92"
       assert_response :not_found
 
       # try to hack with exisiting class
       assert_raise ActionController::RoutingError do
-        get "ActiveRecord%3A%3ABases/133"
+        get "/ActiveRecord%3A%3ABases/133"
       end
     end
   end # context non-existing
@@ -129,7 +129,7 @@ class GetTest < ActionDispatch::IntegrationTest
       a3 = Apple.create :number => 465, :name => "ruth@balistreri.com"
       a4 = Apple.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      get "apples"
+      get "/apples"
       assert_response :ok
       assert_same_elements( [ { "number" => 45, "self" => "http://www.example.com/apples/#{a1.id}" },
                               { "number" => 133, "self" => "http://www.example.com/apples/#{a2.id}" },
@@ -142,7 +142,7 @@ class GetTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      get "bananas/less_than_100", nil, accept("application/bananas-v1")
+      get "/bananas/less_than_100", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_same_elements( [ { "number" => 45,
@@ -169,7 +169,7 @@ class GetTest < ActionDispatch::IntegrationTest
       b3 = Banana.create :number => 465, :name => "ruth@balistreri.com"
       b4 = Banana.create :number => 13, :name => "chadd.lind@abshire.com"
 
-      get "bananas/query?gt=100", nil, accept("application/bananas-v1")
+      get "/bananas/query?gt=100", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_same_elements( [ { "number" => 133,
@@ -193,7 +193,7 @@ class GetTest < ActionDispatch::IntegrationTest
       a1 = Apple.create :number => 133, :name => "camilla@leffler.ca"
       a2 = Apple.create :number => 465, :name => "ruth@balistreri.com"
 
-      get "apples.html"
+      get "/apples.html"
 
       assert_response :ok
       assert_equal "text/html", @response.content_type
@@ -210,104 +210,105 @@ class GetTest < ActionDispatch::IntegrationTest
         Banana.create :number => i
       end
 
-      get "bananas?page=1", nil, accept("application/bananas-v1")
+      get "/bananas?page=1", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 10, json_response.length
       assert_equal (0..9).to_a, json_response.map{|x| x['number']}
+
       assert_equal '<http://www.example.com/bananas?page=2>; rel="next"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
-      get "bananas?page=2", nil, accept("application/bananas-v1")
+      get "/bananas?page=2", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 10, json_response.length
       assert_equal (10..19).to_a, json_response.map{|x| x['number']}
 
       assert_equal '<http://www.example.com/bananas?page=3>; rel="next"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal '<http://www.example.com/bananas?page=1>; rel="prev"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
-      get "bananas?page=5", nil, accept("application/bananas-v1")
+      get "/bananas?page=5", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 8, json_response.length
       assert_equal (40..47).to_a, json_response.map{|x| x['number']}
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal '<http://www.example.com/bananas?page=4>; rel="prev"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
       # page past last one
-      get "bananas?page=80", nil, accept("application/bananas-v1")
+      get "/bananas?page=80", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 0, json_response.length
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal '<http://www.example.com/bananas?page=1>; rel="first"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal '<http://www.example.com/bananas?page=5>; rel="last"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal '<http://www.example.com/bananas?page=5>; rel="prev"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
       # query w/o matches
-      get "bananas/query?page=1&gt=9999"
+      get "/bananas/query?page=1&gt=9999"
 
       assert_equal 0, json_response.length
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal '<http://www.example.com/bananas/query?gt=9999&page=1>; rel="first"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal '<http://www.example.com/bananas/query?gt=9999&page=1>; rel="last"',
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
       # no paging
-      get "bananas", nil, accept("application/bananas-v1")
+      get "/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 48, json_response.length
-      assert_equal nil, @response.header["LINK"]
+      assert_equal nil, @response.header["Link"]
 
     end
 
@@ -330,7 +331,7 @@ class GetTest < ActionDispatch::IntegrationTest
       a2.bananas = [b2, b4]
 
 
-      get "apples/#{a1.id}/bananas", nil, accept("application/bananas-v1")
+      get "/apples/#{a1.id}/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
       assert_equal [{"number" => 45,
                       "name" => "loyce.donnelly@daugherty.info",
@@ -349,7 +350,7 @@ class GetTest < ActionDispatch::IntegrationTest
                       "self" => "http://www.example.com/bananas/#{b3.id}"}], json_response
 
 
-      get "apples/#{a2.id}/bananas", nil, accept("application/bananas-v1")
+      get "/apples/#{a2.id}/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
       assert_equal [{"number" => 145,
                       "name" => "theresa@deckowsipes.net",
@@ -376,7 +377,7 @@ class GetTest < ActionDispatch::IntegrationTest
                                           {:number => 465, :name => "ruth@balistreri.com"}])
       end
 
-      get "eggplants/#{e1.id}/dfruits"
+      get "/eggplants/#{e1.id}/dfruits"
 
       assert_response :ok
       assert_equal [{"self" => "http://www.example.com/dragonfruits/1",
@@ -384,7 +385,7 @@ class GetTest < ActionDispatch::IntegrationTest
                     {"self" => "http://www.example.com/dragonfruits/2",
                       "banana"=>"http://www.example.com/dragonfruits/2/banana"}], json_response
 
-      get "eggplants/#{e1.id}/potato"
+      get "/eggplants/#{e1.id}/potato"
       assert_response :ok
       assert_equal({ "number" => 45,
                      "self" => "http://www.example.com/apples/1",
@@ -404,7 +405,8 @@ class GetTest < ActionDispatch::IntegrationTest
         a.eggplants.build {|e| e.number = 101; e.name = "Catharine Walter"}
       end
 
-      get "apples/#{a1.id}/eggplants?greater_than=100"
+      $halt=true
+      get "/apples/#{a1.id}/eggplants?greater_than=100"
       assert_response :ok
       assert_same_elements ["Wanda Wilkinson","Fredy Wolf V","Catharine Walter"], json_response.map{|x| x['name']}
 
@@ -418,90 +420,90 @@ class GetTest < ActionDispatch::IntegrationTest
         apple.bananas.create :number => i
       end
 
-      get "apples/#{apple.id}/bananas?page=1", nil, accept("application/bananas-v1")
+      get "/apples/#{apple.id}/bananas?page=1", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 15, json_response.length
       assert_equal (0..14).to_a, json_response.map{|x| x['number']}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=2>; rel=\"next\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"last\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"first\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
 
-      get "apples/#{apple.id}/bananas?page=2", nil, accept("application/bananas-v1")
+      get "/apples/#{apple.id}/bananas?page=2", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 15, json_response.length
       assert_equal (15..29).to_a, json_response.map{|x| x['number']}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=3>; rel=\"next\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"last\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"first\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"prev\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
-      get "apples/#{apple.id}/bananas?page=4&extra=foo", nil, accept("application/bananas-v1")
+      get "/apples/#{apple.id}/bananas?page=4&extra=foo", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 3, json_response.length
       assert_equal (45..47).to_a, json_response.map{|x| x['number']}
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?extra=foo&page=4>; rel=\"last\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?extra=foo&page=1>; rel=\"first\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?extra=foo&page=3>; rel=\"prev\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
 
       # page past last one
-      get "apples/#{apple.id}/bananas?page=80", nil, accept("application/bananas-v1")
+      get "/apples/#{apple.id}/bananas?page=80", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 0, json_response.length
 
       assert_equal nil,
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="next"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="next"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"last\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="last"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="last"/}
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=1>; rel=\"first\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="first"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="first"/}
 
 
       assert_equal "<http://www.example.com/apples/#{apple.id}/bananas?page=4>; rel=\"prev\"",
-                   @response.header["LINK"].split(', ').detect{|x| x =~ /rel="prev"/}
+                   @response.header["Link"].split(', ').detect{|x| x =~ /rel="prev"/}
 
       # no paging
-      get "apples/#{apple.id}/bananas", nil, accept("application/bananas-v1")
+      get "/apples/#{apple.id}/bananas", nil, accept("application/bananas-v1")
       assert_response :ok
 
       assert_equal 48, json_response.length
-      assert_equal nil, @response.header["LINK"]
+      assert_equal nil, @response.header["Link"]
 
     end
 
