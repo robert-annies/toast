@@ -31,10 +31,8 @@ module Toast
 
       if reflection.collection?
 
-
         if(@config.pass_params_to.include?(@assoc) and
-           reflection.options[:extend] and
-           reflection.options[:extend].detect{|e| e.method_defined? :find_by_params} )
+           @record.send(@assoc).respond_to?(:find_by_params))
 
           result, pagination_info = paginate_query( @config, @assoc,
                                                     @record.send(@assoc).find_by_params(@params), @params)

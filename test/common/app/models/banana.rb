@@ -40,7 +40,7 @@ class Banana < ActiveRecord::Base
     }
   }
 
-  scope :less_than_100, where("number < 100")
+  scope :less_than_100, lambda { where("number < 100") }
 
 
   def self.query params

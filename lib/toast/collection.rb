@@ -49,7 +49,8 @@ module Toast
         end
 
         records, pagination_info = paginate_query( @config_out, @collection,
-                                                   @model.send(@collection=='all'? 'scoped': @collection), # #scoped ?: #all would trigger query too early
+                                                   # send 'scoped' instead of 'all' in Rails 3 to get a Relation
+                                                   @model.send((@collection=='all' and Rails::VERSION::MAJOR == 3) ? 'scoped': @collection),
                                                    @params )
       end
 
