@@ -15,14 +15,16 @@ Rails.application.routes.draw do
       namespaces << tc.namespace
 
       match("#{tc.namespace}/#{resource_name}(/:id(/:subresource))" => 'toast#catch_all',
+            :via         => [:get, :post, :put, :delete],
             :constraints => { :id => /\d+/ },
-            :resource => resource_name,
-            :as => resource_name,
-            :defaults => { :format => 'json' })
+            :resource    => resource_name,
+            :as          => resource_name,
+            :defaults    => { :format => 'json' })
 
       match("#{tc.namespace}/#{resource_name}/:subresource" => 'toast#catch_all',
-            :resource => resource_name,
-            :defaults => { :format => 'json' })
+            :via         => [:get, :post, :put, :delete],
+            :resource    => resource_name,
+            :defaults    => { :format => 'json' })
     end
   end
 
