@@ -4,7 +4,7 @@ require "toast/version"
 Gem::Specification.new do |s|
   s.name = "toast"
   s.version = Toast::VERSION
-  s.description = "Toast is an extension to Ruby on Rails 3 that lets you expose any ActiveRecord model as a web resource. Operations follow the REST/Hypermedia API principles implemented by a generic hidden controller."
+  s.description = "Toast is an extension to Ruby on Rails 3 and 4 that lets you expose any ActiveRecord model as a web resource. Operations follow the REST/Hypermedia API principles implemented by a generic hidden controller."
   s.summary = "Toast adds a Hypermedia API to ActiveRecord models in Ruby on Rails."
   s.authors = ["robokopp (Robert Annies)"]
   s.email = "robokopp@fernwerk.net"
@@ -27,7 +27,6 @@ Gem::Specification.new do |s|
              ]
   s.homepage = "https://github.com/robokopp/toast"
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
   s.add_dependency('rails','>= 3.1.0')
   s.add_dependency('blockenspiel','~> 0.4.2')
   s.add_dependency('rack-accept-media-types','~> 0.9')
