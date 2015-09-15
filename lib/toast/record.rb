@@ -26,7 +26,7 @@ module Toast
       end
 
       begin
-        payload = ActiveSupport::JSON.decode(payload)
+        payload = ActiveSupport::JSON.decode(payload).with_indifferent_access
       rescue
         raise PayloadFormatError
       end
