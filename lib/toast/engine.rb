@@ -19,7 +19,7 @@ module Toast
 
       # Load all models in app/models early to setup routing
       begin
-        Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require m }
+        Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require_dependency m }
 
       rescue
         # raised when DB is not setup yet. (rake db:schema:load)
