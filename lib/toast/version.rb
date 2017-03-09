@@ -1,4 +1,5 @@
 module Toast
+<<<<<<< 21bf1f3c931941abb8bc9912c8fe3e844d60bbdf
 <<<<<<< 97e12482dc6e6626e34ef922cff823af0c609ba5
 <<<<<<< 8f4d23f227418b8b8c96afc8cc36476ff4cd7c45
 <<<<<<< 542ebf55a00dfc64d12f017b20b571bc14cf8b4a
@@ -26,5 +27,8 @@ module Toast
 >>>>>>> Toast version 1.0.0
 >>>>>>> Toast version 1.0.0
 >>>>>>> Toast version 1.0.0
+=======
+  VERSION = '1.0.0'
+>>>>>>> bugfix: virtual attribute setter should not be called when attribute omitted in payload
 end
  
