@@ -18,7 +18,7 @@ Its main features are:
 
 Toast works with
 
-  * Ruby on Rails >= 3.1.0 (currently tested up to 3.2.16)
+  * Ruby on Rails ~> 3.1.0, ~> 3.2.0 (branch `rails4-support`: ~> 4)
   * Ruby 1.8.7, 1.9.3, 2.0.0
 
 See the [User Manual](https://github.com/robokopp/toast/wiki/User-Manual) for a detailed description.
@@ -29,6 +29,10 @@ Status
 Toast is ready for production and is being used in productive
 applications since 2012. However, misconfigurations can have undesired
 effects.
+
+The branch `rails4-support` adds changes to work with both Rails 3 and
+4.  Usage in Rails 4 is not yet fully confirmed to be of the same
+quality. Most likely it is, as there are only minor changes.
 
 WARNING
 =======
