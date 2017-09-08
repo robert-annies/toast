@@ -24,4 +24,4 @@ defaults:
     values:
       subtitle: This manual covers toast-v1.0.0
 
-theme: jekyll-theme-slate
+theme: jekyll-theme-leap-day
