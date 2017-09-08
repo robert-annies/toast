@@ -1,8 +1,8 @@
 **Table of Contents**
 
-* [Introduction](Introduction)
-* [Installation](Installation)
-* [Configuration](Configuration)
+* [Introduction](introduction)
+* [Installation](installation)
+* [Configuration](configuration)
 * [Response Codes](response_codes)
 * [Global Configuration](global_config)
 * [LINK and UNLINK](link_and_unlink)
