@@ -3,12 +3,17 @@ require 'toast/config_dsl/expose'
 class Toast::ConfigDSL::Base
   include Toast::ConfigDSL::Common
 
-  def expose model, as: 'application/json', under: '', &block
+  def expose model_class, as: 'application/json', under: '', &block
 
-    stack_push "expose(#{model})" do
+    stack_push "expose(#{model_class})" do
 
-      unless model.new.is_a?(ActiveRecord::Base)
-        raise_config_error 'Directive requires an ActiveRecord::Base descendant.'
+      begin
+        unless model_class.new.is_a?(ActiveRecord::Base)
+          raise_config_error 'Directive requires an ActiveRecord::Base descendant.'
+        end
+      rescue ActiveRecord::StatementInvalid => error
+        # may be raised when tables are not setup yet during database setup
+        raise_config_error error.message
       end
 
       unless block_given?
@@ -18,9 +23,10 @@ class Toast::ConfigDSL::Base
       config_data = OpenStruct.new
 
       config_data.instance_eval do
-        # model
-        self.model       = model
-        self.media_type  = as
+        self.source_location = block.source_location.first
+
+        self.model_class     = model_class
+        self.media_type      = as
         self.url_path_prefix = under.split('/').delete_if(&:blank?)
 
         # defaults
@@ -31,8 +37,8 @@ class Toast::ConfigDSL::Base
         self.associations = {}
       end
 
-      if Toast.expositions.detect{|exp| exp.model == config_data.model}
-        raise_config_error "Model #{exp.model} has already another configuration."
+      if Toast.expositions.detect{|exp| exp.model_class == config_data.model_class}
+        raise_config_error "Model class #{exp.model_class} has already another configuration."
       end
 
       Toast.expositions << config_data

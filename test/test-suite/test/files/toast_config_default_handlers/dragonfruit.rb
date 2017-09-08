@@ -1,0 +1,4 @@
+expose(Dragonfruit) {
+  collection(:all) {
+  }
+}

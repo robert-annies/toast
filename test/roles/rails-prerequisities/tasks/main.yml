@@ -1,0 +1,6 @@
+---
+- name: install dev tools and libs
+  dnf: name=sqlite-devel,rubygems,git,ruby-devel,redhat-rpm-config,gcc-c++,zlib-devel,libselinux-python state=latest
+
+- name: install Bundler
+  gem: name=bundler state=present user_install=no

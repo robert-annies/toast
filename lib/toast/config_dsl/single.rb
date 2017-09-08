@@ -7,7 +7,7 @@ class Toast::ConfigDSL::Single
 
       @config_data.via_get =
         OpenStruct.new(permissions: [],
-                       handler: single_get_handler(@config_data.name))
+                       handler: single_get_handler(@config_data.model_class, @config_data.name))
 
       Toast::ConfigDSL::ViaVerb.new(@config_data.via_get).instance_eval &block
     end

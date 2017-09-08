@@ -1,0 +1,77 @@
+---
+# Using Bundler to install and pick the right rails version for calling "rails new"
+# (a temporary Gemfile is put into home and removed after)
+
+- name: Setup Gemfile for Rails install
+  blockinfile:
+    dest: ~/Gemfile
+    create: yes
+    block: |
+      source 'https://rubygems.org'
+      gem 'rails', '= {{ version }}'
+  become: yes
+  become_user: vagrant
+
+- name: bundle Rails
+  bundler:
+    user_install: no
+    state: present
+    chdir: ~
+    executable: /usr/local/bin/bundle
+
+- name: init rails app
+  command: bundle exec rails new rails_{{ version }}-test --api --skip-spring
+  args:
+    chdir: /home/vagrant
+    creates: /home/vagrant/rails_{{ version }}-test
+  become: yes
+  become_user: vagrant
+
+- name: remove temporary Gemfile
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - Gemfile
+    - Gemfile.lock
+
+- name: link test suite
+  shell: cp -rsf /vagrant/test/test-suite/* .
+  args:
+    chdir: /home/vagrant/rails_{{ version }}-test
+  become: yes
+  become_user: vagrant
+
+- name: add development deps to Gemfile
+  blockinfile:
+    dest: /home/vagrant/rails_{{ version }}-test/Gemfile
+    block: |
+      group :development, :test do
+        gem 'shoulda'
+        gem 'pry'
+        gem 'pry-byebug'
+        gem 'pry-rails'
+        gem 'minitest-reporters'
+      end
+      gem 'toast', path: '/vagrant'
+  become: yes
+  become_user: vagrant
+
+- name: bundle test app
+  bundler:
+    state: present
+    chdir: ~/rails_{{ version }}-test
+  become: yes
+  become_user: vagrant
+
+- name: setup database tables
+  command: bin/rails db:setup chdir=/home/vagrant/rails_{{ version }}-test
+  become: yes
+  become_user: vagrant
+
+- name: run toast test suite for Rails {{ version }}
+  command: bin/rails test chdir=/home/vagrant/rails_{{ version }}-test
+  become: yes
+  become_user: vagrant
+  tags:
+    - test

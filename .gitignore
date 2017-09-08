@@ -2,3 +2,4 @@ pkg
 doc
 bin
 test/.vagrant/
+test/provision.retry

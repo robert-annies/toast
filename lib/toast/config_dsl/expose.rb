@@ -13,19 +13,19 @@ class Toast::ConfigDSL::Expose
 
       check_symbol_list attributes
 
-      model = @config_data.model
+      model_class = @config_data.model_class
 
       attributes.each do |attr|
 
-        instance = model.new
+        model = model_class.new
         setter = (attr.to_s + '=').to_sym
 
-        unless (instance.respond_to?(setter) and instance.method(setter).arity == 1)
-          raise_config_error "Exposed attribute setter not found: `#{model.name}##{attr}='. Typo?"
+        unless (model.respond_to?(setter) and model.method(setter).arity == 1)
+          raise_config_error "Exposed attribute setter not found: `#{model_class.name}##{attr}='. Typo?"
         end
 
-        unless (instance.respond_to?(attr) and instance.method(attr).arity == 0)
-          raise_config_error "Exposed attribute getter not found `#{model.name}##{attr}'. Typo?"
+        unless (model.respond_to?(attr) and model.method(attr).arity.in?([-1,0]))
+          raise_config_error "Exposed attribute getter not found `#{model_class.name}##{attr}'. Typo?"
         end
 
         @config_data.writables << attr
@@ -38,13 +38,13 @@ class Toast::ConfigDSL::Expose
 
       check_symbol_list attributes
 
-      model = @config_data.model
+      model_class = @config_data.model_class
 
       attributes.each do |attr|
-        instance = model.new
+        model = model_class.new
 
-        unless (instance.respond_to?(attr) and instance.method(attr).arity == 0)
-          raise_config_error "Exposed attribute getter not found `#{model.name}##{attr}'. Typo?"
+        unless (model.respond_to?(attr) and model.method(attr).arity.in?([-1,0]))
+          raise_config_error "Exposed attribute getter not found `#{model_class.name}##{attr}'. Typo?"
         end
 
         @config_data.readables << attr
@@ -63,13 +63,13 @@ class Toast::ConfigDSL::Expose
     end
   end
 
-  def via_put &block
-    stack_push 'via_put' do
-      @config_data.via_put =
+  def via_patch &block
+    stack_push 'via_patch' do
+      @config_data.via_patch =
         OpenStruct.new(permissions: [],
-                       handler: canonical_put_handler)
+                       handler: canonical_patch_handler)
 
-      Toast::ConfigDSL::ViaVerb.new(@config_data.via_put).instance_eval &block
+      Toast::ConfigDSL::ViaVerb.new(@config_data.via_patch).instance_eval &block
 
     end
   end
@@ -88,7 +88,7 @@ class Toast::ConfigDSL::Expose
 
   def collection name, as: 'application/json', &block
     stack_push "collection(#{name.inspect})" do
-      model = @config_data.model
+      model_class = @config_data.model_class
 
       unless block_given?
         raise_config_error 'Block expected.'
@@ -98,15 +98,15 @@ class Toast::ConfigDSL::Expose
         raise_config_error "collection name expected as Symbol"
       end
 
-      unless model.respond_to?(name)
+      unless model_class.respond_to?(name)
         raise_config_error "`#{name}' must be a callable class method."
       end
 
       @config_data.collections[name] =
-        OpenStruct.new(base_model: model,
+        OpenStruct.new(base_model_class: model_class,
                        collection_name: name,
                        media_type: as,
-                       max_window: Toast.globals[:max_window])
+                       max_window: Toast.settings.max_window)
 
       Toast::ConfigDSL::Collection.new(@config_data.collections[name]).
         instance_eval(&block)
@@ -117,9 +117,9 @@ class Toast::ConfigDSL::Expose
   def single name, &block
     stack_push "single(#{name.inspect})" do
 
-      model = @config_data.model
+      model_class = @config_data.model_class
 
-      unless model.respond_to?(name)
+      unless model_class.respond_to?(name)
         raise_config_error "`#{name}' must be a callable class method."
       end
 
@@ -127,7 +127,7 @@ class Toast::ConfigDSL::Expose
         raise_config_error 'Block expected.'
       end
 
-      @config_data.singles[name] = OpenStruct.new(name: name, model: model)
+      @config_data.singles[name] = OpenStruct.new(name: name, model_class: model_class)
 
       Toast::ConfigDSL::Single.new(@config_data.singles[name]).
         instance_eval(&block)
@@ -138,32 +138,36 @@ class Toast::ConfigDSL::Expose
     stack_push "association(#{name.inspect})" do
 
 
-      model = @config_data.model
+      model_class = @config_data.model_class
 
       unless name.is_a?(Symbol)
         raise_config_error "association name expected as Symbol"
       end
 
-      unless model.reflections[name.to_s].is_a?(ActiveRecord::Reflection::AssociationReflection)
-        raise_config_error 'Model association expected'
+      unless model_class.reflections[name.to_s].
+               try(:macro).in?([:has_many,
+                                :has_one,
+                                :belongs_to,
+                                :has_and_belongs_to_many])
+        raise_config_error 'Association expected'
       end
 
       unless block_given?
         raise_config_error 'Block expected.'
       end
 
-      target_model = model.reflections[name.to_s].klass
-      macro    = model.reflections[name.to_s].macro
+      target_model_class = model_class.reflections[name.to_s].klass
+      macro    = model_class.reflections[name.to_s].macro
       singular = macro.in? [:belongs_to, :has_one]
 
       @config_data.associations[name] =
-        OpenStruct.new(base_model: model,
-                       target_model: target_model,
+        OpenStruct.new(base_model_class: model_class,
+                       target_model_class: target_model_class,
                        assoc_name: name,
                        media_type: as,
                        macro:      macro,
                        singular:   singular,
-                       max_window: singular ? nil : Toast.globals[:max_window])
+                       max_window: singular ? nil : Toast.settings.max_window)
 
       Toast::ConfigDSL::Association.new(@config_data.associations[name]).
         instance_eval(&block)
