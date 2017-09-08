@@ -4,8 +4,8 @@ class Toast::ConfigDSL::ViaVerb
   def allow &block
     stack_push 'allow' do
 
-      if block.arity != 3 and block.arity != -1
-        raise_config_error 'Allow rule must take exactly 3 arguments or a variable (*) argument list'
+      unless block.arity.in? [3, -2, -1]
+        raise_config_error 'Allow rule must list arguments as |*all|, |auth, *rest| or |auth, request_model, uri_params|'
       end
 
       @config_data.permissions << block
@@ -34,7 +34,7 @@ class Toast::ConfigDSL::ViaVerb
                        when /\Aexpose/
                          case Toast::ConfigDSL.stack[-2]
                          when /\Avia_(get|delete)\z/ then 2
-                         when 'via_put'              then 3
+                         when 'via_patch'              then 3
                          end
                        end
 

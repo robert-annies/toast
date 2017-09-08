@@ -1,0 +1,2 @@
+class Dragonfruit < ApplicationRecord
+end

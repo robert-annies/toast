@@ -1,45 +1,34 @@
-require 'toast/active_record_extensions.rb'
-require 'toast/resource.rb'
-require 'toast/collection'
-require 'toast/association'
-require 'toast/record'
-require 'toast/single'
-
-require 'action_dispatch/http/request'
-require 'rack/accept_media_types'
-
 module Toast
   class Engine < Rails::Engine
 
     # configure our plugin on boot. other extension points such
     # as configuration, rake tasks, etc, are also available
     initializer "toast.initialize" do |app|
-      # Add 'acts_as_resource' declaration to ActiveRecord::Base
-      ActiveRecord::Base.extend Toast::ActiveRecordExtensions
 
-      # Load all models in app/models early to setup routing
-      begin
-        Dir["#{Rails.root}/app/models/**/*.rb"].each{|m| require_dependency m }
-
-      rescue
-        # raised when DB is not setup yet. (rake db:schema:load)
+      # allow LINK and UNLINK methods
+      if ActionDispatch::Request::HTTP_METHOD_LOOKUP['LINK'] == :link and
+        ActionDispatch::Request::HTTP_METHOD_LOOKUP['UNLINK'] == :unlink
+        Toast.info "INFO: LINK and UNLINK allowed by this Rails version: #{Rails.version}"
+      else
+        ActionDispatch::Request::HTTP_METHOD_LOOKUP['LINK'] = :link
+        ActionDispatch::Request::HTTP_METHOD_LOOKUP['UNLINK'] = :unlink
       end
 
-      # Monkey patch the request class for Rails 3.0, Rack 1.2
-      # Backport from Rack 1.3
-      if Rack.release == "1.2"
-        class Rack::Request
-          def base_url
-            url = scheme + "://"
-            url << host
+      # for LINK/UNLINK via POST and x-http-method-override header
+      app.middleware.unshift Rack::MethodOverride
 
-            if scheme == "https" && port != 443 ||
-                scheme == "http" && port != 80
-              url << ":#{port}"
-            end
+      # skip init if in test mode: Toast.init should be called in each test
+      unless Rails.env == 'test'
+        begin
+          Toast.info 'Loading Toast'
+          Toast.init
+          Toast.info "Exposed model classes: #{Toast.expositions.map{|e| e.model_class.name}.join(' ')}"
 
-            url
+        rescue Toast::ConfigError => error
+          error.message.split("\n").each do |line|
+            Toast.info line
           end
+          Toast.disable
         end
       end
     end

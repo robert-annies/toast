@@ -3,50 +3,58 @@
 Summary
 =======
 
-Toast is an extension to Ruby on Rails to build web services with low
-programming effort in a coherent way.  Toast extends ActiveRecord such
-that each model can be declared to be a web resource, exposing defined
-attributes for reading and writing using HTTP.
+Toast is a Rack application that hooks into Ruby on Rails. It exposes ActiveRecord models as a web service (REST API). The main difference from doing that with Ruby on Rails itself is it's DSL that covers all aspects of an API in one single configuration. For each model and API endpoint you define:
 
-Its main features are:
+  * what models and attributes are to be exposed
+  * what methods are supported  (GET, PATCH, DELETE, POST,...)
+  * hooks to handle authorization
+  * customized handlers 
 
-  * declaration of web resources based on ActiveRecord models
-  * generic controller handles all actions
-  * automated routing
-  * exposing data values with JSON maps
-  * exposing associations by links (URLs)
+When using Toast there's no Rails controller involved. Model classes and the API configuration is sufficient. 
 
-Toast works with
+Toast uses a REST/hypermedia style API, which is an own interpretation of the REST idea, not compatible with others like JSON API, Siren etc. It's design is much simpler and based on the idea of traversing opaque URIs. 
 
-  * Ruby on Rails ~> 3.1.0, ~> 3.2.0 (branch `rails4-support`: ~> 4)
-  * Ruby 1.8.7, 1.9.3, 2.0.0
+Other features are:
 
-See the [User Manual](https://github.com/robokopp/toast/wiki/User-Manual) for a detailed description.
+  * windowing of collections via _Range/Content-Range_ headers (paging)
+  * attribute selection per request 
+  * processing of URI parameters
+
+Toast v1 is build for Rails 5. The predecesssor v0.9 supports 3 and 4, but has a much different and smaller DSL.
+
+See the User Manual (to be published soon) for a detailed description.
 
 Status
-=====
+======
 
-Toast is ready for production and is being used in productive
-applications since 2012. However, misconfigurations can have undesired
-effects.
+Toast v1 for Rails 5 is a complete rewrite of v0.9, which was first published and used in production since 2012. 
+It comes now with secure defaults: Nothing is exposed unless declared, all endpoints have a default authorization hook responding with 401. 
 
-The branch `rails4-support` adds changes to work with both Rails 3 and
-4.  Usage in Rails 4 is not yet fully confirmed to be of the same
-quality. Most likely it is, as there are only minor changes.
+From my point of view it is production ready. I am in the process of porting a large API from v0.9 to v1 that uses all features and it looks very good so far. Of course minor issues will appear, please help to report and fix them. 
 
-WARNING
-=======
+Installation
+============
 
-A soon the gem is loaded a controller with ready routing is enabled
-serving the annotated model's data records at least for reading for
-everybody.
+with Bundler (Gemfile) from Rubygems:
 
-You need to implement authorization yourself.
+    source 'http://rubygems.org'
+    gem "toast"
+
+from Github:
+
+    gem "toast", :git => "https://github.com/robokopp/toast.git"
+
+then run
+
+    bundle
+    rails generate toast init
+      create  config/toast-api.rb
+      create  config/toast-api
 
 Example
 =======
 
-Let the table `bananas` have the following schema:
+Let the table _bananas_ have the following schema:
 
      create_table "bananas", :force => true do |t|
        t.string   "name"
@@ -55,104 +63,177 @@ Let the table `bananas` have the following schema:
        t.integer  "apple_id"
      end
 
-and let a corresponding model class have a *acts_as_resource* annotation:
+and let a corresponding model class have this code:
 
      class Banana < ActiveRecord::Base
        belongs_to :apple
        has_many :coconuts
 
-       scope :less_than_100, where("number < 100")
-
-       acts_as_resource do
-         # exposed attributes or association names
-         readables :coconuts, :apple
-         writables :name, :number
-
-         # exposed class methods of Banana returning an Array of Banana records
-         collections :less_than_100, :all
-       end
+       scope :less_than_100, where("number < 100")       
      end
 
-The above definition inside the `acts_as_resource` block exposes the
-records of the model Banana automatically via a generic controller to
-the outside world, accepting and delivering JSON representations of
-the records. Let the associated models Apple and Coconut be
-exposed as a resource, too:
+Then we can define the API like this (in `config/toast-api/banana.rb`):
 
-### Get a collection
-    GET /bananas
-    --> 200,  '[{"self":     "http://www.example.com/bananas/23",
-                 "name":     "Fred",
-                 "number":   33,
-                 "coconuts": "http://www.example.com/bananas/23/coconuts",
-                 "apple":    "http://www.example.com/bananas/23/apple,
-                {"self":     "http://www.example.com/bananas/24",
-                  ... }, ... ]
-### Get a customized collection (filtered, paging, etc.)
-    GET /bananas/less_than_100
-    --> 200, '[{BANANA}, {BANANA}, ...]'
+      expose(Banana) {
+
+         readables :color
+         writables :name, :number
+
+         via_get {
+            allow do |user, model, uri_params|
+              true
+            end
+         }
+
+         via_patch {
+            allow do |user, model, uri_params|
+              true
+            end          
+         }
+
+         via_delete {
+            allow do |user, model, uri_params|
+              true
+            end          
+         }
+
+         collection(:less_than_100) {
+           via_get {
+             allow do |user, model, uri_params|
+               true
+             end
+           }
+         }
+
+         collection(:all) {
+           max_window 16
+
+           via_get {
+             allow do |user, model, uri_params|
+               true
+             end
+           }
+
+           via_post {
+             allow do |user, model, uri_params|
+               true
+             end
+           }
+         }
+
+         association(:coconuts) {
+           via_get {
+             allow do |user, model, uri_params|
+               true
+             end
+
+             handler do |banana, uri_params|
+               if uri_params[:max_weight] =~ /\A\d+\z/
+                 banana.coconuts.where("weight <= #{uri_params[:max_weight]}")
+               else
+                 banana.coconuts
+               end.order(:weight)
+             end
+           }
+
+           via_post {
+             allow do |user, model, uri_params|
+               true
+             end
+           }          
+
+           via_link {
+             allow do |user, model, uri_params|
+               true
+             end
+           }          
+         }
+
+         association(:apple) {
+           via_get {
+             allow do |user, model, uri_params|
+               true
+             end
+           }          
+         }
+      }
+
+Note, that all `allow`-blocks returning _true_. In practice authorization logic should be applied. An `allow`-block must be defined for each endpoint because it defaults to return `false`, which causes a 401 response.
+
+The above definition exposes the model Banana as such:
 
 ### Get a single resource representation:
-    GET /bananas/23
+    GET http://www.example.com/bananas/23
     --> 200,  '{"self":     "http://www.example.com/bananas/23"
                 "name":     "Fred",
                 "number":   33,
+                "color":    "yellow",
                 "coconuts": "http://www.example.com/bananas/23/coconuts",
                 "apple":    "http://www.example.com/bananas/23/apple" }'
 
-### Get an associated collection
-    "GET" /bananas/23/coconuts
-    --> 200, '[{COCNUT},{COCONUT},...]',
+The representation of a record is a flat JSON map: _name_ → _value_, in case of associations _name_ → _URI_. The special key _self_ contains the URI from which this record can be fetch alone. _self_ can be treated as a  unique ID of the record (globally unique, if under a FQDN). 
+
+### Get a collection (the :all collection)
+    GET http://www.example.com/bananas
+    --> 200,  '[{"self":     "http://www.example.com/bananas/23",
+                 "name":     "Fred",
+                 "number":   33,
+                 "color":    "yellow",
+                 "coconuts": "http://www.example.com/bananas/23/coconuts",
+                 "apple":    "http://www.example.com/bananas/23/apple,
+                {"self":     "http://www.example.com/bananas/24",
+                  ... }, ... ]'
+
+The default length of collections is limited to 42, this can be adjusted globally or for each endpoint separately. In this case no more than 16 will be delivered due to the `max_window 16` directive.
+
+### Get a customized collection
+    GET http://www.example.com/bananas/less_than_100
+    --> 200, '[{BANANA}, {BANANA}, ...]'
+
+Any scope can be published this way as well as any model class method returning a relation. 
+
+### Get an associated collection + filter
+    GET http://www.example.com/bananas/23/coconuts?max_weight=3
+    --> 200, '[{COCONUT},{COCONUT},...]',
+
+ The COCONUT model must be exposed too. URI parameters can be processed in custom handlers for sorting and filtering. 
 
 ### Update a single resource:
-    PUT /bananas/23, '{"self":   "http://www.example.com/bananas/23"
-                       "name":   "Barney",
-                       "number": 44}'
+    PATCH http://www.example.com/bananas/23, '{"name": "Barney", "number": 44, "foo" => "bar"}'
     --> 200,  '{"self":     "http://www.example.com/bananas/23"
                 "name":     "Barney",
                 "number":   44,
+                "color":    "yellow",
                 "coconuts": "http://www.example.com/bananas/23/coconuts",
                 "apple":    "http://www.example.com/bananas/23/apple"}'
 
+Toast ingores unknown attributes, but prints warnings in it's log file. Only attributes from the 'writables' list will be updated. 
+
 ### Create a new record
-    "POST" /bananas,  '{"name": "Johnny",
-                        "number": 888}'
-    --> 201,  {"self":     "http://www.example.com/bananas/102"
+    POST http://www.example.com/bananas, '{"name": "Johnny", "number": 888}'
+    --> 201, '{"self":     "http://www.example.com/bananas/102"
                "name":     "Johnny",
-               "number":   888,
-               "coconuts": "http://www.example.com/bananas/102/coconuts" ,
-               "apple":    "http://www.example.com/bananas/102/apple }
+               "number":    888,
+               "color":     null,
+               "coconuts": "http://www.example.com/bananas/102/coconuts",
+               "apple":    "http://www.example.com/bananas/102/apple }'
 
 ### Create an associated record
-    "POST" /bananas/23/coconuts, '{COCONUT}'
-    --> 201,  {"self":"http://www.example.com/coconuts/432,
-               ...}
+    POST http://www.example.com/bananas/23/coconuts, '{COCONUT}'
+    --> 201,  {"self":"http://www.example.com/coconuts/432, ...}
 
+  
 ### Delete records
-    DELETE /bananas/23
+    DELETE http://www.example.com/bananas/23
     --> 200
 
-More details and configuration options are documented in the manual.
+### Linking records
 
-Installation
-============
+    LINK "http://www.example.com/bananas/23/coconuts", 
+      Link:  "http://www.example.com/coconuts/31"
+    --> 200
 
-With bundler from  (rubygems.org)
+Toast uses the (unusual) methods LINK and UNLINK in order to express the action of linking or unlinking existing resources. The above request will add _Coconut#31_ to the association _Banana#coconuts_. 
 
-    gem "toast"
 
-the latest Git:
 
-    gem "toast", :git => "https://github.com/robokopp/toast.git"
-
-Remarks
-=======
-
-REST is more than some pretty URIs, the use of the HTTP verbs and
-response codes. It's on the Toast user to invent meaningful media
-types that control the application's state and introduce
-semantics. With toast you can build REST services or tightly coupled
-server-client applications, which ever suits the task best. That's why
-TOAST stands for:
-
->  **TOast Ain't reST**

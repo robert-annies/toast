@@ -1,0 +1,10 @@
+toast_settings {
+  max_window 42
+  link_unlink_via_post false
+
+  authenticate do |request|
+    # authenticate the request here (ActionDispatch::Request)
+    # returned object (except false) is passed as first argument to every allow-block for authorization
+    false
+  end
+}
