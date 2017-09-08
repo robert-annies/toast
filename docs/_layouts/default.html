@@ -8,7 +8,10 @@
     <meta name="description" content="{{ site.title | default: site.github.repository_name }} : {{ site.description | default: site.github.project_tagline }}">
 
     <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-
+    <link rel="icon" type="image/png" href="{{ "/favicons/favicon-32x32.png" | prepend: site.baseurl }}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{{ "/favicons/android-chrome-192x192.png" | prepend: site.baseurl }}" sizes="192x192">
+    <link rel="icon" type="image/png" href="{{ "/favicons/favicon-96x96.png" | prepend: site.baseurl }}" sizes="96x96">
+    <link rel="icon" type="image/png" href="{{ "/favicons/favicon-16x16.png" | prepend: site.baseurl }}" sizes="16x16">
 {% seo %}
   </head>
 
@@ -18,7 +21,7 @@
     <div id="header_wrap" class="outer">
         <header class="inner">
           <a id="forkme_banner" href="{{ site.github.repository_url }}">View on GitHub</a>
-
+      
           <h1 id="project_title">{{ site.title | default: site.github.repository_name }}</h1>
           <h2 id="project_tagline">{{ site.description | default: site.github.project_tagline }}</h2>
 
@@ -37,7 +40,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">    
+    <div id="main_content_wrap" class="outer" >    
       <section id="main_content" class="inner">
         {{ content }}
       </section>
