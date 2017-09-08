@@ -1,0 +1,10 @@
+* Traceability for manual entries and test case
+** Configuration parsing (non-runtime)
+*** sections
+**** A: Expose.md / expose directive config items
+**** B: association.md / association directive config items
+
+**** C: collection.md / collection directive config items
+**** D: via_get.md / via_get config items (allow+handler)
+**** E: single.md / single directive config items
+**** F: handler.md, default handler tests

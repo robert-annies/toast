@@ -1,0 +1,5 @@
+
+Toast is the basic layer on which HTTP service applications can be build.
+
+The next step is a speciification of a HTTP API for Toeasted models, such that a generic client for UI can be built that faciliates CRUD + Link management between resources.
+
