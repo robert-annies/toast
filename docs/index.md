@@ -1,8 +1,3 @@
----
-layout: page
-title: Toast Manual
----
-
 **Table of Contents**
 
 * [Introduction](Introduction)
