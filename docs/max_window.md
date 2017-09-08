@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'max_window'
----
+# Directive 'max_window'
 
 `max_window {SIZE}`
 

@@ -3,3 +3,8 @@ doc
 bin
 test/.vagrant/
 test/provision.retry
+docs/.bundle
+docs/_site
+docs/vendor
+docs/.ruby-version
+docs/Gemfile.lock

@@ -1,7 +1,4 @@
----
-layout: page
-title: Global Configuration
----
+# Global Configuration
 
 For settings regarding all exposed models and behavior a global configuration file is located at `config/toast-api.rb`. It has following form and default values:
 

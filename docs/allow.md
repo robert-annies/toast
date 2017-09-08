@@ -1,3 +1,5 @@
+# Directive: allow
+
 {% highlight ruby %}
 allow do |auth, request_model, uri_params|
   # make decision whether to authorize or not
@@ -27,7 +29,7 @@ Any result object of the `authenticate` block is passed to Toast's
 authorization process, that calls the appropriate `allow` block for
 the respective URI.
 
-# Example
+## Example
 Often the authentication object is the identified user model. How to
 identify the user is up to you (maybe by OAuth, OpenID, login/password
 DB lookup, LDAP, ...)
@@ -35,10 +37,10 @@ DB lookup, LDAP, ...)
 {% highlight ruby %}
 toast_settings {
   authenticate do |request|
-      ActionController::HttpAuthentication::Basic.authenticate(request) do |login,password|
-        user = User.find_by_login login
-        user.authenticate(password)
-      end
+    ActionController::HttpAuthentication::Basic.authenticate(request) do |login,password|
+      user = User.find_by_login login
+      user.authenticate(password)
+    end
   end
 }
 {% endhighlight %}

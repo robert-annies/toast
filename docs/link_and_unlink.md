@@ -1,7 +1,4 @@
----
-layout: page
-title: HTTP Methods LINK and UNLINK
----
+# HTTP Methods LINK and UNLINK
 
 Toast uses the HTTP methods LINK and UNLINK for associating and dis-associating existing resources.
 

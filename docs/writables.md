@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'writables'
----
+# Directive 'writables'
 
 `writables {ATTRIBUTE},{ATTRIBUTE},...`
 

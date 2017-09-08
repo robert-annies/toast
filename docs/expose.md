@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'expose'
----
+# Directive 'expose'
 
 {% highlight ruby %}
 expose({MODEL}, as: {MEDIA_TYPE}, under: {PATH}) {

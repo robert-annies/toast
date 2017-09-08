@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'via_get'
----
+# Directive 'via_get'
 
 `via_get { ... }`
 

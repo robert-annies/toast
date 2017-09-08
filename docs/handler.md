@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive Handler
----
+# Directive Handler
 
 `handler` defines a block of run-time code that should be executed in
 place of a default handler when processing a HTTP request.

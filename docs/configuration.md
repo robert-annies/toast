@@ -1,7 +1,4 @@
----
-layout: page
-title: Configuration
----
+# Configuration
 
 All configuration files for Toast reside in `config/toast-api/`. They
 contain text in Ruby syntax. The file naming is

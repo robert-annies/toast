@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'association'
----
+# Directive 'association'
 
 `association({ASSOC}) { ... }`
 

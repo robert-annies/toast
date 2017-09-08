@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'via_delete'
----
+# Directive 'via_delete'
 
 `via_delete { ... }`
 

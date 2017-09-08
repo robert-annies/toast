@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'via_patch'
----
+# Directive 'via_patch'
 
 `via_patch { ... }`
 

@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'via_unlink'
----
+# Directive 'via_unlink'
 
 `via_unlink { ... }`
 

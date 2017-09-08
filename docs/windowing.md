@@ -1,7 +1,4 @@
----
-layout: page
-title: Windowing (Pagination)
----
+# Windowing (Pagination)
 
 Responses containing arrays of resources are delivered partially (a.k.a paging).
 The HTTP headers _Range_ (request) and _Content-Range_ (response) are uitilized for windowing.

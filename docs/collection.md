@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'collection'
----
+# Directive 'collection'
 
 `collection({COLL}) { ... }`
 

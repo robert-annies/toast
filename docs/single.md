@@ -1,7 +1,4 @@
----
-layout: page
-title: Directive 'single'
----
+# Directive 'single'
 
 `single({SINGLE}) { ... }`
 
