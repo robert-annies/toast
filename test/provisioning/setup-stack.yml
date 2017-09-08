@@ -1,0 +1,31 @@
+---
+- hosts: all
+  user: vagrant
+  become_user: root
+  tasks:
+    # Ruby 2.2.3 from custom rpm
+    #   compiled in a earlier life of this box like this:
+    #   http://www.server-world.info/en/note?os=CentOS_7&p=ruby22)
+    - name: install Ruby 2.2.3
+      yum: name=/vagrant/provisioning/ruby-2.2.3-1.el7.centos.x86_64.rpm state=present
+
+    - name: install dev tools
+      yum: name="@sDevelopment tools" state=present
+
+    - name: install SQLite
+      yum: name=sqlite-devel
+
+    - name: install zlib (for nokogiri)
+      yum: name=zlib-devel
+
+    - name: install Bundler
+      gem: name=bundler state=present user_install=no
+
+    - name: install Git
+      yum: name=git state=latest
+
+    - name: bundle install
+      command: su vagrant -c /usr/bin/bundle install chdir=/vagrant/rails5_app
+
+    - name: setup database tables
+      command: bin/rails db:setup chdir=/vagrant/rails5_app

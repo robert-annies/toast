@@ -27,8 +27,7 @@ Gem::Specification.new do |s|
              ]
   s.homepage = "https://github.com/robokopp/toast"
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
-  s.add_dependency('rails',['>= 3.1.0', '< 4.0.0'])
+  s.add_dependency('rails',['>= 3.1.0', '< 5.0.0'])
   s.add_dependency('blockenspiel','~> 0.4.2')
   s.add_dependency('rack-accept-media-types','~> 0.9')
   s.add_dependency('rack-link_headers', '~> 2.2.2')
