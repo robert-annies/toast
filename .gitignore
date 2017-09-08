@@ -1,4 +1,4 @@
 pkg
 doc
 bin
-test/summary.log
+test/.vagrant/
