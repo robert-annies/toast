@@ -1,8 +1,3 @@
----
-layout: page
-title: Directive 'allow'
----
-
 {% highlight ruby %}
 allow do |auth, request_model, uri_params|
   # make decision whether to authorize or not
