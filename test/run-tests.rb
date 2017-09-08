@@ -47,6 +47,7 @@ rails_ruby_matrix.keys.sort.each do |rails_version|
       end
     else
       puts 'not found, skipping  (use rbenv to provide other rubies)'
+      next
     end
 
     # run tests
