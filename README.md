@@ -22,7 +22,7 @@ Other features are:
 
 Toast v1 is build for Rails 5. The predecesssor v0.9 supports 3 and 4, but has a much different and smaller DSL.
 
-See the User Manual (to be published soon) for a detailed description.
+See the [User Manual](https://robokopp.github.io/toast) for a detailed description.
 
 Status
 ======
