@@ -1,8 +1,3 @@
----
-layout: page
-title: Introduction
----
-
 # Basics
 
 Toast is a Rack application that hooks into Ruby on Rails providing a REST
