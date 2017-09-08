@@ -33,7 +33,7 @@ rails_ruby_matrix.keys.sort.each do |rails_version|
 
     elsif `which rbenv` != ''
       # check with rbenv
-      rbenv_system = `rbenv local system; ruby -v`.match(/ruby (\d\.\d\.\d)/)[1]
+      rbenv_system = `RBENV_SYSTEM=system ruby -v`.match(/ruby (\d\.\d\.\d)/)[1]
       rbenv_ruby   = `rbenv versions`.split.grep(/#{ruby_version}/).first
 
       # switch ruby with rbenv
