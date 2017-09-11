@@ -1,4 +1,4 @@
-# Directive: allow
+# Directive: 'allow'
 
 {% highlight ruby %}
 allow do |auth, request_model, uri_params|

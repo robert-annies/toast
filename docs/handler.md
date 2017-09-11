@@ -380,7 +380,7 @@ Update a resource/model-instance by it's canonical URI.
 *Default Handler*
 {% highlight ruby %}
 handler do |model_instance, payload, uri_params|
-  model_instance.update! payload
+  model_instance.update payload
 end
 {% endhighlight %}
 
@@ -420,7 +420,7 @@ expose(Person) {
     end
     ## implicit handler
     # handler do |model_instance, payload, uri_params|
-    #   model_instance.update! payload
+    #   model_instance.update payload
     # end
   }
 }
@@ -457,7 +457,7 @@ the model class.
 *Default Handler*
 {% highlight ruby %}
 handler do |payload, uri_params|
-  {MODEL}.create! payload
+  {MODEL}.create payload
 end
 {% endhighlight %}
 
@@ -491,7 +491,7 @@ expose(Person) {
       end
       ## implicit handler
       # handler do |payload, uri_params|
-      #   Person.create! payload
+      #   Person.create payload
       # end
     }
   }
@@ -519,7 +519,7 @@ Create a new resource/model-instance via a association. The record is created an
 *Default Handler*
 {% highlight ruby %}
 handler do |source, payload, uri_params|
-  source.{NAME}.create! payload
+  source.{NAME}.create payload
 end
 {% endhighlight %}
 
@@ -569,7 +569,7 @@ expose(Group) {
       end
       ## Implicit handler
       # handler do |source, payload, uri_params|
-      #   source.members.create! payload
+      #   source.members.create payload
       # end
   }
 }
@@ -620,7 +620,7 @@ Delete a resource/model-instance by it's canonical URI.
 *Default Handler*
 {% highlight ruby %}
 handler do |model_instance, uri_params|
-  model_instance.destroy!
+  model_instance.destroy
 end
 {% endhighlight %}
 
@@ -650,7 +650,7 @@ expose(Person) {
     end
     ## implicit handler
     # handler do |model_instance, uri_params|
-    #   model_instance.destroy!
+    #   model_instance.destroy
     # end
   }
 }
@@ -676,7 +676,7 @@ or update such associations.
 {% highlight ruby %}
 handler do |source, target, uri_params|
   source.{NAME} = target
-  source.save!
+  source.save
 end
 {% endhighlight %}
 
@@ -717,7 +717,7 @@ expose(Person) {
         ## implicit handler
         # handler do |source, target, uri_params|
         #  source.group = target
-        #  source.save!
+        #  source.save
         # end
       }
     }
@@ -855,7 +855,7 @@ effect.
 handler do |source, target, uri_params|
   if source.{NAME} == target
     source.{NAME} = nil
-    source.save!
+    source.save
   end
 end
 {% endhighlight %}
@@ -898,7 +898,7 @@ expose(Person){
         # handler do |source, target, uri_params|
         #   if source.group == target
         #     source.group = nil
-        #     source.save!
+        #     source.save
         #   end
         # end
       }
