@@ -113,6 +113,13 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_response :not_found
       assert_equal "collection or single `all_in_universe' not configured in: test/files/toast_config_default_handlers/apple.rb", @response.body
 
+      # no configuration found
+      get "/eggplants",
+          headers:  mkhd(token: 'TOK_admin'),
+          xhr: true
+      assert_response :not_found
+      assert_equal "no API configuration found for model `Eggplant'", @response. body
+
       # class method raises exception
       get "/bananas/all_wrong",
           headers:  mkhd(token: 'TOK_admin'),

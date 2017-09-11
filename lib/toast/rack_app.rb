@@ -57,7 +57,7 @@ class Toast::RackApp
     begin
       base_config = get_config(model_class)
     rescue Toast::Errors::ConfigNotFound => error
-      return response :internal_server_error,
+      return response :not_found,
                       msg: "no API configuration found for model `#{model_class.name}'"
     end
 
