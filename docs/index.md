@@ -8,3 +8,4 @@
 * [LINK and UNLINK](link_and_unlink)
 * [Windowing (Pagination)](windowing)
 * [Error Handling](error_handling)
+* [Attribute Selection](attribute_selection)
