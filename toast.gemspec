@@ -12,6 +12,7 @@ EOF
   s.summary = "Toast exposes ActiveRecord models as a web service (REST API)."
   s.authors = ["robokopp (Robert Annies)"]
   s.email = "robokopp@fernwerk.net"
+  s.license = 'MIT'
   s.extra_rdoc_files = [
     "README.md"
   ]
@@ -23,6 +24,7 @@ EOF
              
   s.homepage = "https://github.com/robokopp/toast"
   s.require_paths = ["lib"]
+  s.required_ruby_version = '>= 2.2.2'
   s.add_dependency('rails','~> 5')
   s.add_dependency('rack-accept-media-types','~> 0.9')
   s.add_dependency('link_header', '~> 0.0.8')
