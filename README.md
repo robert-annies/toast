@@ -30,6 +30,8 @@ Status
 Toast v1 for Rails 5 is a complete rewrite of v0.9, which was first published and used in production since 2012. 
 It comes now with secure defaults: Nothing is exposed unless declared, all endpoints have a default authorization hook responding with 401. 
 
+v1 is not compatible with v0.9, and it is not tested with Rails < v5. All configurations must be ported to the new DSL. 
+
 From my point of view it is production ready. I am in the process of porting a large API from v0.9 to v1 that uses all features and it looks very good so far. Of course minor issues will appear, please help to report and fix them. 
 
 Installation
