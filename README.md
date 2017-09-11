@@ -71,7 +71,7 @@ and let a corresponding model class have this code:
        belongs_to :apple
        has_many :coconuts
 
-       scope :less_than_100, where("number < 100")       
+       scope :less_than_100, -> { where("number < 100") }
      end
 
 Then we can define the API like this (in `config/toast-api/banana.rb`):
@@ -160,7 +160,7 @@ Then we can define the API like this (in `config/toast-api/banana.rb`):
          }
       }
 
-Note, that all `allow`-blocks returning _true_. In practice authorization logic should be applied. An `allow`-block must be defined for each endpoint because it defaults to return `false`, which causes a 401 response.
+Note, that all allow-blocks in the above example return _true_. In practice authorization logic should be applied. An allow-block must be defined for each endpoint because it defaults to return _false_, which causes a _401 Unauthorized_ response.
 
 The above definition exposes the model Banana as such:
 
@@ -192,7 +192,7 @@ The default length of collections is limited to 42, this can be adjusted globall
     GET http://www.example.com/bananas/less_than_100
     --> 200, '[{BANANA}, {BANANA}, ...]'
 
-Any scope can be published this way as well as any model class method returning a relation. 
+Any _scope_ or class method returning a relation can be published this way.
 
 ### Get an associated collection + filter
     GET http://www.example.com/bananas/23/coconuts?max_weight=3
@@ -235,7 +235,7 @@ Toast ingores unknown attributes, but prints warnings in it's log file. Only att
       Link:  "http://www.example.com/coconuts/31"
     --> 200
 
-Toast uses the (unusual) methods LINK and UNLINK in order to express the action of linking or unlinking existing resources. The above request will add _Coconut#31_ to the association _Banana#coconuts_. 
+Toast uses the (unusual) HTTP verbs LINK and UNLINK in order to express the action of linking or unlinking existing resources. The above request will add _Coconut#31_ to the association _Banana#coconuts_. 
 
 
 
