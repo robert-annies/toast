@@ -1,13 +1,3 @@
-unless defined?(Rails)
-  puts 'The Toast gem is made for Ruby on Rails 5.'
-  exit 1
-end
-
-unless Rails::VERSION::MAJOR == 5
-  puts 'Toast v1 requires Ruby on Rails 5, try v0.9 for older rails.'
-  exit 1
-end
-
 require 'ostruct'
 require 'toast/engine'
 require 'toast/config_dsl'

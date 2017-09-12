@@ -151,12 +151,12 @@ class GetSingleTest < ActionDispatch::IntegrationTest
           headers: mkhd(token: 'TOK_admin'),
           xhr: true
 
-      if Rails.version =~ /\A5.0/
+      if Rails::VERSION::MAJOR < 5 or Rails.version =~ /\A5.0/
         assert_response :internal_server_error
         assert_match "exception raised in handler: `SQLite3::SQLException: no such column: number.0:",
                      @response.body
       else
-        # Rails >= 5.1 does not thow exception
+        # Rails >= 5.1 does not throw exception
         assert_response :not_found
         assert_equal "resource not found at /apples/pluck", @response.body
       end

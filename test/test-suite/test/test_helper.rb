@@ -26,20 +26,19 @@ end
 
 # monkey patch to support link and unlink helpers
 module ActionDispatch::Integration::RequestHelpers
-  def link path, *args
-    if Rails.version =~ /\A5.0/
-      # was renamed in 5.1
-      process_with_kwargs(:link, path, *args)
-    else
-      process(:link, path, *args)
-    end
-  end
 
-  def unlink path, *args
-    if Rails.version =~ /\A5.0/
-      process_with_kwargs(:unlink, path, *args)
-    else
-      process(:unlink, path, *args)
+  [:get,:put,:patch,:post,:delete,:link,:unlink].each do |method_name|
+    define_method method_name do |path, *args|
+      case Rails.version
+      when /\A4\./   
+        process method_name, path, args.first.try(:fetch,:params, nil), args.first.try(:fetch,:headers, nil)
+      when /\A5\.0\./
+        process_with_kwargs(method_name, path, *args) 
+      when /\A5\.1/
+        process method_name, path, *args
+      else
+        raise "Rails version #{Rails.version} is not supported."        
+      end
     end
   end
 end

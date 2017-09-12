@@ -9,14 +9,26 @@ class Apple < ApplicationRecord
   before_destroy do
     if number == 1092
       errors.add(:base, 'before_destroy callback threw :abort')
-      throw :abort
+      if Rails::VERSION::MAJOR < 5
+        false
+      else
+        throw :abort
+      end
+    else
+      true
     end
   end
 
   before_save(on: :update) do
     if number == 444
       errors.add(:base, 'before_save callback threw :abort')
-      throw :abort
+      if Rails::VERSION::MAJOR < 5
+        false
+      else
+        throw :abort
+      end
+    else
+      true
     end
   end
 

@@ -20,9 +20,18 @@ Other features are:
   * attribute selection per request 
   * processing of URI parameters
 
-Toast v1 is build for Rails 5. The predecesssor v0.9 supports 3 and 4, but has a much different and smaller DSL.
-
 See the [User Manual](https://robokopp.github.io/toast) for a detailed description.
+
+Releases
+========
+
+## Toast version ≥ 1.0.2
+
+Works with Rails 5 and 4.2.9+. This version will be tested with upcoming new Rails releases and receives bugfixes and new features. 
+
+## Toast version 0.9.*
+
+Works with Rails 3 and 4. It has a much different and smaller DSL, which is not compatible with v1. This version will not receive any updates or fixes anymore.
 
 Status
 ======

@@ -13,9 +13,9 @@ class PatchCanonicalTest < ActionDispatch::IntegrationTest
                                {name: 'Etiam', number: 1944} ])
 
       patch "/apples/#{apples.second.id}",
-          params: {name: 'Fringilla'}.to_json,
-          headers: mkhd(token: 'TOK_admin'),
-          xhr: true
+            params: {name: 'Fringilla'}.to_json,
+            headers: mkhd(token: 'TOK_admin'),
+            xhr: true
 
       assert_response :ok
 

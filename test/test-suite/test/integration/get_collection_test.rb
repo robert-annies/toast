@@ -126,7 +126,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
           xhr: true
 
       assert_response :internal_server_error
-      assert_match /exception raised in via_get handler: `Crazy Diamond' in .*app\/models\/banana.rb:19/,
+      assert_match /exception raised in via_get handler: `Crazy Diamond' in .*app\/models\/banana.rb:30/,
                    @response.body
 
       # return unexpected object

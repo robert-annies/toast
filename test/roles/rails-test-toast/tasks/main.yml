@@ -2,13 +2,19 @@
 # Using Bundler to install and pick the right rails version for calling "rails new"
 # (a temporary Gemfile is put into home and removed after)
 
+- set_fact:
+    rails_5: "{{ version.split('.')[0] == '5' }}"
+    app_dir: rails_{{ '.'.join(version.split('.')[0:2]) }}-test
+  tags: 
+    - test
+
 - name: Setup Gemfile for Rails install
   blockinfile:
     dest: ~/Gemfile
     create: yes
     block: |
       source 'https://rubygems.org'
-      gem 'rails', '= {{ version }}'
+      gem 'rails', '~> {{ version }}'
   become: yes
   become_user: vagrant
 
@@ -19,13 +25,40 @@
     chdir: ~
     executable: /usr/local/bin/bundle
 
-- name: init rails app
-  command: bundle exec rails new rails_{{ version }}-test --api --skip-spring
+- name: init rails app (v5)
+  command: bundle exec rails new {{ app_dir }} --api --skip-spring
   args:
     chdir: /home/vagrant
-    creates: /home/vagrant/rails_{{ version }}-test
+    creates: /home/vagrant/{{ app_dir }}
   become: yes
   become_user: vagrant
+  when: rails_5
+
+- name: init rails app (v4)
+  command: bundle exec rails new {{ app_dir }} --skip-javascript --skip-spring
+  args:
+    chdir: /home/vagrant
+    creates: /home/vagrant/{{ app_dir }}
+  become: yes
+  become_user: vagrant
+  when: not rails_5
+
+- name: remove uglifier
+  lineinfile: 
+    path: /home/vagrant/{{ app_dir }}/Gemfile
+    regexp: gem 'uglifier'
+    state: absent
+  become: yes
+  become_user: vagrant  
+  when: not rails_5
+
+- name: bundle again
+  command: bundle
+  args:
+    chdir: /home/vagrant/{{ app_dir }}
+  become: yes
+  become_user: vagrant
+  when: not rails_5
 
 - name: remove temporary Gemfile
   file:
@@ -38,13 +71,13 @@
 - name: link test suite
   shell: cp -rsf /vagrant/test/test-suite/* .
   args:
-    chdir: /home/vagrant/rails_{{ version }}-test
+    chdir: /home/vagrant/{{ app_dir }}
   become: yes
   become_user: vagrant
 
 - name: add development deps to Gemfile
   blockinfile:
-    dest: /home/vagrant/rails_{{ version }}-test/Gemfile
+    dest: /home/vagrant/{{ app_dir }}/Gemfile
     block: |
       group :development, :test do
         gem 'shoulda'
@@ -60,17 +93,17 @@
 - name: bundle test app
   bundler:
     state: present
-    chdir: ~/rails_{{ version }}-test
+    chdir: ~/{{ app_dir }}
   become: yes
   become_user: vagrant
 
 - name: setup database tables
-  command: bin/rails db:setup chdir=/home/vagrant/rails_{{ version }}-test
+  command: bin/rake db:setup chdir=/home/vagrant/{{ app_dir }}
   become: yes
   become_user: vagrant
 
 - name: run toast test suite for Rails {{ version }}
-  command: bin/rails test chdir=/home/vagrant/rails_{{ version }}-test
+  command: bin/rake test chdir=/home/vagrant/{{ app_dir }}
   become: yes
   become_user: vagrant
   tags:

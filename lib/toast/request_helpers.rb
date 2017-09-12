@@ -48,13 +48,14 @@ module Toast::RequestHelpers
     result
   end
 
-  def represent record_or_enum, config
-    result = if record_or_enum.is_a? Enumerable
-               record_or_enum.map do |record|
+  def represent one_or_many_records, config
+
+    result = if one_or_many_records.respond_to?(:map)
+               one_or_many_records.map do |record|
                  represent_one(record, config)
                end
              else
-               represent_one(record_or_enum, config)
+               represent_one(one_or_many_records, config)
              end
 
     result.to_json

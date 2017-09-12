@@ -24,8 +24,8 @@ EOF
              
   s.homepage = "https://github.com/robokopp/toast"
   s.require_paths = ["lib"]
-  s.required_ruby_version = '>= 2.2.2'
-  s.add_dependency('rails','~> 5')
+  s.required_ruby_version = '>= 2.0.0'
+  s.add_dependency('rails','>= 4.2.9')
   s.add_dependency('rack-accept-media-types','~> 0.9')
   s.add_dependency('link_header', '~> 0.0.8')
 end

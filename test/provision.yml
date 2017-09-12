@@ -7,10 +7,13 @@
     - role: rails-prerequisities
 
     - role: rails-test-toast
-      version: 5.0.5
+      version: 5.0.0
 
     - role: rails-test-toast
-      version: 5.1.3
+      version: 5.1.0
+
+    - role: rails-test-toast
+      version: 4.2.0
 
   tasks:
     # when tests fail this task is not reached

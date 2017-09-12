@@ -1,5 +1,10 @@
 class Banana < ApplicationRecord
-  belongs_to :apple, optional: true
+  if Rails::VERSION::MAJOR < 5
+    belongs_to :apple
+  else
+    belongs_to :apple, optional: true
+  end
+
   has_one :apple_surprise, :class_name => 'Apple'
   has_many :coconuts
 
@@ -9,7 +14,13 @@ class Banana < ApplicationRecord
   before_create do
     if name == 'forbidden'
       errors.add(:base, "before_create callback threw :abort")
-      throw :abort
+      if Rails::VERSION::MAJOR < 5
+        false
+      else
+        throw :abort
+      end
+    else
+      true
     end
   end
 
