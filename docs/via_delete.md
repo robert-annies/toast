@@ -35,6 +35,6 @@ expose(Person) {
 
 Request:
 
-    DELETE https://toast-examples.org/people/44
+    DELETE https://example.com/people/44
 
 Removed the resource/model-instance.

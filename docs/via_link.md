@@ -72,21 +72,21 @@ expose(Country) {
 
 Request:
 
-    LINK https://toast-examples.org/people/102/country
-         Link: <https://toast-examples.org/countries/40>; rel="related"
+    LINK https://example.com/people/102/country
+         Link: <https://example.com/countries/40>; rel="related"
 
 Response: `200 OK`
 
 Request:
 
-    GET https://toast-examples.org/people/102/country
+    GET https://example.com/people/102/country
 
 Response:
 
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/countries/40",
-    "people"    : "https://toast-examples.org/countries/40/people",
+    "self"      : "https://example.com/countries/40",
+    "people"    : "https://example.com/countries/40/people",
     "name"      : "Switzerland",
     "languages" : ["fr","de","it"]
 }
@@ -96,19 +96,19 @@ Response:
 
 Request:
 
-    LINK https://toast-examples.org/countries/40/people
-         Link: <https://toast-examples.org/people/44>; rel="related"
+    LINK https://example.com/countries/40/people
+         Link: <https://example.com/people/44>; rel="related"
 
 Response: `200 OK`
 
 Request:
-    GET https://toast-examples.org/countries/40/people
+    GET https://example.com/countries/40/people
 
 {% highlight json %}
 [
     {
-	"self"      : "https://toast-examples.org/people/44",
-	"country"   : "https://toast-examples.org/people/44/countries",
+	"self"      : "https://example.com/people/44",
+	"country"   : "https://example.com/people/44/countries",
 	"first_name": "Johnny",
 	"last_name" : "Gold"
     } , ...

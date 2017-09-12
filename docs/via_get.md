@@ -37,12 +37,12 @@ expose(Person) {
 
 Request:
 
-`GET https://toast-examples.org/people/44`
+`GET https://example.com/people/44`
 
 Response:
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/people/44",
+    "self"      : "https://example.com/people/44",
     "first_name": "John",
     "last_name" : "Silver"
 }

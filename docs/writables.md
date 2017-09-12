@@ -28,13 +28,13 @@ expose(Person) {
 }
 {% endhighlight %}
 
-`PATCH https://toast-examples.org/people/42 {"first_name": "George"}`
+`PATCH https://example.com/people/42 {"first_name": "George"}`
 
 would update the record and respond with:
 
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/people/42",
+    "self"      : "https://example.com/people/42",
     "first_name": "Jason",
     "last_name" : "George",
     "phone"     : "082-0193878560"

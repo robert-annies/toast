@@ -75,14 +75,14 @@ Let the resource `countries/40` be associated with the resource `people/102/coun
 
 Request:
 
-    UNLINK https://toast-examples.org/people/102/country
-           Link: <https://toast-examples.org/countries/40>; rel="related"
+    UNLINK https://example.com/people/102/country
+           Link: <https://example.com/countries/40>; rel="related"
 
 Response: `200 OK`
 
 Request:
 
-    GET https://toast-examples.org/people/102/country
+    GET https://example.com/people/102/country
 
 Response: `404 Not Found`
 
@@ -94,21 +94,21 @@ Let the resource `people/44` be associated with the resource `countries/40/peopl
 
 Request:
 
-    UNLINK https://toast-examples.org/countries/40/people
-           Link: <https://toast-examples.org/people/44>; rel="related"
+    UNLINK https://example.com/countries/40/people
+           Link: <https://example.com/people/44>; rel="related"
 
 Response: `200 OK`
 
 Request:
-    GET https://toast-examples.org/countries/40/people
+    GET https://example.com/countries/40/people
 
 {% highlight javascript %}
 [
     {
-	"self"      : "https://toast-examples.org/people/76",
-	"country"   : "https://toast-examples.org/people/76/countries",
+	"self"      : "https://example.com/people/76",
+	"country"   : "https://example.com/people/76/countries",
 	"first_name": "Karl",
 	"last_name" : "Kohl"
-    } ,...  // https://toast-examples.org/people/44 not in here
+    } ,...  // https://example.com/people/44 not in here
 ]
 {% endhighlight %}

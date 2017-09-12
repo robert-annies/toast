@@ -29,11 +29,11 @@ expose(Person) {
 }
 {% endhighlight %}
 
-would yield a representation for `GET https://toast-examples.org/people/42`:
+would yield a representation for `GET https://example.com/people/42`:
 
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/people/42",
+    "self"      : "https://example.com/people/42",
     "first_name": "Jason",
     "last_name" : "Plant",
     "phone"     : "082-0193878560"

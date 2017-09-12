@@ -75,26 +75,26 @@ would yield a JSON representation:
 
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/people/42",
+    "self"      : "https://example.com/people/42",
     "first_name": "Jason",
-    "friends"   : "https://toast-examples.org/people/42/friends"
+    "friends"   : "https://example.com/people/42/friends"
 }
 {% endhighlight %}
 
 The HTTP API provides read access to a collection of "friend" records, which are delivered as a JSON array:
 
-`GET https://toast-examples.org/people/42/friends`:
+`GET https://example.com/people/42/friends`:
 {% highlight json %}
 [
     {
-	"self"      : "https://toast-examples.org/people/1902",
+	"self"      : "https://example.com/people/1902",
 	"first_name": "John",
-	"friends"   : "https://toast-examples.org/people/1902/friends"
+	"friends"   : "https://example.com/people/1902/friends"
     },
     {
-	"self"      : "https://toast-examples.org/people/23",
+	"self"      : "https://example.com/people/23",
 	"first_name": "Jakob",
-	"friends"   : "https://toast-examples.org/people/23/friends"
+	"friends"   : "https://example.com/people/23/friends"
     }
 ]
 {% endhighlight %}

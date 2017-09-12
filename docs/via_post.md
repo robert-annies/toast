@@ -77,15 +77,15 @@ expose(Post) {
 
 Request:
 
-    POST https://toast-examples.org/people
+    POST https://example.com/people
       {"first_name": "Elinor", "last_name": "Langosh"}
 
 Response:
 
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/people/102",
-    "posts"     : "https://toast-examples.org/people/102/posts",
+    "self"      : "https://example.com/people/102",
+    "posts"     : "https://example.com/people/102/posts",
     "first_name": "Elinor",
     "last_name" : "Langosh"
 }
@@ -93,15 +93,15 @@ Response:
 
 Request:
 
-    POST https://toast-examples.org/people/102/posts
+    POST https://example.com/people/102/posts
       {"title": "My First Toast", "text": "It was a bit dry."}
 
 Response:
 
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/posts/2957",
-    "author"    : "https://toast-examples.org/posts/2957/author",
+    "self"      : "https://example.com/posts/2957",
+    "author"    : "https://example.com/posts/2957/author",
     "title"     : "My First Toast",
     "text"      : "It was a bit dry."
 }

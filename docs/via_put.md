@@ -34,13 +34,13 @@ expose(Person) {
 
 Request:
 
-    PATCH https://toast-examples.org/people/44
+    PATCH https://example.com/people/44
       {"first_name": "Johnny", "last_name": "Gold"}
 
 Response:
 {% highlight json %}
 {
-    "self"      : "https://toast-examples.org/people/44",
+    "self"      : "https://example.com/people/44",
     "first_name": "Johnny",
     "last_name" : "Gold"
 }

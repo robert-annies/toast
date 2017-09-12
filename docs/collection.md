@@ -65,34 +65,34 @@ expose(Person) {
 
 would yield:
 
-`GET https://toast-examples.org/people`:
+`GET https://example.com/people`:
 {% highlight json %}
 [
     {
-	"self"      : "https://toast-examples.org/people/1902",
+	"self"      : "https://example.com/people/1902",
 	"first_name": "John",
 	"last_name" : "Smith"
     },{
-	"self"      : "https://toast-examples.org/people/23",
+	"self"      : "https://example.com/people/23",
 	"first_name": "Jakob",
 	"last_name" : "Miller"
     },{
-	"self"      : "https://toast-examples.org/people/87",
+	"self"      : "https://example.com/people/87",
 	"first_name": "John",
 	"last_name" : "Gordon"
     }
 ]
 {% endhighlight %}
 
-`GET https://toast-examples.org/people/johns`:
+`GET https://example.com/people/johns`:
 {% highlight json %}
 [
     {
-	"self"      : "https://toast-examples.org/people/1902",
+	"self"      : "https://example.com/people/1902",
 	"first_name": "John",
 	"last_name" : "Smith"
     },{
-	"self"      : "https://toast-examples.org/people/87",
+	"self"      : "https://example.com/people/87",
 	"first_name": "John",
 	"last_name" : "Gordon"
     }
