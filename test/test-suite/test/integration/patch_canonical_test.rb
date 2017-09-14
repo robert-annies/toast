@@ -126,7 +126,7 @@ class PatchCanonicalTest < ActionDispatch::IntegrationTest
             xhr: true
 
       assert_response :not_found
-      assert_equal "resource at /oranges/123 not found", @response.body
+      assert_equal "no API configuration found for endpoint /oranges/123", @response.body
 
       # aborted by callback
       apples.second.update_column :number, 444

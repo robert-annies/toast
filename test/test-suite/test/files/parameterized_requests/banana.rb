@@ -1,4 +1,4 @@
-expose(Banana, as: 'application/banana+json', under: 'test/api-v1/') {
+expose(Banana, as: 'application/banana+json') {
 
   writables :name, :number
   readables :curvature

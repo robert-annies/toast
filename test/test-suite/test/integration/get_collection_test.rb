@@ -118,7 +118,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
           headers:  mkhd(token: 'TOK_admin'),
           xhr: true
       assert_response :not_found
-      assert_equal "no API configuration found for model `Eggplant'", @response. body
+      assert_equal "no API configuration found for endpoint /eggplants", @response. body
 
       # class method raises exception
       get "/bananas/all_wrong",

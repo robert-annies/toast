@@ -117,7 +117,7 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
       get "/oranges/2943", xhr: true
 
       assert_response :not_found
-      assert_equal "resource at /oranges/2943 not found", @response.body
+      assert_equal "no API configuration found for endpoint /oranges/2943", @response.body
 
       # exception from allow handler
       Toast.init 'test/files/get_canonical_allow_exception.rb'
@@ -174,7 +174,7 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
           xhr: true
 
       assert_response :not_found
-      assert_equal "resource at /objects/3 not found",
+      assert_equal "no API configuration found for endpoint /objects/3",
                    @response.body
 
 

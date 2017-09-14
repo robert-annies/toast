@@ -20,6 +20,21 @@ class Toast::ConfigDSL::Base
         raise_config_error 'Block expected.'
       end
 
+      # register base path with 'under' prefix
+      to_path_tree = lambda do |path|        
+        if path.empty?
+          { model_class.to_s.underscore.pluralize => model_class }
+        else 
+          { path.first => to_path_tree.call(path[1..-1]) }
+        end
+      end
+
+      path = under.split('/').delete_if(&:blank?)
+      Toast.path_tree.deep_merge!(to_path_tree.call(path)) do |key,v1,v2|
+        raise_config_error "multiple definitions of endpoint URI segment `.../#{key}/...'"
+      end
+
+      # base config object
       config_data = OpenStruct.new
 
       config_data.instance_eval do
@@ -27,8 +42,8 @@ class Toast::ConfigDSL::Base
 
         self.model_class     = model_class
         self.media_type      = as
-        self.url_path_prefix = under.split('/').delete_if(&:blank?)
-
+        self.prefix_path     = path
+ 
         # defaults
         self.readables    = []
         self.writables    = []

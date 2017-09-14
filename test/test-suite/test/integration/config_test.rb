@@ -56,8 +56,8 @@ class ConfigTest < ActiveSupport::TestCase
       Toast.init 'test/files/toast_config_1/*'
       a,b = Toast.expositions
 
-      assert_equal [],                a.url_path_prefix
-      assert_equal ['test','api-v1'], b.url_path_prefix
+      assert_equal [],                a.prefix_path
+      assert_equal ['test','api-v1'], b.prefix_path
     end
 
     should 'register writable attributes [A.5]' do
@@ -167,6 +167,17 @@ class ConfigTest < ActiveSupport::TestCase
       assert_equal "CONFIG ERROR: Unknown directive: `good_morning'\n"+
                    "              directive: /expose(Banana)\n"+
                    "              in file  : test/files/unknown_directive.rb:6",
+                   error.message
+    end
+
+    should 'raise error on conflicting prefix paths' do
+      error = assert_raises Toast::ConfigError do
+          Toast.init 'test/files/under_path_conflict.rb'
+      end 
+
+      assert_equal "CONFIG ERROR: multiple definitions of endpoint URI segment `.../eggplants/...'\n"+
+                   "              directive: /expose(Apple)\n"+
+                   "              in file  : test/files/under_path_conflict.rb:43",
                    error.message
     end
   end # context "expose directives"

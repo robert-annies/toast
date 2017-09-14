@@ -12,7 +12,10 @@ module Toast
   # collects all configs of one expose block (DSL methods write to it)
   @@current_expose = nil
 
-  cattr_accessor :expositions, :settings
+  # path tree to resolve the requested model
+  @@path_tree = {}
+
+  cattr_accessor :expositions, :settings, :path_tree
 
   class ConfigError < StandardError
   end
@@ -23,6 +26,7 @@ module Toast
     # clean up
     Toast.expositions.clear
     Toast.settings = nil
+    Toast.path_tree = {}
 
     settings = ''
     # read global settings

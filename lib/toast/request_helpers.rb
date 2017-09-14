@@ -23,7 +23,8 @@ module Toast::RequestHelpers
       result[attr.to_s] = record.send(attr) if attr_selected?(attr)
     end
 
-    model_uri =  "#{@base_uri}/#{record.class.name.underscore.pluralize}"    
+    model_uri = [@base_uri, config.prefix_path, record.class.name.underscore.pluralize].delete_if(&:blank?).join('/')
+
     result['self'] = "#{model_uri}/#{record.id}" if attr_selected?('self')
 
     # add associations, collections and singles

@@ -34,32 +34,20 @@ class Toast::RackApp
     end
 
     path       = request.path_parameters[:toast_path].split('/')
+    
+    # look up requested model
+    model_class = resolve_model(path, Toast.path_tree)
 
-    # strip path prefixes
-    # get  model class
-    begin
-      if path.first.singularize == path.first # not in plural form?
-        raise NameError
-      end
-      model_class = path.first.singularize.classify.constantize
-      raise NameError unless is_active_record?(model_class)
-    rescue NameError
+    if model_class.nil?
       return response :not_found,
-                      msg: "resource at /#{path.join('/')} not found"
+                      msg: "no API configuration found for endpoint /#{path.join('/')}"
     end
 
     # select base configuration
+    base_config = get_config(model_class)
 
-    ## This is unused. Do we need it at all?
-    # preferred_type = Rack::AcceptMediaTypes.new(env['HTTP_ACCEPT']).prefered || "application/json"
-
-    # the base_config is the configuration for the model corresponding to the first part of the URI path
-    begin
-      base_config = get_config(model_class)
-    rescue Toast::Errors::ConfigNotFound => error
-      return response :not_found,
-                      msg: "no API configuration found for model `#{model_class.name}'"
-    end
+    # remove path prefix
+    path = path[(base_config.prefix_path.length)..-1]
 
     toast_request =
       case path.length
@@ -130,4 +118,17 @@ class Toast::RackApp
     toast_request.respond
 
   end
+
+  private
+    # gets the model class from the 
+    # it's similar to Hash#dig but stops at a non string
+    def resolve_model path, path_tree
+      if path_tree[ path.first ].is_a?(Hash) 
+        # dig deeper
+        resolve_model(path[1..-1], path_tree[ path.first ])
+      else
+        path_tree[ path.first ]
+      end
+    end  
 end
+
