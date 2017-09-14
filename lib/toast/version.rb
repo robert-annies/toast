@@ -1,3 +1,3 @@
 module Toast
-  VERSION = '1.0.2'
-end 
+  VERSION = '1.0.3'
+end
