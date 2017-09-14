@@ -4,6 +4,8 @@
   become_user: root
 
   roles:
+    - role: shell-basics
+
     - role: rails-prerequisities
 
     - role: rails-test-toast

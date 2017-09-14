@@ -1,0 +1,17 @@
+---
+- name: set english UTF-8 locale
+  lineinfile:
+    path: /etc/locale.conf
+    state: present
+    regexp: ^LANG=
+    line: LANG="en_US.UTF-8"
+  become: yes
+
+- name: shell history search with arrow keys
+  blockinfile:
+    path: /etc/inputrc
+    state: present
+    block: |      
+      "\e[A":history-search-backward
+      "\e[B":history-search-forward 
+  become: yes
