@@ -11,7 +11,7 @@ class Toast::CollectionRequest
     @base_uri        = base_uri(request)
     @verb            = request.request_method.downcase
     @requested_range = Toast::HttpRange.new(request.env['HTTP_RANGE'])
-    @selected_attributes = request.query_parameters.delete(:toast_select).try(:split,',')
+    @selected_attributes = request.query_parameters[:toast_select].try(:split,/ *, */)
     @uri_params      = request.query_parameters
     @auth            = auth
     @request         = request
