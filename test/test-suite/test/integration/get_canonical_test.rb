@@ -99,7 +99,7 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
           xhr: true
 
       assert_response :unauthorized
-      assert_equal "authorization failed", @response.body
+      assert_equal "not authorized by allow block in: test/files/get_canonical_auth.rb:5", @response.body
 
       # unauthorized by allow block, with custom response headers and body
       get "/apples/#{apples.third.id}",
@@ -125,7 +125,8 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
       get "/apples/#{apples.third.id}", xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception from via_get handler: This should never happen!", @response.body
+      assert_equal "exception raised in allow block: `This should never happen!' in test/files/get_canonical_allow_exception.rb:5",
+                   @response.body
 
     end
   end
@@ -166,7 +167,7 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
           xhr: true
 
       assert_response :internal_server_error
-      assert_match /exception from via_get handler: undefined method `wtf=' for #<Apple/,
+      assert_match /exception raised in via_get handler: `undefined method `wtf=' for #<Apple/,
                    @response.body
 
       get "/objects/#{apples.third.id}?filter=wtf",

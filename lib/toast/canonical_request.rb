@@ -35,25 +35,32 @@ class Toast::CanonicalRequest
                msg: "GET not configured"
     else
       begin
-        model = @base_config.via_get.handler.call(
-          @base_config.model_class.find(@id), @uri_params
-        )
+        model_instance = @base_config.model_class.find(@id)
 
         # call allow blocks to authorize
-        if @base_config.via_get.permissions.all?{|p| p.call(@auth, model, @uri_params)}
-          response :ok,
-                   headers: {"Content-Type" => @base_config.media_type},
-                   msg: "sent #{model.class}##{model.id}",
-                   body: represent(model, @base_config)
-        else
-          response :unauthorized, msg: "authorization failed"
-        end
+        call_allow @base_config.via_get.permissions, @auth, model_instance, @uri_params
+
+        model_instance = call_handler(@base_config.via_get.handler, model_instance, @uri_params)
+
+        response :ok,
+                 headers: {"Content-Type" => @base_config.media_type},
+                 msg: "sent #{model_instance.class}##{model_instance.id}",
+                 body: represent(model_instance, @base_config)
 
       rescue ActiveRecord::RecordNotFound
         response :not_found, msg: "#{@base_config.model_class}##{@id} not found"
 
       rescue BadRequest => error
         response :bad_request, msg: "`#{error.message}' in: #{error.source_location}"
+
+      rescue AllowError => error
+        response :internal_server_error,
+                        msg: "exception raised in allow block: `#{error.orig_error.message}' in #{error.source_location}"
+      rescue HandlerError => error
+        response :internal_server_error,
+                        msg: "exception raised in via_get handler: `#{error.orig_error.message}' in #{error.source_location}"
+      rescue NotAllowed => error
+        response :unauthorized, msg: "not authorized by allow block in: #{error.source_location}"
 
       rescue => error
         response :internal_server_error, msg: "exception from via_get handler: " + error.message
