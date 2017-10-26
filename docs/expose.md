@@ -18,27 +18,38 @@ For each exposed model there should be one or more `expose` stanzas,
 with following arguments:
 
 * `{MODEL}` is the model to be exposed. It must be an ActiveRecord
-  or descendant. <!-- [A.1, A.2] -->
+  or descendant.
 
 * `{MEDIA_TYPE}` is an optional string defining the media type of the
   response. The `Content-Type` HTTP header is set to this value, that
   defaults to `application/json`.
-  <!-- [A.3] -->
 
-* `{PATH}` is a path string which is prepended to the URI of the
-  resource. Leading and trailing `/` are ignored.
-  <!-- [A.4] -->
+* `{PATH}` is a slash delimited path string which is prepended to the URI path of the
+  resource. Leading and trailing slashes are ignored. With path prefixes can separate your api from your other routes, to avoid collisons or you can use it for versioning. 
+
+  For example the canonical URI of a model instance would be:
+
+  `http://example.com/path/segment/of/your/choice/apples/8` 
+
+  if you set 
+
+  `expose(Apple, under: /path/segment/of/your/choice)`
 
 * `{DIRECTIVE} ...` is a list of configuration directives to define
   the API of this model.
   Possible directives under `expose` are:
 
+  * [`readables`](readables)      
+  * [`writables`](writables)     
+  * [`association`](association) 
+  * [`collection`](collection)   
+  * [`single`](single)           
+  * [`via_get`](via_get)         
+  * [`via_patch`](via_patch)
+  * [`via_post`](via_post)
+  * [`via_delete`](via_delete)   
+  * [`via_link`](via_link)   
+  * [`via_unlink`](via_unlink)   
 
-  * [`readables`](readables)      <!-- [A.6] -->
-  * [`writables`](writables)      <!-- [A.5] -->
-  * [`association`](association)  <!-- [A.9] -->
-  * [`collection`](collection)    <!-- [A.7] -->
-  * [`single`](single)            <!-- [A.8] -->
-  * [`via_get`](via_get)          <!-- [A.9] -->
-  * [`via_patch`](via_put)          <!-- [A.10] -->
-  * [`via_delete`](via_delete)    <!-- [A.11] -->
+
+

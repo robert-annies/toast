@@ -12,7 +12,7 @@ The UNLINK-requests URI must be that of an association (a.k.a _context IRI_) and
 
 See also [RFC&nbsp;5988 Web Linking](https://tools.ietf.org/html/rfc5988)
 
-See also this note on [UNLINK and UNUNLINK](link_and_unlink)
+See also this note on [LINK and UNLINK](link_and_unlink)
 
 # Example
 {% highlight ruby %}
