@@ -7,7 +7,7 @@ class Toast::CanonicalRequest
   def initialize id, base_config, auth, request
     @id          = id
     @base_config = base_config
-    @selected_attributes = request.query_parameters.delete(:toast_select).try(:split,',')
+    @selected_attributes = request.query_parameters[:toast_select].try(:split,/ *, */)
     @uri_params  = request.query_parameters
     @base_uri    = base_uri(request)
     @verb        = request.request_method.downcase
