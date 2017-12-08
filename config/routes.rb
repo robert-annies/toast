@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Toast::RackApp.new, at: '/*toast_path'
+  match '*toast_path', to: Toast::RackApp.new,  via: :all
 end

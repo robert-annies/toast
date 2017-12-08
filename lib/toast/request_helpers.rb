@@ -12,8 +12,9 @@ module Toast::RequestHelpers
   # relies on HTTP_X_FORWARDED* headers
   def base_uri request
     port  = ":#{request.port}" unless request.port.in?([80,443])
-    path  = request.path.sub(request.path_parameters[:toast_path]+'/','')
-    (request.protocol + request.host + port.to_s + path).chomp('/')
+    # remove recource path part form full path (namespace remains) 
+    path  = request.path.sub(request.path_parameters[:toast_path],'')
+    (request.protocol + request.host + port.to_s + path).chomp('/')  
   end
 
   def represent_one record, config
