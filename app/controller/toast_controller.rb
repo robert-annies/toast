@@ -10,7 +10,13 @@ class ToastController < ApplicationController
 
       unless request.headers["LINK"].nil?
         # extract "path_info" from link header
-        request.headers["LINK"] =~ /(#{request.protocol + request.host + request.script_name})(.*)/
+        port = if(request.port != 80 and request.port != 443)
+                 ":#{request.port}"
+               else
+                 ""
+               end
+
+        request.headers["LINK"] =~ /(#{request.protocol + request.host + port + request.script_name})(.*)/
       end
 
       toast_response = @resource.apply(request.method, request.body.read, request.content_type, $2)
