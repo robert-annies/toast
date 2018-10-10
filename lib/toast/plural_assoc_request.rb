@@ -195,7 +195,7 @@ class Toast::PluralAssocRequest
           return response :bad_request, msg: "Link header missing or invalid"
         end
 
-        name, target_id = URI(link.href).path.split('/')[1..-1]
+        name, target_id = split_link_header(link)
         target_model_class = name.singularize.classify.constantize
 
         unless is_active_record? target_model_class
@@ -246,7 +246,7 @@ class Toast::PluralAssocRequest
           return response :bad_request, msg: "Link header missing or invalid"
         end
 
-        name, id = URI(link.href).path.split('/')[1..-1]
+        name, id = split_link_header(link)
         target_model_class = name.singularize.classify.constantize
 
         unless is_active_record? target_model_class

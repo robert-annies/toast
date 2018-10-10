@@ -17,6 +17,11 @@ module Toast::RequestHelpers
     (request.protocol + request.host + port.to_s + path).chomp('/')  
   end
 
+  # split the name and id of the resource from a LinkHeader
+  def split_link_header link
+    URI(link.href).path.sub(@request.script_name,'').split('/')[1..-1]
+  end
+
   def represent_one record, config
     result = {}
 
