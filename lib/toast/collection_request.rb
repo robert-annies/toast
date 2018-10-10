@@ -124,7 +124,7 @@ class Toast::CollectionRequest
 
         if new_instance.persisted?
           response :created,
-                   headers: {"Content-Type" => @config.media_type},
+                   headers: {"Content-Type" => @base_config.media_type},
                    msg: "created #{new_instance.class}##{new_instance.id}",
                    body: represent(new_instance, @base_config)
         else

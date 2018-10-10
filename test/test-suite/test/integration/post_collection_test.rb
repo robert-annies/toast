@@ -23,6 +23,7 @@ class PostCollectionTest < ActionDispatch::IntegrationTest
            xhr: true
 
       assert_response :created
+      assert_equal 'application/apple+json', @response.content_type
 
       new_id = Apple.find_by_name('Henry').id
 
