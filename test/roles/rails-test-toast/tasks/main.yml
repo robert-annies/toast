@@ -102,7 +102,17 @@
   become: yes
   become_user: vagrant
 
-- name: run toast test suite for Rails {{ version }}
+- command: bin/rails -v 
+  register: final_version
+  become: yes
+  become_user: vagrant
+  changed_when: false
+  args:
+    chdir: /home/vagrant/{{ app_dir }}
+  tags:
+    - test
+
+- name: run toast test suite for {{ final_version.stdout }}
   command: bin/rake test chdir=/home/vagrant/{{ app_dir }}
   become: yes
   become_user: vagrant

@@ -34,10 +34,8 @@ module ActionDispatch::Integration::RequestHelpers
         process method_name, path, args.first.try(:fetch,:params, nil), args.first.try(:fetch,:headers, nil)
       when /\A5\.0\./
         process_with_kwargs(method_name, path, *args) 
-      when /\A5\.1/
+      else  # >= 5.1
         process method_name, path, *args
-      else
-        raise "Rails version #{Rails.version} is not supported."        
       end
     end
   end
