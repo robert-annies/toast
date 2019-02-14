@@ -113,7 +113,8 @@ class Toast::SingularAssocRequest
 
           @config.via_link.handler.call(source, target_model_class.find(target_id), @uri_params)
           response :ok,
-                   msg: "linked #{source.class}##{source.id} with #{target_model_class.name}##{@id}"
+                   msg: "linked #{source.class}##{source.id} with #{target_model_class.name}##{@id}",
+                   body: Toast.settings.link_unlink_via_post ? '' : nil
 
         rescue NotAllowed => error
           return response :unauthorized, msg: "not authorized by allow block in: #{error.source_location}"
@@ -182,7 +183,8 @@ class Toast::SingularAssocRequest
         call_handler(@config.via_unlink.handler, source, target, @uri_params)
 
         response :ok,
-                 msg: "unlinked #{source.class}##{source.id} from #{target_model_class.name}##{target_id}"
+                 msg: "unlinked #{source.class}##{source.id} from #{target_model_class.name}##{target_id}",
+                 body: Toast.settings.link_unlink_via_post ? '' : nil
 
       rescue NotAllowed => error
         return response :unauthorized,

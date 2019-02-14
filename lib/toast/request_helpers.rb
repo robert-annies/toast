@@ -12,9 +12,9 @@ module Toast::RequestHelpers
   # relies on HTTP_X_FORWARDED* headers
   def base_uri request
     port  = ":#{request.port}" unless request.port.in?([80,443])
-    # remove recource path part form full path (namespace remains) 
+    # remove recource path part form full path (namespace remains)
     path  = request.path.sub(request.path_parameters[:toast_path],'')
-    (request.protocol + request.host + port.to_s + path).chomp('/')  
+    (request.protocol + request.host + port.to_s + path).chomp('/')
   end
 
   # split the name and id of the resource from a LinkHeader
@@ -90,7 +90,7 @@ module Toast::RequestHelpers
 
     unless Rails.env == 'production'
       # put message in body, too, if body is free
-      body ||= msg
+      body = msg if body.blank?
     end
 
     [ Rack::Utils::SYMBOL_TO_STATUS_CODE[status_sym],
