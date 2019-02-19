@@ -1,7 +1,7 @@
 ---
 - hosts: all
-  become: yes
-  become_user: root
+  # become: yes
+  # become_user: root
 
   roles:
     - role: shell-basics
@@ -9,19 +9,19 @@
     - role: rails-prerequisities
 
     - role: rails-test-toast
-      version: 4.2.0
+      version: 4.2.10
 
     - role: rails-test-toast
-      version: 5.0.0
+      version: 5.0.7
 
     - role: rails-test-toast
-      version: 5.1.0
+      version: 5.1.6
 
     - role: rails-test-toast
-      version: 5.2.0
+      version: 5.2.1
 
   tasks:
     # when tests fail this task is not reached
     - debug: msg="All tests passed successfully."
       tags:
-        - test
+        - run-test

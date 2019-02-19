@@ -1,120 +1,48 @@
 ---
-# Using Bundler to install and pick the right rails version for calling "rails new"
-# (a temporary Gemfile is put into home and removed after)
+- tags: [test-app]
+  vars:
+    app_dir: /home/vagrant/rails_{{ version }}-test
 
-- set_fact:
-    rails_5: "{{ version.split('.')[0] == '5' }}"
-    app_dir: rails_{{ '.'.join(version.split('.')[0:2]) }}-test
-  tags: 
-    - test
+  block:
+  - name: (rails v{{version}}) rails app dir exists
+    file:
+      state: directory
+      path: "{{ app_dir }}"
 
-- name: Setup Gemfile for Rails install
-  blockinfile:
-    dest: ~/Gemfile
-    create: yes
-    block: |
-      source 'https://rubygems.org'
-      gem 'rails', '~> {{ version }}'
-  become: yes
-  become_user: vagrant
+  - name: (rails v{{version}}) Gemfile present
+    copy:
+      src: "Gemfile-{{ version }}"
+      dest: "{{ app_dir }}/Gemfile"
 
-- name: bundle Rails
-  bundler:
-    user_install: no
-    state: present
-    chdir: ~
-    executable: /usr/local/bin/bundle
+  - name: (rails v{{version}}) Gemfile.lock present
+    copy:
+      src: "Gemfile.lock-{{ version }}"
+      dest: "{{ app_dir }}/Gemfile.lock"
 
-- name: init rails app (v5)
-  command: bundle exec rails new {{ app_dir }} --api --skip-spring
-  args:
-    chdir: /home/vagrant
-    creates: /home/vagrant/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-  when: rails_5
+  - name: (rails v{{version}}) bundled
+    command: bundle install --path vendor/bundle
+    args:
+      chdir: "{{ app_dir }}"
 
-- name: init rails app (v4)
-  command: bundle exec rails new {{ app_dir }} --skip-javascript --skip-spring
-  args:
-    chdir: /home/vagrant
-    creates: /home/vagrant/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-  when: not rails_5
+  - name: (rails v{{version}}) Rails setup
+    command: bundle exec rails new . --skip-gemfile --api --skip-spring
+    args:
+      chdir: "{{ app_dir }}"
+      creates: "{{ app_dir }}/config.ru"
 
-- name: remove uglifier
-  lineinfile: 
-    path: /home/vagrant/{{ app_dir }}/Gemfile
-    regexp: gem 'uglifier'
-    state: absent
-  become: yes
-  become_user: vagrant  
-  when: not rails_5
+  - name: (rails v{{version}}) link test suite
+    shell: cp -rsf /vagrant/test/test-suite/* .
+    args:
+      chdir: "{{ app_dir }}"
 
-- name: bundle again
-  command: bundle
-  args:
-    chdir: /home/vagrant/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-  when: not rails_5
+  - name: (rails v{{version}}) setup database tables
+    command: bundle exec rake db:setup
+    args:
+      chdir: "{{ app_dir }}"
 
-- name: remove temporary Gemfile
-  file:
-    state: absent
-    path: "{{ item }}"
-  with_items:
-    - Gemfile
-    - Gemfile.lock
-
-- name: link test suite
-  shell: cp -rsf /vagrant/test/test-suite/* .
-  args:
-    chdir: /home/vagrant/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-
-- name: add development deps to Gemfile
-  blockinfile:
-    dest: /home/vagrant/{{ app_dir }}/Gemfile
-    block: |
-      group :development, :test do
-        gem 'shoulda'
-        gem 'pry'
-        gem 'pry-byebug'
-        gem 'pry-rails'
-        gem 'minitest-reporters'
-      end
-      gem 'toast', path: '/vagrant'
-  become: yes
-  become_user: vagrant
-
-- name: bundle test app
-  bundler:
-    state: present
-    chdir: ~/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-
-- name: setup database tables
-  command: bin/rake db:setup chdir=/home/vagrant/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-
-- command: bin/rails -v 
-  register: final_version
-  become: yes
-  become_user: vagrant
-  changed_when: false
-  args:
-    chdir: /home/vagrant/{{ app_dir }}
-  tags:
-    - test
-
-- name: run toast test suite for {{ final_version.stdout }}
-  command: bin/rake test chdir=/home/vagrant/{{ app_dir }}
-  become: yes
-  become_user: vagrant
-  tags:
-    - test
+  - name: (rails v{{version}}) run toast test suite
+    command: bundle exec rake test
+    args:
+      chdir: "{{ app_dir }}"
+    tags:
+      - run-test
