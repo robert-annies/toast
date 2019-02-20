@@ -60,10 +60,10 @@ class Toast::ConfigDSL::Association
 
   def max_window size
     stack_push 'max_window' do
-      if size.is_a?(Fixnum) and size > 0
+      if size.is_a?(Integer) and size > 0
         @config_data.max_window = size
       elsif size == :unlimited
-        @config_data.max_window = 10**6 # yes that's inifinity 
+        @config_data.max_window = 10**6 # yes that's inifinity
       else
         raise_config_error 'max_window must a positive integer or :unlimited'
       end
