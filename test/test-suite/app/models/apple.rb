@@ -19,7 +19,7 @@ class Apple < ApplicationRecord
     end
   end
 
-  before_save(on: :update) do
+  before_update do
     if number == 444
       errors.add(:base, 'before_save callback threw :abort')
       if Rails::VERSION::MAJOR < 5
