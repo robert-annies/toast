@@ -8,16 +8,16 @@ Toast is a Rack application that hooks into Ruby on Rails. It exposes ActiveReco
   * what models and attributes are to be exposed
   * what methods are supported  (GET, PATCH, DELETE, POST,...)
   * hooks to handle authorization
-  * customized handlers 
+  * customized handlers
 
-When using Toast there's no Rails controller involved. Model classes and the API configuration is sufficient. 
+When using Toast there's no Rails controller involved. Model classes and the API configuration is sufficient.
 
-Toast uses a REST/hypermedia style API, which is an own interpretation of the REST idea, not compatible with others like JSON API, Siren etc. It's design is much simpler and based on the idea of traversing opaque URIs. 
+Toast uses a REST/hypermedia style API, which is an own interpretation of the REST idea, not compatible with others like JSON API, Siren etc. It's design is much simpler and based on the idea of traversing opaque URIs.
 
 Other features are:
 
   * windowing of collections via _Range/Content-Range_ headers (paging)
-  * attribute selection per request 
+  * attribute selection per request
   * processing of URI parameters
 
 See the [User Manual](https://robokopp.github.io/toast) for a detailed description.
@@ -27,7 +27,7 @@ Releases
 
 ## Toast version ≥ 1.0.2
 
-Works with Rails 5 and 4.2.9+. This version will be tested with upcoming new Rails releases and receives bugfixes and new features. 
+Works with Rails from version 4.2.9+ up to 6. This version will be tested with upcoming new Rails releases and receives bugfixes and new features.
 
 ## Toast version 0.9.*
 
@@ -89,13 +89,13 @@ Then we can define the API like this (in `config/toast-api/banana.rb`):
          via_patch {
             allow do |user, model, uri_params|
               true
-            end          
+            end
          }
 
          via_delete {
             allow do |user, model, uri_params|
               true
-            end          
+            end
          }
 
          collection(:less_than_100) {
@@ -141,13 +141,13 @@ Then we can define the API like this (in `config/toast-api/banana.rb`):
              allow do |user, model, uri_params|
                true
              end
-           }          
+           }
 
            via_link {
              allow do |user, model, uri_params|
                true
              end
-           }          
+           }
          }
 
          association(:apple) {
@@ -155,7 +155,7 @@ Then we can define the API like this (in `config/toast-api/banana.rb`):
              allow do |user, model, uri_params|
                true
              end
-           }          
+           }
          }
       }
 
@@ -172,7 +172,7 @@ The above definition exposes the model Banana as such:
                 "coconuts": "http://www.example.com/bananas/23/coconuts",
                 "apple":    "http://www.example.com/bananas/23/apple" }'
 
-The representation of a record is a flat JSON map: _name_ → _value_, in case of associations _name_ → _URI_. The special key _self_ contains the URI from which this record can be fetch alone. _self_ can be treated as a  unique ID of the record (globally unique, if under a FQDN). 
+The representation of a record is a flat JSON map: _name_ → _value_, in case of associations _name_ → _URI_. The special key _self_ contains the URI from which this record can be fetch alone. _self_ can be treated as a  unique ID of the record (globally unique, if under a FQDN).
 
 ### Get a collection (the :all collection)
     GET http://www.example.com/bananas
@@ -197,7 +197,7 @@ Any _scope_ or class method returning a relation can be published this way.
     GET http://www.example.com/bananas/23/coconuts?max_weight=3
     --> 200, '[{COCONUT},{COCONUT},...]',
 
- The COCONUT model must be exposed too. URI parameters can be processed in custom handlers for sorting and filtering. 
+ The COCONUT model must be exposed too. URI parameters can be processed in custom handlers for sorting and filtering.
 
 ### Update a single resource:
     PATCH http://www.example.com/bananas/23, '{"name": "Barney", "number": 44, "foo" => "bar"}'
@@ -208,7 +208,7 @@ Any _scope_ or class method returning a relation can be published this way.
                 "coconuts": "http://www.example.com/bananas/23/coconuts",
                 "apple":    "http://www.example.com/bananas/23/apple"}'
 
-Toast ingores unknown attributes, but prints warnings in it's log file. Only attributes from the 'writables' list will be updated. 
+Toast ingores unknown attributes, but prints warnings in it's log file. Only attributes from the 'writables' list will be updated.
 
 ### Create a new record
     POST http://www.example.com/bananas, '{"name": "Johnny", "number": 888}'
@@ -223,18 +223,18 @@ Toast ingores unknown attributes, but prints warnings in it's log file. Only att
     POST http://www.example.com/bananas/23/coconuts, '{COCONUT}'
     --> 201,  {"self":"http://www.example.com/coconuts/432, ...}
 
-  
+
 ### Delete records
     DELETE http://www.example.com/bananas/23
     --> 200
 
 ### Linking records
 
-    LINK "http://www.example.com/bananas/23/coconuts", 
+    LINK "http://www.example.com/bananas/23/coconuts",
       Link:  "http://www.example.com/coconuts/31"
     --> 200
 
-Toast uses the (unusual) HTTP verbs LINK and UNLINK in order to express the action of linking or unlinking existing resources. The above request will add _Coconut#31_ to the association _Banana#coconuts_. 
+Toast uses the (unusual) HTTP verbs LINK and UNLINK in order to express the action of linking or unlinking existing resources. The above request will add _Coconut#31_ to the association _Banana#coconuts_.
 
 
 
