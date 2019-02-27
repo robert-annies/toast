@@ -127,7 +127,7 @@ module Toast::RequestHelpers
     rescue Toast::Errors::BadRequest
       raise # re-raise
     rescue => error
-      raise Toast::Errors::HandlerError.new(error, error.backtrace.first.sub(/:in.*/,''))
+      raise Toast::Errors::HandlerError.new(error, error.backtrace.first.try(:sub,/:in.*/,''))
     end
     result
   end
