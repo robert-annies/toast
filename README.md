@@ -20,7 +20,7 @@ Other features are:
   * attribute selection per request
   * processing of URI parameters
 
-See the [User Manual](https://robokopp.github.io/toast) for a detailed description.
+See the [User Manual](https://robert-annies.github.io/toast) for a detailed description.
 
 Releases
 ========
