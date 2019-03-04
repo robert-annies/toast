@@ -6,7 +6,7 @@ require 'toast/plural_assoc_request'
 require 'toast/errors'
 
 class Toast::RackApp
-  # NOTE: the RackApp object is shared in threads of concurrent requests 
+  # NOTE: the RackApp object is shared in threads of concurrent requests
   #       (e.g. when using Puma server, but not in Passenger (single-threded, multi-process)).
   #       Anyays, don't use any instance vars (@ variables in #call).
   #       It causes chaos
@@ -16,17 +16,18 @@ class Toast::RackApp
   def call(env)
 
     request = ActionDispatch::Request.new(env)
-    
+    Toast.request = request
+
     Toast.logger.info "[#{Thread.current.object_id}] processing: <#{URI.decode(request.fullpath)}>"
 
-    # Authentication: respond with 401 on exception or falsy return value: 
+    # Authentication: respond with 401 on exception or falsy return value:
     begin
       unless (auth = Toast::ConfigDSL::Settings::AuthenticateContext.new.
                       instance_exec(request, &Toast.settings.authenticate))
          return response :unauthorized, msg: "authentication failed"
       end
-    rescue Toast::Errors::CustomAuthFailure => caf   
-      return response(caf.response_data[:status] || :unauthorized, 
+    rescue Toast::Errors::CustomAuthFailure => caf
+      return response(caf.response_data[:status] || :unauthorized,
                msg: caf.response_data[:body],
                headers: caf.response_data[:headers])
     rescue => error
@@ -34,7 +35,7 @@ class Toast::RackApp
     end
 
     path       = request.path_parameters[:toast_path].split('/')
-    
+
     # look up requested model
     model_class = resolve_model(path, Toast.path_tree)
 
@@ -120,15 +121,15 @@ class Toast::RackApp
   end
 
   private
-    # gets the model class from the 
+    # gets the model class from the
     # it's similar to Hash#dig but stops at a non string
     def resolve_model path, path_tree
-      if path_tree[ path.first ].is_a?(Hash) 
+      if path_tree[ path.first ].is_a?(Hash)
         # dig deeper
         resolve_model(path[1..-1], path_tree[ path.first ])
       else
         path_tree[ path.first ]
       end
-    end  
+    end
 end
 

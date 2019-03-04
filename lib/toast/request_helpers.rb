@@ -8,13 +8,8 @@ module Toast::RequestHelpers
     end || raise(Toast::Errors::ConfigNotFound)
   end
 
-  # this is hard when behind a proxy
-  # relies on HTTP_X_FORWARDED* headers
   def base_uri request
-    port  = ":#{request.port}" unless request.port.in?([80,443])
-    # remove recource path part form full path (namespace remains)
-    path  = request.path.sub(request.path_parameters[:toast_path],'')
-    (request.protocol + request.host + port.to_s + path).chomp('/')
+    Toast.base_uri
   end
 
   # split the name and id of the resource from a LinkHeader
@@ -25,11 +20,20 @@ module Toast::RequestHelpers
   def represent_one record, config
     result = {}
 
+    model_uri = [@base_uri, config.prefix_path, record.class.name.underscore.pluralize].delete_if(&:blank?).join('/')
+
+    # can we inject model_uri  into the recortd, so that virtual attribute methods can use it in their result?
+
+    # - setting a special property on the record :-/, OK Toast could extend all exposed classes by a special accessor,
+    #   maybe only if configured.
+    # - calling somehow this method in different/extended context (how?)
+    # - passing this as parameter, while not requiring all the attribute methods to accept a 2. arg (possible?)
+    # - If the result is a String it can return a templated String like "{{ toast_uri }}", OK for single
+    #   strings, but for mebedded Hashes with Strings no, too expensive.
+
     (config.readables + config.writables).each do |attr|
       result[attr.to_s] = record.send(attr) if attr_selected?(attr)
     end
-
-    model_uri = [@base_uri, config.prefix_path, record.class.name.underscore.pluralize].delete_if(&:blank?).join('/')
 
     result['self'] = "#{model_uri}/#{record.id}" if attr_selected?('self')
 

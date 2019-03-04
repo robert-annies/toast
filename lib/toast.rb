@@ -15,7 +15,7 @@ module Toast
   # path tree to resolve the requested model
   @@path_tree = {}
 
-  cattr_accessor :expositions, :settings, :path_tree
+  cattr_accessor :expositions, :settings, :path_tree, :request
 
   class ConfigError < StandardError
   end
@@ -59,7 +59,7 @@ module Toast
 
   def self.info str
     if Rails.const_defined?('Server') # only on console server
-      puts Toast::Sym+'  Toast: '+str 
+      puts Toast::Sym+'  Toast: '+str
     end
   end
 
@@ -82,7 +82,7 @@ module Toast
   # base_uri must be passed to be prepended in URIs
   def self.represent instance, base_uri = ''
 
-    # using RequestHelper#represent_one method with a mocked up object
+    # using RequestHelper#represent_one method with a mocked up object :-/
     obj = Object.new
     class << obj
       include Toast::RequestHelpers
@@ -90,5 +90,14 @@ module Toast
     end
     obj.base_uri = base_uri
     obj.represent_one(instance, obj.get_config(instance.class) )
+  end
+
+  def self.base_uri
+    raise Toast::NotInRequestContext unless request
+
+    port  = ":#{request.port}" unless request.port.in?([80,443])
+    # remove recource path part form full path (namespace remains)
+    path  = request.path.sub(request.path_parameters[:toast_path],'')
+    (request.protocol + request.host + port.to_s + path).chomp('/')
   end
 end

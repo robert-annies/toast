@@ -38,4 +38,7 @@ module Toast::Errors
       @response_data = response_data
     end
   end
+
+  class Toast::NotInRequestContext < StandardError; end
+
 end

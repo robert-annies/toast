@@ -20,11 +20,14 @@ class Toast::ConfigDSL::Base
         raise_config_error 'Block expected.'
       end
 
+
+
+
       # register base path with 'under' prefix
-      to_path_tree = lambda do |path|        
+      to_path_tree = lambda do |path|
         if path.empty?
           { model_class.to_s.underscore.pluralize => model_class }
-        else 
+        else
           { path.first => to_path_tree.call(path[1..-1]) }
         end
       end
@@ -32,6 +35,15 @@ class Toast::ConfigDSL::Base
       path = under.split('/').delete_if(&:blank?)
       Toast.path_tree.deep_merge!(to_path_tree.call(path)) do |key,v1,v2|
         raise_config_error "multiple definitions of endpoint URI segment `.../#{key}/...'"
+      end
+
+      # externd model_class with toast_uri accessor
+      model_class.send(:define_method, :toast_full_uri) do
+        Toast.base_uri + '/' + self.toast_local_uri
+      end
+
+      model_class.send(:define_method, :toast_local_uri) do
+        [path, self.class.name.underscore.pluralize, self.id].delete_if(&:blank?).join('/')
       end
 
       # base config object
@@ -43,7 +55,7 @@ class Toast::ConfigDSL::Base
         self.model_class     = model_class
         self.media_type      = as
         self.prefix_path     = path
- 
+
         # defaults
         self.readables    = []
         self.writables    = []
