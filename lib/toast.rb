@@ -80,7 +80,7 @@ module Toast
 
   # get the  representation (as Hash) by instance (w/o request)
   # base_uri must be passed to be prepended in URIs
-  def self.represent instance, base_uri = ''
+  def self.represent instance, base_uri = nil
 
     # using RequestHelper#represent_one method with a mocked up object :-/
     obj = Object.new
@@ -88,7 +88,7 @@ module Toast
       include Toast::RequestHelpers
       attr_accessor :base_uri
     end
-    obj.base_uri = base_uri
+    obj.base_uri = base_uri || Toast.base_uri
     obj.represent_one(instance, obj.get_config(instance.class) )
   end
 
