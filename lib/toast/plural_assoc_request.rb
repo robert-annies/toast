@@ -60,11 +60,13 @@ class Toast::PluralAssocRequest
 
         call_allow(@config.via_get.permissions, @auth, source, @uri_params) # may raise NotAllowed, AllowError
 
-
         # count = relation.count doesn't always work
         # fix problematic select extensions for counting (-> { select(...) })
         # this fails if the where clause depends on the the extended select
-        count = relation.count_by_sql relation.to_sql.sub(/SELECT.+FROM/,'SELECT COUNT(*) FROM')
+        # also remove any ORDER clauses
+
+        # How can we do this with the ActiveRecord API in a cleaner way?
+        count = relation.count_by_sql relation.to_sql.sub(/SELECT.+FROM/,'SELECT COUNT(*) FROM').sub(/ORDER BY.*/,'')
         headers = {"Content-Type" => @config.media_type}
 
         if count > 0
