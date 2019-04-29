@@ -36,10 +36,8 @@ class ConfigTest < ActiveSupport::TestCase
         Toast.init 'test/files/cherry.rb'
       end
 
-      assert_equal "CONFIG ERROR: uninitialized constant Cherry\n"+
-                   "              directive: /\n"+
-                   "              in file  : test/files/cherry.rb", # line number is unknown here
-                   error.message
+      assert_match(/CONFIG ERROR: uninitialized constant.*?Cherry.*?in file\s+: test\/files\/cherry.rb/m,
+                   error.message)
     end
 
     should 'register media types [A.3]' do
@@ -173,7 +171,7 @@ class ConfigTest < ActiveSupport::TestCase
     should 'raise error on conflicting prefix paths' do
       error = assert_raises Toast::ConfigError do
           Toast.init 'test/files/under_path_conflict.rb'
-      end 
+      end
 
       assert_equal "CONFIG ERROR: multiple definitions of endpoint URI segment `.../eggplants/...'\n"+
                    "              directive: /expose(Apple)\n"+

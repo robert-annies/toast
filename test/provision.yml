@@ -24,7 +24,7 @@
       version: 5.2.2
 
     - role: rails-test-toast
-      version: 6.0.0beta1
+      version: 6.0.0.rc1
 
   tasks:
     # when tests fail this task is not reached
