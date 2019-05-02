@@ -50,7 +50,7 @@ class Toast::SingularAssocRequest
           response :ok,
                    headers: {"Content-Type" => @config.media_type},
                    body: represent(model_instance, target_config),
-                   msg: "sent ##{@config.model_class}##{@id}"
+                   msg: "sent #{target_config.model_class}##{model_instance.id}"
         end
 
       rescue NotAllowed => error
