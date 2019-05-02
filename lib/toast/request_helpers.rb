@@ -90,7 +90,7 @@ module Toast::RequestHelpers
   #
   # Return: Rack conform response
   def response status_sym, headers: {}, msg: nil, body: nil
-    Toast.logger.info "[#{Thread.current.object_id}] done: #{msg}"
+    Toast.logger.info "done: #{msg}"
 
     unless Rails.env == 'production'
       # put message in body, too, if body is free
