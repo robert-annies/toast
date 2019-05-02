@@ -18,7 +18,7 @@ class Toast::RackApp
     request = ActionDispatch::Request.new(env)
     Toast.request = request
 
-    Toast.logger.info "[#{Thread.current.object_id}] processing: <#{URI.decode(request.fullpath)}>"
+    Toast.logger.info "[#{Thread.current.object_id}] processing: <#{request.method} #{URI.decode(request.fullpath)}>"
 
     # Authentication: respond with 401 on exception or falsy return value:
     begin
