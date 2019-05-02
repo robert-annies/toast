@@ -87,7 +87,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
           xhr: true
 
       assert_response :ok
-      
+
       assert_same_elements( [{
                                "name"              =>'Malesuada'
                              },{
@@ -111,7 +111,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
                                'apple' => "http://www.example.com/bananas/#{bananas2.third.id}/apple"
                              }],
                             JSON.parse(@response.body) )
-    
+
 
       #
       # failure tests
@@ -247,6 +247,10 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       Toast.init 'test/files/toast_config_default_handlers/*',
                  'test/files/settings-token-auth.rb'
 
+      toast_log = File.open('log/toast.log')
+      toast_log.seek(0, IO::SEEK_END)
+
+
       apple = Apple.create
       apple.bananas.create!( (1..25).to_a.map{|n| {number: n}} )
 
@@ -273,6 +277,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 7, prb.length
       assert_equal (1..7).to_a, prb.map{|x| x['number']}
       assert_equal "items=0-6/25", @response.header['Content-Range']
+      assert_match /done: sent 7 records of Coconut/, toast_log.readlines.last
 
       # request a range
       get "/bananas/#{banana.id}/coconuts",
@@ -283,7 +288,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 5, JSON.parse(@response.body).length
       assert_equal "items=5-9/25", @response.header['Content-Range']
       assert_equal [6,7,8,9,10], JSON.parse(@response.body).map{|x| x['number']}
-
+      assert_match /done: sent 5 records of Coconut/, toast_log.readlines.last
 
       # request a range large than max_window=7
       get "/bananas/#{banana.id}/coconuts",
@@ -294,6 +299,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 7, JSON.parse(@response.body).length
       assert_equal "items=3-9/25", @response.header['Content-Range']
       assert_equal (4..10).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 7 records of Coconut/, toast_log.readlines.last
 
       # request a range omitting start
       get "/bananas/#{banana.id}/coconuts",
@@ -304,6 +310,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 4, JSON.parse(@response.body).length
       assert_equal "items=0-3/25", @response.header['Content-Range']
       assert_equal (1..4).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 4 records of Coconut/, toast_log.readlines.last
 
       # request a range omitting end
       get "/bananas/#{banana.id}/coconuts",
@@ -314,6 +321,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 4, JSON.parse(@response.body).length
       assert_equal "items=21-24/25", @response.header['Content-Range']
       assert_equal (22..25).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 4 records of Coconut/, toast_log.readlines.last
 
       # request a range omitting start and end
       get "/bananas/#{banana.id}/coconuts",
@@ -324,6 +332,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 7, JSON.parse(@response.body).length
       assert_equal "items=0-6/25", @response.header['Content-Range']
       assert_equal (1..7).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 7 records of Coconut/, toast_log.readlines.last
 
       # request an 'inverse' range (will ignore the range end)
       get "/bananas/#{banana.id}/coconuts",
@@ -334,6 +343,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
       assert_equal 4, JSON.parse(@response.body).length
       assert_equal "items=21-24/25", @response.header['Content-Range']
       assert_equal (22..25).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 4 records of Coconut/, toast_log.readlines.last
 
       # empty list has no content-range
       Banana.delete_all

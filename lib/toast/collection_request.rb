@@ -51,6 +51,8 @@ class Toast::CollectionRequest
         if relation.is_a?(ActiveRecord::Relation) and
           relation.model == @config.base_model_class
 
+          result = relation.limit(window).offset(range_start)
+
           # count = relation.count doesn't always work
           # fix problematic select extensions for counting (-> { select(...) })
           # this fails if the where clause depends on the the extended select
@@ -58,19 +60,13 @@ class Toast::CollectionRequest
           headers = {"Content-Type" => @config.media_type}
 
           if count > 0
-            range_end = if (range_start + window - 1) > (count - 1) # behind last
-                        count - 1
-                      else
-                        (range_start + window - 1)
-                      end
-
-            headers[ "Content-Range"] = "items=#{range_start}-#{range_end}/#{count}"
+            headers["Content-Range"] = "items=#{range_start}-#{range_start + result.length - 1}/#{count}"
           end
 
           response :ok,
                    headers: headers,
-                   body: represent(relation.limit(window).offset(range_start), @base_config),
-                   msg: "sent #{count} of #{@config.mode_class}"
+                   body: represent(result, @base_config),
+                   msg: "sent #{result.length} records of #{@base_config.model_class}"
 
         else
           # wrong class/model_class

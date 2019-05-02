@@ -60,6 +60,8 @@ class Toast::PluralAssocRequest
 
         call_allow(@config.via_get.permissions, @auth, source, @uri_params) # may raise NotAllowed, AllowError
 
+        result = relation.limit(window).offset(range_start)
+
         # count = relation.count doesn't always work
         # fix problematic select extensions for counting (-> { select(...) })
         # this fails if the where clause depends on the the extended select
@@ -70,19 +72,13 @@ class Toast::PluralAssocRequest
         headers = {"Content-Type" => @config.media_type}
 
         if count > 0
-          range_end = if (range_start + window - 1) > (count - 1) # behind last
-                      count - 1
-                    else
-                      (range_start + window - 1)
-                    end
-
-          headers[ "Content-Range"] = "items=#{range_start}-#{range_end}/#{count}"
+          headers["Content-Range"] = "items=#{range_start}-#{range_start + result.length - 1}/#{count}"
         end
 
         response :ok,
                  headers: headers,
-                 body: represent(relation.limit(window).offset(range_start), target_config),
-                 msg: "sent #{count} of #{target_config.model_class}"
+                 body: represent(result, target_config),
+                 msg: "sent #{result.length} records of #{target_config.model_class}"
 
 
       rescue  ActiveRecord::RecordNotFound

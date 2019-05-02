@@ -235,6 +235,9 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       Toast.init 'test/files/toast_config_default_handlers/*',
                  'test/files/settings-token-auth.rb'
 
+      toast_log = File.open('log/toast.log')
+      toast_log.seek(0, IO::SEEK_END)
+
       apples = Apple.create!( (1..25).to_a.map{|n| {number: n}} )
 
 
@@ -246,6 +249,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_response :ok
       assert_equal 10, JSON.parse(@response.body).length
       assert_equal "items=0-9/25", @response.header['Content-Range']
+      assert_match /done: sent 10 records of Apple/, toast_log.readlines.last
 
       bananas = Banana.create!( (1..25).to_a.map{|n| {number: n}} )
 
@@ -259,6 +263,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 7, prb.length
       assert_equal (12..18).to_a, prb.map{|x| x['number']}
       assert_equal "items=0-6/14", @response.header['Content-Range']
+      assert_match /done: sent 7 records of Banana/, toast_log.readlines.last
 
       # request a range
       get "/apples/all",
@@ -269,6 +274,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 5, JSON.parse(@response.body).length
       assert_equal "items=5-9/25", @response.header['Content-Range']
       assert_equal [6,7,8,9,10], JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 5 records of Apple/, toast_log.readlines.last
 
       # request a range large than max_window=10
       get "/apples/all",
@@ -279,6 +285,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 10, JSON.parse(@response.body).length
       assert_equal "items=3-12/25", @response.header['Content-Range']
       assert_equal (4..13).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 10 records of Apple/, toast_log.readlines.last
 
       # request a range omitting start
       get "/apples/all",
@@ -289,6 +296,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 4, JSON.parse(@response.body).length
       assert_equal "items=0-3/25", @response.header['Content-Range']
       assert_equal (1..4).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 4 records of Apple/, toast_log.readlines.last
 
       # request a range omitting end
       get "/apples/all",
@@ -299,8 +307,9 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 4, JSON.parse(@response.body).length
       assert_equal "items=21-24/25", @response.header['Content-Range']
       assert_equal (22..25).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 4 records of Apple/, toast_log.readlines.last
 
-      # request a range omitting start and end
+      # request a range omitting start and end (max_window 10)
       get "/apples/all",
           headers:  mkhd(token: 'TOK_admin', range: "-"),
           xhr: true
@@ -309,6 +318,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 10, JSON.parse(@response.body).length
       assert_equal "items=0-9/25", @response.header['Content-Range']
       assert_equal (1..10).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 10 records of Apple/, toast_log.readlines.last
 
       # request an 'inverse' range (will ignore the range end)
       get "/apples/all",
@@ -319,6 +329,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_equal 4, JSON.parse(@response.body).length
       assert_equal "items=21-24/25", @response.header['Content-Range']
       assert_equal (22..25).to_a, JSON.parse(@response.body).map{|x| x['number']}
+      assert_match /done: sent 4 records of Apple/, toast_log.readlines.last
 
       # empty result
       get "/bananas/query?gt=999999",
@@ -328,6 +339,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
       assert_response :ok
       assert_equal 0, JSON.parse(@response.body).length
       assert_nil   @response.header['Content-Range']
+      assert_match /done: sent 0 records of Banana/, toast_log.readlines.last
     end
   end
 end
