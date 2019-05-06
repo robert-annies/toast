@@ -220,7 +220,7 @@ class GetCollectionTest < ActionDispatch::IntegrationTest
           headers: mkhd(token: 'TOK_user'),
           xhr: true
       assert_response :unauthorized
-      assert_equal "not authorized by allow block in: test/files/parameterized_requests/apple.rb:134",
+      assert_equal "not authorized by allow block in: test/files/parameterized_requests/apple.rb:141",
                    @response.body
 
     end

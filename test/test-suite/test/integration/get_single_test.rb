@@ -166,7 +166,7 @@ class GetSingleTest < ActionDispatch::IntegrationTest
           headers: mkhd(token: 'TOK_user'),
           xhr: true
       assert_response :unauthorized
-      assert_equal "not authorized by allow block in: test/files/parameterized_requests/apple.rb:56",
+      assert_equal "not authorized by allow block in: test/files/parameterized_requests/apple.rb:63",
                    @response.body
 
       # GET unconfigured (no via_get in single block)

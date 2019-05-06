@@ -24,9 +24,11 @@ module Toast::Errors
 
   class BadRequest < StandardError
     attr_accessor :source_location
+    attr_accessor :code
 
-    def initialize message, source_location
+    def initialize message, source_location, code = nil
       @source_location = source_location
+      @code = code
       super message
     end
   end

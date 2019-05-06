@@ -7,7 +7,14 @@ expose(Apple, as: 'application/apple+json') {
     end
 
     handler do |model_instance, uri_params|
-      model_instance.send(uri_params[:filter]+'=', '[FILTERED]')
+      if uri_params[:filter]
+        model_instance.send(uri_params[:filter]+'=', '[FILTERED]')
+      end
+
+      if uri_params[:coded_error]
+        bad_request "The is the end, my only friend", code: "APOCALYPSE_NOW"
+      end
+
       model_instance
     end
   }

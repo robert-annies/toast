@@ -208,7 +208,7 @@ class PostCollectionTest < ActionDispatch::IntegrationTest
            xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in via_post handler: `Boom!' in test/files/parameterized_requests/apple.rb:151", @response.body
+      assert_equal "exception raised in via_post handler: `Boom!' in test/files/parameterized_requests/apple.rb:158", @response.body
 
     end
   end

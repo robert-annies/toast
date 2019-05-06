@@ -158,7 +158,7 @@ class UnlinkPluralAssociationTest < ActionDispatch::IntegrationTest
              xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:116",
+      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:123",
                    @response.body
 
       # exception in handler
@@ -168,7 +168,7 @@ class UnlinkPluralAssociationTest < ActionDispatch::IntegrationTest
              xhr: true
 
        assert_response :internal_server_error
-       assert_equal "exception raised in via_unlink handler: `Boom!' in test/files/parameterized_requests/apple.rb:122",
+       assert_equal "exception raised in via_unlink handler: `Boom!' in test/files/parameterized_requests/apple.rb:129",
                     @response.body
     end
   end

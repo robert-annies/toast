@@ -122,8 +122,8 @@ module Toast::RequestHelpers
 
     begin
       context = Object.new
-      context.define_singleton_method(:bad_request) do |message|
-        raise Toast::Errors::BadRequest.new message, caller.first.sub(/:in.*/,'')
+      context.define_singleton_method(:bad_request) do |message, options = {}|
+        raise Toast::Errors::BadRequest.new message, caller.first.sub(/:in.*/,''), options[:code]
       end
 
       result = context.instance_exec *args, &proc

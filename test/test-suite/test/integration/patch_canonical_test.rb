@@ -197,7 +197,7 @@ class PatchCanonicalTest < ActionDispatch::IntegrationTest
             xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:16",
+      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:23",
                    @response.body
 
       # handler raises exception
@@ -207,7 +207,7 @@ class PatchCanonicalTest < ActionDispatch::IntegrationTest
             xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in via_patch handler: `Boom!' in test/files/parameterized_requests/apple.rb:22",
+      assert_equal "exception raised in via_patch handler: `Boom!' in test/files/parameterized_requests/apple.rb:29",
                    @response.body
 
       # handler raises a 'bad_request'
@@ -217,7 +217,7 @@ class PatchCanonicalTest < ActionDispatch::IntegrationTest
             xhr: true
 
       assert_response :bad_request
-      assert_equal "`Poing!' in: test/files/parameterized_requests/apple.rb:23",
+      assert_equal "`Poing!' in: test/files/parameterized_requests/apple.rb:30",
                    @response.body
 
     end

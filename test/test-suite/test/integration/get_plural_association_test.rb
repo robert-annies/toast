@@ -233,7 +233,7 @@ class GetPluralAssociationTest < ActionDispatch::IntegrationTest
           xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:74",
+      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:81",
                    @response.body
 
     end

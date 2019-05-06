@@ -102,7 +102,7 @@ class DeleteCanonicalTest < ActionDispatch::IntegrationTest
              xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:39",
+      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:46",
                    @response.body
 
       # handler raises exception
@@ -111,7 +111,7 @@ class DeleteCanonicalTest < ActionDispatch::IntegrationTest
              xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in handler: `Boom!' in test/files/parameterized_requests/apple.rb:45",
+      assert_equal "exception raised in handler: `Boom!' in test/files/parameterized_requests/apple.rb:52",
                    @response.body
 
     end

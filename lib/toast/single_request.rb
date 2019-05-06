@@ -49,7 +49,8 @@ class Toast::SingleRequest
                         msg: "exception raised in allow block: `#{error.orig_error.message}' in #{error.source_location}"
 
       rescue BadRequest => error
-        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}"
+        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}",
+                  headers: {'X-Toast-Error' => error.code}
 
       rescue HandlerError => error
         return response :internal_server_error,

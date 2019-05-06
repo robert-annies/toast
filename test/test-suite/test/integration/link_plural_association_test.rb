@@ -152,7 +152,7 @@ class LinkPluralAssociationTest < ActionDispatch::IntegrationTest
            xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:103",
+      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:110",
                    @response.body
 
       # exception in handler
@@ -162,7 +162,7 @@ class LinkPluralAssociationTest < ActionDispatch::IntegrationTest
            xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in via_link handler: `Boom!' in test/files/parameterized_requests/apple.rb:109",
+      assert_equal "exception raised in via_link handler: `Boom!' in test/files/parameterized_requests/apple.rb:116",
                    @response.body
 
     end

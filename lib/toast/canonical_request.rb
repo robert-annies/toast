@@ -51,7 +51,8 @@ class Toast::CanonicalRequest
         response :not_found, msg: "#{@base_config.model_class}##{@id} not found"
 
       rescue BadRequest => error
-        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}"
+        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}",
+                  headers: {'X-Toast-Error' => error.code}
 
       rescue AllowError => error
         response :internal_server_error,
@@ -117,7 +118,8 @@ class Toast::CanonicalRequest
         response :not_found, msg: error.message
 
       rescue BadRequest => error
-        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}"
+        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}",
+                  headers: {'X-Toast-Error' => error.code}
 
       rescue AllowError => error
         response :internal_server_error,
@@ -165,7 +167,8 @@ class Toast::CanonicalRequest
                         msg: "exception raised in allow block: `#{error.orig_error.message}' in #{error.source_location}"
 
       rescue BadRequest => error
-        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}"
+        response :bad_request, msg: "`#{error.message}' in: #{error.source_location}",
+                  headers: {'X-Toast-Error' => error.code}
 
       rescue HandlerError => error
         return response :internal_server_error,

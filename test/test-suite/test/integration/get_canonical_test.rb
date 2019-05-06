@@ -44,7 +44,7 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
       assert_response :ok
       assert_equal( {
                       "name"    =>'Neque',
-                      "kind"    => 'tree fruit',                     
+                      "kind"    => 'tree fruit',
                       "first"  => "http://www.example.com/apples/first"
                     },
                     JSON.parse(@response.body) )
@@ -178,8 +178,12 @@ class GetCanonicalTest < ActionDispatch::IntegrationTest
       assert_equal "no API configuration found for endpoint /objects/3",
                    @response.body
 
+      get "/apples/#{apples.third.id}?coded_error=10",
+          headers: mkhd(token: 'TOK_admin'),
+          xhr: true
 
-
+      assert_response :bad_request
+      assert_equal "APOCALYPSE_NOW", @response.headers["X-Toast-Error"]
     end
 
   end

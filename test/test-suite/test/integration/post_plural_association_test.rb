@@ -141,7 +141,7 @@ class PostPluralAssociationTest < ActionDispatch::IntegrationTest
            xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in via_post handler: `Boom!' in test/files/parameterized_requests/apple.rb:94",
+      assert_equal "exception raised in via_post handler: `Boom!' in test/files/parameterized_requests/apple.rb:101",
                    @response.body
 
       # exception from allow block
@@ -151,7 +151,7 @@ class PostPluralAssociationTest < ActionDispatch::IntegrationTest
            xhr: true
 
       assert_response :internal_server_error
-      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:87",
+      assert_equal "exception raised in allow block: `Boom!' in test/files/parameterized_requests/apple.rb:94",
                    @response.body
     end
   end
