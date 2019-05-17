@@ -67,8 +67,7 @@ class Toast::PluralAssocRequest
         # this fails if the where clause depends on the the extended select
         # also remove any ORDER clauses
 
-        # How can we do this with the ActiveRecord API in a cleaner way?
-        count = relation.count_by_sql relation.to_sql.sub(/SELECT.+FROM/,'SELECT COUNT(*) FROM').sub(/ORDER BY.*/,'')
+        count = relation.unscope(:select).select(:id).count
         headers = {"Content-Type" => @config.media_type}
 
         if count > 0

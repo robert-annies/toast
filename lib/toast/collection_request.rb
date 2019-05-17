@@ -53,10 +53,7 @@ class Toast::CollectionRequest
 
           result = relation.limit(window).offset(range_start)
 
-          # count = relation.count doesn't always work
-          # fix problematic select extensions for counting (-> { select(...) })
-          # this fails if the where clause depends on the the extended select
-          count = relation.count_by_sql relation.to_sql.sub(/SELECT.+FROM/,'SELECT COUNT(*) FROM')
+          count = relation.unscope(:select).select(:id).count
           headers = {"Content-Type" => @config.media_type}
 
           if count > 0
