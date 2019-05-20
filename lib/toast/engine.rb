@@ -19,16 +19,19 @@ module Toast
 
       # skip init if in test mode: Toast.init should be called in each test
       unless Rails.env == 'test'
-        begin
-          Toast.info 'Loading Toast'
-          Toast.init
-          Toast.info "Exposed model classes: #{Toast.expositions.map{|e| e.model_class.name}.join(' ')}"
+        # defer initilization after auto-loader has registered all models
+        app.config.after_initialize do
+          begin
+            Toast.info 'Loading Toast'
+            Toast.init
+            Toast.info "Exposed model classes: #{Toast.expositions.map{|e| e.model_class.name}.join(' ')}"
 
-        rescue Toast::ConfigError => error
-          error.message.split("\n").each do |line|
-            Toast.info line
+          rescue Toast::ConfigError => error
+            error.message.split("\n").each do |line|
+              Toast.info line
+            end
+            Toast.disable
           end
-          Toast.disable
         end
       end
     end
