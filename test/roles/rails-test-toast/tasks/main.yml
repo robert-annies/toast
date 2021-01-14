@@ -14,10 +14,10 @@
       src: "Gemfile-{{ version }}"
       dest: "{{ app_dir }}/Gemfile"
 
-  - name: (rails v{{version}}) Gemfile.lock present
-    copy:
-      src: "Gemfile.lock-{{ version }}"
-      dest: "{{ app_dir }}/Gemfile.lock"
+  # - name: (rails v{{version}}) Gemfile.lock present
+  #   copy:
+  #     src: "Gemfile.lock-{{ version }}"
+  #     dest: "{{ app_dir }}/Gemfile.lock"
 
   - name: (rails v{{version}}) bundled
     command: bundle install --path vendor/bundle
