@@ -207,7 +207,7 @@ class Toast::PluralAssocRequest
         call_handler(@config.via_link.handler, source, target, @uri_params)
 
         response :ok,
-                 msg: "linked #{target_model_class.name}##{@id} with #{source.class}##{source.id}.#{@config.assoc_name}",
+                 msg: "linked #{target_model_class.name}##{target_id} with #{source.class}##{source.id}.#{@config.assoc_name}",
                  body: Toast.settings.link_unlink_via_post ? '' : nil
 
       rescue ActiveRecord::RecordNotFound => error
@@ -247,7 +247,7 @@ class Toast::PluralAssocRequest
           return response :bad_request, msg: "Link header missing or invalid"
         end
 
-        name, id = split_link_header(link)
+        name, target_id = split_link_header(link)
         target_model_class = name.singularize.classify.constantize
 
         unless is_active_record? target_model_class
@@ -255,10 +255,10 @@ class Toast::PluralAssocRequest
         end
 
         call_allow(@config.via_unlink.permissions, @auth, source, @uri_params)
-        call_handler(@config.via_unlink.handler, source, target_model_class.find(id), @uri_params)
+        call_handler(@config.via_unlink.handler, source, target_model_class.find(target_id), @uri_params)
 
         response :ok,
-                 msg: "unlinked #{target_model_class.name}##{id} from #{source.class}##{source.id}.#{@config.assoc_name}",
+                 msg: "unlinked #{target_model_class.name}##{target_id} from #{source.class}##{source.id}.#{@config.assoc_name}",
                  body: Toast.settings.link_unlink_via_post ? '' : nil
 
       rescue ActiveRecord::RecordNotFound => error
