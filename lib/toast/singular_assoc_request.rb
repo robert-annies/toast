@@ -107,7 +107,7 @@ class Toast::SingularAssocRequest
             return response :not_found, msg: "target class `#{target_model_class.name}' is not an `ActiveRecord'"
           end
 
-          if  target_model_class != @config.target_model_class
+          if  target_model_class.name != @config.target_model_class.name
             return response :bad_request,
                             msg: "target class `#{target_model_class.name}' invalid, expect: `#{@config.target_model_class}'"
           end
@@ -164,7 +164,7 @@ class Toast::SingularAssocRequest
           return response :not_found, msg: "target class `#{target_model_class.name}' is not an `ActiveRecord'"
         end
 
-        if target_model_class != @config.target_model_class
+        if target_model_class.name != @config.target_model_class.name
           return response :bad_request,
                           msg: "target class `#{target_model_class.name}' invalid, expect: `#{@config.target_model_class}'"
         end

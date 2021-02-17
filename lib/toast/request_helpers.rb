@@ -4,7 +4,7 @@ module Toast::RequestHelpers
 
   def get_config model_class
     Toast.expositions.detect do |exp|
-      exp.model_class == model_class
+      exp.model_class.name == model_class.name
     end || raise(Toast::Errors::ConfigNotFound)
   end
 

@@ -64,7 +64,7 @@ class Toast::ConfigDSL::Base
         self.associations = {}
       end
 
-      if Toast.expositions.detect{|exp| exp.model_class == config_data.model_class}
+      if Toast.expositions.detect{|exp| exp.model_class.name == config_data.model_class.name}
         raise_config_error "Model class #{exp.model_class} has already another configuration."
       end
 

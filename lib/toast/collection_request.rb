@@ -49,7 +49,7 @@ class Toast::CollectionRequest
                     @auth, relation, @uri_params)
 
         if relation.is_a?(ActiveRecord::Relation) and
-          relation.model== @config.base_model_class
+          relation.model.name == @config.base_model_class.name
 
           result = relation.limit(window).offset(range_start)
 
