@@ -30,7 +30,7 @@ module Toast
 
     settings = ''
     # read global settings
-    if File.exists? settings_path
+    if File.exist? settings_path
       open settings_path do |f|
         settings = f.read
       end
