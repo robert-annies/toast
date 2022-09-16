@@ -93,8 +93,7 @@ class Toast::SingularAssocRequest
 
           call_allow(@config.via_link.permissions, @auth, source, @uri_params)
 
-
-          link = LinkHeader.parse(@request.headers['Link']).find_link(['ref','related'])
+          link = LinkHeader.parse(@request.headers['Link']).find_link(['rel','related'])
 
           if link.nil?
             return response :bad_request, msg: "Link header missing or invalid"
@@ -151,7 +150,7 @@ class Toast::SingularAssocRequest
         source = @base_config.model_class.find(@id)
         call_allow(@config.via_unlink.permissions, @auth, source, @uri_params)
 
-        link = LinkHeader.parse(@request.headers['Link']).find_link(['ref','related'])
+        link = LinkHeader.parse(@request.headers['Link']).find_link(['rel','related'])
 
         if link.nil?
           return response :bad_request, msg: "Link header missing or invalid"
