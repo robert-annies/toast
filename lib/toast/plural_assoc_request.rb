@@ -51,15 +51,15 @@ class Toast::PluralAssocRequest
                       end
 
         source = @base_config.model_class.find(@id) # may raise ActiveRecord::RecordNotFound
+
+        call_allow(@config.via_get.permissions, @auth, source, @uri_params) # may raise NotAllowed, AllowError
         relation = call_handler(@config.via_get.handler, source, @uri_params) # may raise HandlerError
 
         unless relation.is_a? ActiveRecord::Relation and relation.model.name == @config.target_model_class.name
           return response :internal_server_error,
                           msg: "plural association handler returned `#{relation.class}', expected `ActiveRecord::Relation' (#{@config.target_model_class})"
         end
-
-        call_allow(@config.via_get.permissions, @auth, source, @uri_params) # may raise NotAllowed, AllowError
-
+        
         result = relation.limit(window).offset(range_start)
 
         # count = relation.count doesn't always work
