@@ -68,6 +68,11 @@ class Toast::PluralAssocRequest
         # also remove any ORDER clauses
 
         count = relation.unscope(:select).select(:id).count
+        if(count.is_a? Hash) 
+          # can happen with 'GROUP BY' 
+          count = count.length 
+        end
+
         headers = {"Content-Type" => @config.media_type}
 
         if count > 0
