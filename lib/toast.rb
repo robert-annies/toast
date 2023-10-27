@@ -93,7 +93,7 @@ module Toast
   end
 
   def self.base_uri
-    raise Toast::NotInRequestContext unless request
+    return '' unless request
 
     port  = ":#{request.port}" unless request.port.in?([80,443])
     # remove recource path part form full path (namespace remains)
