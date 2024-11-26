@@ -53,7 +53,8 @@ class Toast::CollectionRequest
 
           result = relation.limit(window).offset(range_start)
 
-          count = relation.unscope(:select).select(:id).count
+          count = relation.unscope(:select,:order).distinct(false).select(:id).count
+
           headers = {"Content-Type" => @config.media_type}
 
           if count > 0

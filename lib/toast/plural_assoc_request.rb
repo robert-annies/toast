@@ -67,7 +67,7 @@ class Toast::PluralAssocRequest
         # this fails if the where clause depends on the the extended select
         # also remove any ORDER clauses
 
-        count = relation.unscope(:select).select(:id).count
+        count = relation.unscope(:select,:order).distinct(false).select(:id).count
         if(count.is_a? Hash) 
           # can happen with 'GROUP BY' 
           count = count.length 
